@@ -809,7 +809,7 @@ async function runNowcast(){
     const r=nowcastFrom(frames.slice(0,3));r.ms=frames[0].ms;r.n=frames.length;NC.res=r;NC.frames=frames;renderNowcast();try{checkAlerts();}catch(e){}
     if(RAD.product==='tc')buildTCRadar();
     if(WX){SIM=simulate(WX);const c=store.get('tc_calib_'+t.id,null);if(c&&Date.now()-c.ts<4*3600e3)applyCalib(c);renderWeather();}
-  }catch(e){if(my!==NC.seq)return;NC.res=null;renderMatrix();sensLayer.clearLayers();$('nc-main').textContent='Nowcast radar non disponibile ora';$('nc-sub').textContent='La previsione della prima ora usa i modelli meteo.';st.textContent='Motivo: '+e.message;mtxMsg('⚠️ Matrice spenta. Motivo: '+e.message,true);$('nc-strip').innerHTML='';$('nc-lbl').innerHTML='';}
+  }catch(e){if(my!==NC.seq)return;NC.res=null;renderMatrix();sensLayer.clearLayers();$('nc-main').textContent='Nowcast radar non disponibile ora';$('nc-sub').textContent='La previsione della prima ora usa i modelli meteo.';st.textContent='Motivo: '+e.message;mtxMsg(!PONTE&&/github\.io$/.test(location.hostname)?'⚠️ Matrice spenta: su GitHub il radar della Protezione Civile ha bisogno del ponte Cloudflare (gratis). Finché non c\'è, la previsione usa i modelli meteo.':'⚠️ Matrice spenta. Motivo: '+e.message,true);$('nc-strip').innerHTML='';$('nc-lbl').innerHTML='';}
 }
 function renderNowcast(){
   const r=NC.res;if(!r)return;const age=Math.round((Date.now()-r.ms)/60e3),hh=new Date(r.ms).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
