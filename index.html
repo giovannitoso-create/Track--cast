@@ -186,6 +186,12 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 @media (prefers-reduced-motion:reduce){#boxscr .bx-tickin,#boxscr[data-lvl=red] .bx-hero{animation:none}}
 @media(max-width:1000px){#boxscr .g{grid-template-columns:repeat(2,1fr);grid-template-areas:"hero hero" "radar radar" "tl tl" "a b" "c d" "e e" "tk tk"}}
 @media(max-width:560px){#boxscr .g{grid-template-columns:1fr;grid-template-areas:"hero" "radar" "tl" "a" "b" "c" "d" "e" "tk"}#boxscr .bx-hero{flex-direction:column;text-align:center}#boxscr .bx-chips{justify-content:center}}
+#vgun{position:fixed;inset:0;background:rgba(3,6,12,.72);display:none;align-items:center;justify-content:center;z-index:5000;padding:14px}
+#vgun .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;max-width:480px;width:100%;padding:16px;max-height:94vh;overflow:auto}
+#vgun .vg-read{display:flex;align-items:center;gap:14px;margin:12px 0 6px}#vg-val{font-size:56px;font-weight:900;line-height:1;color:var(--asph);font-variant-numeric:tabular-nums}#vg-val small{font-size:.4em;color:var(--ink2);margin-left:4px}
+#vg-unc{color:var(--ink2);font-size:15px;margin-top:2px}#vg-dot{width:18px;height:18px;border-radius:50%;background:#ff3b3b;box-shadow:0 0 0 4px rgba(255,59,59,.25),0 0 18px #ff3b3b;flex:none}
+#vg-dot.on{animation:vgdot .9s ease-out}@keyframes vgdot{0%{transform:scale(.3);opacity:.2}60%{transform:scale(1.4)}100%{transform:scale(1);opacity:1}}
+.vg-track svg{width:100%;height:auto;display:block;border-radius:10px}
 #repdlg{position:fixed;inset:0;background:rgba(3,6,12,.72);display:none;align-items:center;justify-content:center;z-index:5000;padding:14px}
 #repdlg .box{background:var(--surface);border:1px solid var(--line);border-radius:12px;max-width:440px;width:100%;padding:16px;max-height:92vh;overflow:auto}
 #repdlg h3{margin:0 0 4px}#repdlg .opt{display:block;width:100%;text-align:left;margin:6px 0;padding:10px 12px;border-radius:9px;border:1px solid var(--line);background:#121a26;color:var(--ink);font-size:14px;cursor:pointer}
@@ -366,7 +372,7 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
       <div class="corr" id="corrbox"></div>
       <div class="condhead"><svg id="cicon" viewBox="0 0 48 48"></svg>
         <div><div class="big" id="ctemp">--°</div><div class="desc" id="cdesc"></div><div class="upd" id="cupd"></div></div>
-        <div style="margin-left:auto;text-align:right"><div class="sub" style="margin:0">ASFALTO ORA</div><div class="big" id="casph" style="color:var(--asph)">--°</div><div class="upd" id="caspd"></div></div>
+        <div style="margin-left:auto;text-align:right"><div class="sub" style="margin:0">ASFALTO ORA</div><div class="big" id="casph" style="color:var(--asph)">--°</div><div class="upd" id="caspd"></div><button class="chipb" id="vgunopen" style="margin-top:4px">🔫 Pistola virtuale</button></div>
       </div>
       <div class="kpis">
         <div class="kpi"><div class="l"><svg viewBox="0 0 16 16"><path d="M7 2a1.5 1.5 0 0 1 3 0v7.5a3 3 0 1 1-3 0z"/></svg>Aria</div><div class="v" id="k-ta"></div><div class="d" id="k-ta2"></div></div>
@@ -520,6 +526,15 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
   <div class="sub" style="margin:0">Radar avanzato con matrice sensori, nowcast con probabilità, nubi dal satellite e avvisi temporali in anticipo. In arrivo: avvisi “pioggia in pista” sul telefono.</div><div id="plans-body"></div></div></div>
 <div id="pdfstage" aria-hidden="true"></div>
 <div id="boxscr" data-lvl="green"><div class="bx-head"><span class="bx-dot"></span><b id="bx-title"></b><span id="bx-upd"></span><span id="bx-clock"></span><button class="chipb" id="bx-x" style="font-size:15px">Esci</button></div><div class="g" id="bx-grid"></div></div>
+<div id="vgun"><div class="box">
+  <div style="display:flex;align-items:center;gap:8px"><h3 style="margin:0">🔫 Pistola virtuale</h3><button class="chipb" id="vg-x" style="margin-left:auto">Chiudi</button></div>
+  <div class="vg-read"><span id="vg-dot"></span><div><div id="vg-val">--</div><div id="vg-unc"></div></div></div>
+  <div class="sub" id="vg-where" style="margin:0;font-weight:600;color:var(--ink)"></div><div class="sub" id="vg-src" style="margin:2px 0 8px"></div>
+  <div id="vg-track" class="vg-track"></div>
+  <div class="sub" style="margin:4px 0 8px">👆 Tocca un tratto della pista per leggere la temperatura in quel punto.</div>
+  <div class="row"><button class="btn" id="vg-here">📍 Dove sono io</button></div>
+  <div class="sep"></div><div class="sub" style="margin:0 0 6px">È un valore <b>calcolato</b>, non misurato: il telefono non ha un sensore di calore. Con una misura vera (pistola o stazione) diventa molto più preciso:</div>
+  <div class="row"><input id="vg-real" type="number" step="0.5" placeholder="°C misurati" style="width:120px"><button class="btn primary" id="vg-ok">Tara con la mia misura</button></div></div></div>
 <div id="repdlg"><div class="box">
   <h3>Segnala un errore</h3><div class="sub" style="margin:0 0 8px">Dimmi cosa vedi in pista: ricalcolo subito meteo, radar e asfalto con il tuo dato.</div>
   <div id="repstep1">
@@ -794,7 +809,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='20/11/2026 12:30';
+const TC_VER='20/11/2026 13:30';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)return;const ctx=cv.getContext('2d'),W=cv.width,C=W/2;ctx.clearRect(0,0,W,W);
@@ -1234,6 +1249,31 @@ function renderSetupTab(){const P=$('pt-setup');if(!SIM){P.innerHTML='<div class
 const BOX={timer:null,wake:null};
 function renderBoxTab(){$('pt-box').innerHTML=`<div class="sub">Una vista a tutto schermo per il tablet o la TV della tenda: radar, pioggia, nubi, asfalto, gomma e pressioni, aggiornati da soli. Lo schermo resta acceso.</div>
   <div class="pt-row"><button class="btn primary" id="bx-open">📺 Apri lo schermo box</button></div>`;$('bx-open').onclick=openBox;}
+// ===== Pistola virtuale: temperatura dell'asfalto punto per punto, calcolata (non misurata) =====
+// Stesso bilancio energetico della previsione + colore dell'asfalto di ogni tratto dalla foto satellitare.
+// La precisione dipende da cosa c'è dietro: stazione del team, una tua misura recente, misure passate o solo fisica.
+function vgunAt(la,lo){if(!SIM||!CUR)return null;const n=SIM.S[SIM.ni],st=stationFresh();
+  let T=n.asph,src,unc;
+  if(st&&st.asph!=null){T=st.asph;src='dalla stazione del team (sensore)';unc=0.5;}
+  else if(SIM.calib&&Date.now()-SIM.calib.ts<3*36e5){src='calcolata e tarata con la tua misura delle '+new Date(SIM.calib.ts).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});unc=1.5;}
+  else if(asphBias(CUR.id)){src='calcolata e corretta con le misure fatte qui';unc=2.5;}
+  else{src='calcolata dal bilancio di sole, nubi, vento e colore dell\'asfalto';unc=(n.sw||0)>300?4:2.5;}
+  let local=0,alb=null;const AP=CUR.albPts;
+  if(la!=null&&AP&&AP.length&&CUR.alb!=null){let b=null,bd=1e18;for(const a of AP){const dd=(a.lat-la)**2+((a.lon-lo)*Math.cos(la*Math.PI/180))**2;if(dd<bd){bd=dd;b=a;}}
+    if(b){alb=b.alb;const v=n.ws/3.6,h=(5.7+3.8*v)+4*EPS*SIGMA*(n.asph+273.15)**3+12;local=((1-b.alb)-(1-CUR.alb))*(n.sw||0)/h;}}
+  return{T:T+local,unc,src,local,alb,sun:(n.sw||0)>150};}
+function openVgun(){if(!CUR||!SIM){status('Scegli prima una pista.',true);return;}const D=$('vgun');D.style.display='flex';
+  const svg=trackSVG(CUR,CUR.albPts?'heat':'sat');$('vg-track').innerHTML=svg;
+  const show=(r,where)=>{if(!r)return;$('vg-val').innerHTML=`${fmt(r.T,1)}<small>°C</small>`;$('vg-unc').textContent=`± ${fmt(r.unc,1)} °C`;
+    $('vg-where').textContent=where;$('vg-src').textContent=`Temperatura ${r.src}${r.local&&Math.abs(r.local)>=0.3?` · questo tratto ${r.local>0?'+':'−'}${fmt(Math.abs(r.local),1)} °C rispetto alla media (asfalto ${r.local>0?'più scuro':'più chiaro'})`:''}.`;
+    const dot=$('vg-dot');dot.classList.remove('on');void dot.offsetWidth;dot.classList.add('on');};
+  // tocca un tratto della pista
+  $('vg-track').querySelectorAll('[data-la]').forEach(l=>{l.style.cursor='crosshair';l.addEventListener('click',()=>{$('vg-track').querySelectorAll('[data-la]').forEach(x=>x.setAttribute('stroke-width','7'));l.setAttribute('stroke-width','12');show(vgunAt(+l.dataset.la,+l.dataset.lo),'Tratto toccato sulla pista');});});
+  const here=()=>{if(POS&&hav(POS.lat,POS.lon,CUR.lat,CUR.lon)<1.5)show(vgunAt(POS.lat,POS.lon),'Dove sei tu adesso (GPS)');else show(vgunAt(null,null),'Media della pista');};
+  $('vg-here').onclick=()=>{if(!POS){status('Accendi la posizione per misurare dove sei.',true);}here();};
+  $('vg-ok').onclick=()=>{const v=parseFloat(String($('vg-real').value).replace(',','.'));if(isNaN(v))return;$('calib').value=v;$('calibok').click();$('vg-real').value='';setTimeout(here,300);};
+  const hint=$('vg-track').nextElementSibling;hint.textContent=$('vg-track').querySelector('[data-la]')?'👆 Tocca un tratto della pista per leggere la temperatura in quel punto.':'Il colore dell\'asfalto dalla foto satellitare non è ancora pronto: per ora vale la media della pista.';
+  here();}
 async function openBox(){if(!CUR){status('Scegli prima una pista.',true);return;}$('boxscr').style.display='block';drawBox();clearInterval(BOX.timer);BOX.timer=setInterval(drawBox,15000);const tick=()=>{$('bx-clock').textContent=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'});};tick();clearInterval(BOX.clk);BOX.clk=setInterval(tick,1000);
   try{await $('boxscr').requestFullscreen?.();}catch(e){}try{BOX.wake=await navigator.wakeLock?.request('screen');}catch(e){}}
 function closeBox(){$('boxscr').style.display='none';clearInterval(BOX.timer);clearInterval(BOX.clk);try{document.fullscreenElement&&document.exitFullscreen();}catch(e){}try{BOX.wake&&BOX.wake.release();}catch(e){}}
@@ -2006,7 +2046,7 @@ function repStep2(k){const b=$('repstep2');$('repstep1').style.display='none';b.
       else{const n=SIM&&SIM.S[SIM.ni];done({ta:v,taWas:WX?WX.current.temperature_2m:(n?n.ta:v)});}};}
   else if(k==='pos'){$('repdlg').style.display='none';const f=$('fixpos');if(f)f.click();}}
 $('repopen').onclick=()=>{if(!CUR)return;$('repstep1').style.display='block';$('repstep2').style.display='none';$('repback').style.display='none';$('repdlg').style.display='flex';};
-$('repclose').onclick=()=>$('repdlg').style.display='none';$('repback').onclick=()=>{$('repstep1').style.display='block';$('repstep2').style.display='none';$('repback').style.display='none';};
+$('repclose').onclick=()=>$('repdlg').style.display='none';$('vgunopen').onclick=()=>openVgun();$('vg-x').onclick=()=>$('vgun').style.display='none';$('vgun').onclick=e=>{if(e.target.id==='vgun')$('vgun').style.display='none';};$('repback').onclick=()=>{$('repstep1').style.display='block';$('repstep2').style.display='none';$('repback').style.display='none';};
 $('repdlg').onclick=e=>{if(e.target.id==='repdlg')$('repdlg').style.display='none';};
 document.querySelectorAll('#repstep1 .opt').forEach(x=>x.onclick=()=>repStep2(x.dataset.k));
 // ---- Tyres ----
@@ -2329,7 +2369,7 @@ function sunAzEl(lat,lon,ms){const r=Math.PI/180,d=ms/864e5-10957.5,g=(357.529+0
   const ra=Math.atan2(Math.cos(e)*Math.sin(Ls),Math.cos(Ls)),dec=Math.asin(Math.sin(e)*Math.sin(Ls)),gmst=((18.697374558+24.06570982441908*d)%24+24)%24,H=(gmst*15+lon)*r-ra,φ=lat*r;
   const el=Math.asin(Math.sin(φ)*Math.sin(dec)+Math.cos(φ)*Math.cos(dec)*Math.cos(H)),az=Math.atan2(-Math.sin(H),Math.tan(dec)*Math.cos(φ)-Math.sin(φ)*Math.cos(H));return{az:(az/r+360)%360,el:el/r};}
 function shMode(t){const m=store.get('tc_shmode','heat');return m==='heat'&&!(t&&t.albPts&&SIM)?'sat':m;}
-function trackSVG(t){const W=440,H=280,P=30,MODE=shMode(t),SAT=MODE!=='draw',HEAT=MODE==='heat';
+function trackSVG(t,forceMode){const W=440,H=280,P=30,MODE=forceMode||shMode(t),SAT=MODE!=='draw',HEAT=MODE==='heat';
   if(!t)return `<svg viewBox="0 0 ${W} ${H}"><text x="${W/2}" y="${H/2}" text-anchor="middle" style="fill:#7f91aa;font-weight:500">Scegli una pista</text></svg>`;
   const shape=t.shape&&t.shape.length?t.shape:null;
   // Web Mercator at zoom 0 (same projection as the map tiles)
@@ -2352,11 +2392,11 @@ function trackSVG(t){const W=440,H=280,P=30,MODE=shMode(t),SAT=MODE!=='draw',HEA
     if(HEAT){ // thermal map: same energy balance as the forecast, with the asphalt colour of each stretch from the photo
       const n=SIM.S[SIM.ni],Tm=n.asph,v=n.ws/3.6,h=(5.7+3.8*v)+4*EPS*SIGMA*(Tm+273.15)**3+12,AP=t.albPts;
       const albAt=(la,lo)=>{let b=null,bd=1e18;for(const a of AP){const dd=(a.lat-la)**2+((a.lon-lo)*Math.cos(la*Math.PI/180))**2;if(dd<bd){bd=dd;b=a;}}return b?b.alb:t.alb;};
-      const segs=[];t.shape.forEach((l,li)=>{for(let i=1;i<l.length;i++){const la=(l[i-1][0]+l[i][0])/2,lo=(l[i-1][1]+l[i][1])/2,T=Tm+((1-albAt(la,lo))-(1-t.alb))*n.sw/h;segs.push({a:X(pts[li][i-1]),b:X(pts[li][i]),T});}});
+      const segs=[];t.shape.forEach((l,li)=>{for(let i=1;i<l.length;i++){const la=(l[i-1][0]+l[i][0])/2,lo=(l[i-1][1]+l[i][1])/2,T=Tm+((1-albAt(la,lo))-(1-t.alb))*n.sw/h;segs.push({a:X(pts[li][i-1]),b:X(pts[li][i]),T,la,lo});}});
       const lo=Math.min(...segs.map(q=>q.T)),hi=Math.max(...segs.map(q=>q.T)),span=Math.max(1,hi-lo),mid=(lo+hi)/2,L0=mid-span/2,L1=mid+span/2;
       const ramp=T=>{const u=Math.max(0,Math.min(1,(T-L0)/(L1-L0))),A=[253,227,192],B=[180,56,12];return`rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*u)).join(',')})`;};
       g+=`<path d="${d}" fill="none" stroke="#0b1220" stroke-opacity=".7" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>`;
-      segs.forEach(q=>{g+=`<line x1="${q.a[0].toFixed(1)}" y1="${q.a[1].toFixed(1)}" x2="${q.b[0].toFixed(1)}" y2="${q.b[1].toFixed(1)}" stroke="${ramp(q.T)}" stroke-width="7" stroke-linecap="round"><title>asfalto ${fmt(q.T,1)} °C</title></line>`;});
+      segs.forEach(q=>{g+=`<line x1="${q.a[0].toFixed(1)}" y1="${q.a[1].toFixed(1)}" x2="${q.b[0].toFixed(1)}" y2="${q.b[1].toFixed(1)}" stroke="${ramp(q.T)}" stroke-width="7" stroke-linecap="round" data-la="${q.la}" data-lo="${q.lo}"><title>asfalto ${fmt(q.T,1)} °C</title></line>`;});
       g+=`<defs><linearGradient id="hramp"><stop offset="0" stop-color="rgb(253,227,192)"/><stop offset="1" stop-color="rgb(180,56,12)"/></linearGradient></defs>
         <g transform="translate(${W/2-70},${H-30})"><rect x="-8" y="-14" rx="5" width="156" height="36" fill="#0b1220" fill-opacity=".82"/><text x="0" y="-2" style="font-size:9.5px;fill:#c9d4e3">Asfalto ora, tratto per tratto</text>
         <rect x="0" y="4" width="140" height="7" rx="3" fill="url(#hramp)"/><text x="0" y="20" style="font-size:9.5px;fill:#e8eef7">${fmt(L0,1)}°</text><text x="140" y="20" text-anchor="end" style="font-size:9.5px;fill:#e8eef7">${fmt(L1,1)}°</text></g>`;}
