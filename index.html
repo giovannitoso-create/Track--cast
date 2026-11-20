@@ -770,7 +770,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='19/11/2026 16:30';
+const TC_VER='20/11/2026 09:00';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)return;const ctx=cv.getContext('2d'),W=cv.width,C=W/2;ctx.clearRect(0,0,W,W);
@@ -870,7 +870,8 @@ const TC_CFG=Object.assign({
   supabaseUrl:'',supabaseKey:'',
   stripe:{singolo_mese:'',singolo_anno:'',team_mese:'',team_anno:''}, // link di pagamento Stripe (https://buy.stripe.com/…)
   portal:'',                                                         // link al portale clienti Stripe (gestisci/disdici)
-  prezzi:{singolo_mese:'6,99 €',singolo_anno:'59 €',team_mese:'19,99 €',team_anno:'179 €'}
+  prezzi:{singolo_mese:'6,99 €',singolo_anno:'59 €',team_mese:'19,99 €',team_anno:'179 €'},
+  oauth:['google','github']                                          // accesso senza password: attivali in Supabase › Authentication › Providers
 },window.__TC_CFG||{});
 const ACCT={sb:null,session:null,plan:null,ready:false};
 const acctOn=()=>!!(TC_CFG.supabaseUrl&&TC_CFG.supabaseKey);
@@ -891,10 +892,16 @@ const planLabel=s=>`${s.plan==='team'?'Pro team'+(s.team?' “'+esc(s.team)+'”
 function renderAcct(){const B=$('acct-body');
   if(!acctOn()){B.innerHTML='<div class="sub">Gli account non sono ancora attivi: per ora tutto TrackCast è gratis.</div>';return;}
   if(!ACCT.session){B.innerHTML=`<div class="sub" style="margin:0">Crea un account gratuito: diario, assetti, sessioni GPS e impostazioni restano salvati nel tuo account e li ritrovi su ogni dispositivo. Il piano Pro si attiva dopo e resta legato all\'account.</div>
+    ${(TC_CFG.oauth||[]).length?`<div class="row">${TC_CFG.oauth.map(pv=>`<button class="btn" data-oauth="${pv}">${pv==='google'?'Entra con Google':pv==='github'?'Entra con GitHub':pv==='apple'?'Entra con Apple':'Entra con '+esc(pv)}</button>`).join('')}</div><div class="sub" style="margin:2px 0 0;text-align:center">oppure con la tua email</div>`:''}
     <label>Email<input id="ac-mail" type="email" autocomplete="email" placeholder="nome@esempio.it"></label>
+    <div class="row" style="margin-top:0"><button class="btn" id="ac-link">Mandami un link per entrare (senza password)</button></div>
     <label>Password<input id="ac-pw" type="password" autocomplete="current-password" placeholder="almeno 8 caratteri"></label>
     <div class="row"><button class="btn primary" id="ac-in">Accedi</button><button class="btn" id="ac-up">Crea account</button><a href="#" id="ac-forgot" style="font-size:12px;color:#9fc6ff;margin-left:auto">Password dimenticata?</a></div><div class="sub" id="ac-msg" style="margin-top:8px"></div>`;
-    const msg=(t,e)=>{$('ac-msg').innerHTML=e?`<span class="err">${t}</span>`:t;};const cred=()=>({email:$('ac-mail').value.trim(),password:$('ac-pw').value});
+    const msg=(t,e)=>{$('ac-msg').innerHTML=e?`<span class="err">${t}</span>`:t;};
+    B.querySelectorAll('[data-oauth]').forEach(b=>b.onclick=async()=>{const{error}=await ACCT.sb.auth.signInWithOAuth({provider:b.dataset.oauth,options:{redirectTo:location.origin+location.pathname}});if(error)msg(error.message,true);});
+    $('ac-link').onclick=async()=>{const em=$('ac-mail').value.trim();if(!/^\S+@\S+\.\S+$/.test(em))return msg('Scrivi la tua email.',true);
+      const{error}=await ACCT.sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+location.pathname}});if(error)return msg(error.message,true);msg('Ti ho mandato una email: apri il link e sei dentro, anche senza password.');};
+    const cred=()=>({email:$('ac-mail').value.trim(),password:$('ac-pw').value});
     $('ac-in').onclick=async()=>{const{error}=await ACCT.sb.auth.signInWithPassword(cred());if(error)msg(error.message==='Invalid login credentials'?'Email o password sbagliate.':error.message,true);};
     $('ac-up').onclick=async()=>{const c=cred();if(c.password.length<8)return msg('La password deve avere almeno 8 caratteri.',true);const{data,error}=await ACCT.sb.auth.signUp({...c,options:{emailRedirectTo:location.origin+location.pathname}});
       if(error)return msg(error.message,true);msg(data.session?'Account creato.':'Account creato: ti ho mandato una email, apri il link per confermare e poi accedi.');};
