@@ -5,7 +5,7 @@ window.__TC_CFG={supabaseUrl:'demo',supabaseKey:'demo',stripe:{singolo_mese:'dem
  const OUT='tc_demo_out';let ctx=null;
  const waitClaude=()=>new Promise(r=>{const t0=Date.now();(function p(){if(window.claude&&window.claude.use)return r(true);if(Date.now()-t0>5000)return r(false);setTimeout(p,100);})();});
  const ready=(async()=>{try{if(!await waitClaude())return null;const[db,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!user)return null;
-   const me=await user.me();if(!me||!me.id)return null;ctx={db,uid:me.id,email:me.email||'',name:me.name||''};return ctx;}catch(e){console.warn('demo account',e);return null;}})();
+   const me=await user.me();if(!me||!me.id)return null;ctx={db,uid:me.id,email:me.email||'',name:me.name||'',owner:!!me.isOwner};return ctx;}catch(e){console.warn('demo account',e);return null;}})();
  window.__demoAcct=ready;
  const col=()=>ctx.db.collection('data/users/'+ctx.uid);
  const enc=k=>k.replace(/[^A-Za-z0-9_.~:@+-]/g,c=>'~'+c.charCodeAt(0).toString(16));
@@ -35,7 +35,7 @@ window.__TC_CFG={supabaseUrl:'demo',supabaseKey:'demo',stripe:{singolo_mese:'dem
    updateUser:async()=>err('Nel prototipo non ci sono password.')},
   from:table,
   rpc:async(fn,a)=>{await ready;if(!ctx)return err('Account non disponibile');
-   if(fn==='my_plan'){const p=await planDoc(),s=p.sub;return{data:{pro:!!(s&&s.status==='active'),subs:s?[s]:[],teams:p.teams},error:null};}
+   if(fn==='my_plan'){const p=await planDoc(),s=p.sub;return{data:{pro:ctx.owner||!!(s&&s.status==='active'),admin:ctx.owner,subs:s?[s]:[],teams:p.teams},error:null};}
    if(fn==='create_team'){const p=await planDoc();if(p.teams.some(t=>t.role==='proprietario'))return err('Nel prototipo puoi avere un solo team.');
      p.teams.push({id:'demo'+Date.now().toString(36),name:String(a&&a.team_name||'Team').slice(0,40),role:'proprietario',invite_code:Math.random().toString(16).slice(2,10).toUpperCase(),members:1});await savePlan(p);return{data:null,error:null};}
    if(fn==='join_team')return err('Nel prototipo i team non si possono condividere: prova a crearne uno tuo.');

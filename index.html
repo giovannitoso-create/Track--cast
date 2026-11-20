@@ -770,7 +770,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='20/11/2026 10:00';
+const TC_VER='20/11/2026 10:30';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)return;const ctx=cv.getContext('2d'),W=cv.width,C=W/2;ctx.clearRect(0,0,W,W);
@@ -887,7 +887,7 @@ async function refreshPlan(){const was=proOK();ACCT.plan=null;if(ACCT.sb&&ACCT.s
   renderAcctBtn();applyProGate();try{renderCloudStatus();cloudSoon();}catch(e){}try{if(ACCT.session)udSoon(300);}catch(e){}if(!was&&proOK()&&CUR){runNowcast();runCloudcast();}}
 function applyProGate(){$('nowc').classList.toggle('locked',ACCT.ready&&!proOK());if(typeof ptGate==='function')ptGate();}
 function renderAcctBtn(){const b=$('acctbtn');if(!acctOn()){b.style.display='none';return;}b.style.display='';
-  b.innerHTML=ACCT.session?(proOK()?'<span class="badge pro">PRO</span> Account':'👤 Account'):'👤 Accedi';}
+  b.innerHTML=ACCT.session?(ACCT.plan&&ACCT.plan.admin?'👑 Creatore':proOK()?'<span class="badge pro">PRO</span> Account':'👤 Account'):'👤 Accedi';}
 const planLabel=s=>`${s.plan==='team'?'Pro team'+(s.team?' “'+esc(s.team)+'”':''):'Pro singolo'} · ${s.billing==='anno'?'annuale':'mensile'}${s.until?' · fino al '+new Date(s.until).toLocaleDateString('it-IT'):''}`;
 function renderAcct(){const B=$('acct-body');
   if(!acctOn()){B.innerHTML='<div class="sub">Gli account non sono ancora attivi: per ora tutto TrackCast è gratis.</div>';return;}
@@ -908,8 +908,8 @@ function renderAcct(){const B=$('acct-body');
     $('ac-forgot').onclick=async ev=>{ev.preventDefault();const em=$('ac-mail').value.trim();if(!em)return msg('Scrivi prima la tua email.',true);await ACCT.sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});msg('Se l\'email è registrata, arriva un link per cambiare la password.');};
     return;}
   const P=ACCT.plan||{pro:false,subs:[],teams:[]},active=(P.subs||[]).filter(s=>['active','trialing'].includes(s.status));
-  B.innerHTML=`<div class="row" style="margin-top:4px"><b>${esc(ACCT.session.user.email)}</b><span class="badge ${P.pro?'pro':'free'}">${P.pro?'PRO':'GRATIS'}</span></div>
-    ${active.length?active.map(s=>`<div class="sub" style="margin:6px 0 0">✅ ${planLabel(s)}</div>`).join(''):'<div class="sub" style="margin:6px 0 0">Piano gratuito: il radar avanzato è riservato al Pro.</div>'}
+  B.innerHTML=`<div class="row" style="margin-top:4px"><b>${esc(ACCT.session.user.email)}</b><span class="badge ${P.pro?'pro':'free'}">${P.admin?'👑 CREATORE':P.pro?'PRO':'GRATIS'}</span></div>
+    ${P.admin?'<div class="sub" style="margin:6px 0 0">👑 <b>Account del creatore</b>: tutto TrackCast incluso, per sempre, senza abbonamento. Anche il tuo team ha tutto il Pro.</div>':active.length?active.map(s=>`<div class="sub" style="margin:6px 0 0">✅ ${planLabel(s)}</div>`).join(''):'<div class="sub" style="margin:6px 0 0">Piano gratuito: il radar avanzato è riservato al Pro.</div>'}
     <div class="row">${P.pro?'':'<button class="btn primary" id="ac-gopro">⭐ Passa a Pro</button>'}${TC_CFG.portal&&active.length?`<a class="btn" href="${TC_CFG.portal}?prefilled_email=${encodeURIComponent(ACCT.session.user.email)}" target="_blank" rel="noopener">Gestisci abbonamento</a>`:''}<button class="btn" id="ac-out">Esci</button></div>
     ${ACCT.recover?`<div class="sep"></div><h3 style="font-size:15px">🔑 Nuova password</h3><div class="row"><input id="ac-npw" type="password" autocomplete="new-password" placeholder="almeno 8 caratteri" style="flex:1;min-width:150px"><button class="btn primary" id="ac-npwok">Salva password</button></div>`:''}
     <div class="sep"></div><h3 style="font-size:15px">💾 I tuoi dati</h3>
@@ -931,7 +931,7 @@ function renderAcct(){const B=$('acct-body');
   B.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{try{navigator.clipboard.writeText(b.dataset.copy);b.textContent='Copiato';}catch(e){}});
   B.querySelectorAll('[data-leave]').forEach(b=>b.onclick=async()=>{await ACCT.sb.rpc('leave_team',{tid:b.dataset.leave});await refreshPlan();renderAcct();});}
 function openAcct(){renderAcct();$('acct').style.display='flex';}
-function openPlans(){$('acct').style.display='none';const P=ACCT.plan||{teams:[]},own=(P.teams||[]).filter(t=>t.role==='proprietario'),pz=TC_CFG.prezzi;
+function openPlans(){if(ACCT.plan&&ACCT.plan.admin)return openAcct();$('acct').style.display='none';const P=ACCT.plan||{teams:[]},own=(P.teams||[]).filter(t=>t.role==='proprietario'),pz=TC_CFG.prezzi;
   if(!ACCT.session){openAcct();$('ac-msg')&&($('ac-msg').innerHTML='Prima accedi o crea un account gratuito, poi scegli il piano Pro.');return;}
   const card=(k,tit,price,per,note,best)=>`<div class="plan${best?' best':''}"><div class="sub">${tit}</div><b class="pr">${price}</b><div class="sub">${per}</div><div class="sub">${note}</div><button class="btn${best?' primary':''}" data-buy="${k}">Scegli</button></div>`;
   $('plans-body').innerHTML=`<div class="plans">${card('singolo_mese','Singolo · mensile',pz.singolo_mese,'al mese','Per un pilota o meccanico. Disdici quando vuoi.')}${card('singolo_anno','Singolo · annuale',pz.singolo_anno,'all\'anno','Tutta la stagione, conviene rispetto al mensile.',true)}
