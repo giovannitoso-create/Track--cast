@@ -371,7 +371,8 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
           <div class="sv" id="press">—</div><div class="t3" id="pressnote"></div>
           <div class="inl"><label>La tua base <input type="number" id="pbase" step="0.01" style="width:62px" placeholder="bar"></label><label>con asfalto a <input type="number" id="pbaseT" step="1" style="width:52px" placeholder="°C"> °C</label></div>
           <div class="inl"><label>Turno <select id="psess"><option value="prove">Prove libere</option><option value="quali">Qualifica (corto)</option><option value="gara">Gara (lungo)</option></select></label>
-            <label>Obiettivo a caldo <input type="number" id="phot" step="0.01" style="width:62px" placeholder="bar"></label></div>
+            <label>Obiettivo a caldo <input type="number" id="phot" step="0.01" style="width:62px" placeholder="bar"></label>
+            <label title="Temperatura della gomma quando la gonfi: all'ombra è quella dell'aria, al sole anche 15-20 °C di più">Gonfio a <input type="number" id="ptinf" step="1" style="width:52px" placeholder="aria"> °C</label></div>
           <div class="inl"><label>Pilota <select id="pdrv"></select></label><button class="chipb" id="diaryopen" style="border-color:#6b4a1e;color:#ffc56b">📒 Diario pressioni</button></div>
           <div class="inl"><label>Asfalto misurato ora <input type="number" id="calib" step="0.5" placeholder="°C"></label><button class="chipb" id="calibok">Tara</button></div></div>
       </div>
@@ -459,6 +460,7 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
       <label>Post. a freddo (bar)<input id="dcr" type="number" step="0.01"></label>
       <label>Ant. a caldo (bar)<input id="dhf" type="number" step="0.01"></label>
       <label>Post. a caldo (bar)<input id="dhr" type="number" step="0.01"></label>
+      <label title="Temperatura della gomma quando l'hai gonfiata a freddo. Vuoto = temperatura dell'aria">Gonfiate a (°C)<input id="dtinf" type="number" step="1" placeholder="aria"></label>
       <label>Giro migliore<input id="dbest" placeholder="es. 48.512"></label>
       <label>Giri del turno<input id="dlaps" type="number" min="0"></label>
       <label style="grid-column:span 2">Note<input id="dnote" placeholder="assetto, sensazioni, gommatura…"></label>
@@ -770,7 +772,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='20/11/2026 10:30';
+const TC_VER='20/11/2026 11:30';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)return;const ctx=cv.getContext('2d'),W=cv.width,C=W/2;ctx.clearRect(0,0,W,W);
@@ -1065,7 +1067,7 @@ function sessStats(S,ts,dur){const sel=S.filter(p=>p.ts>=ts-7.5*60e3&&p.ts<ts+du
 function sessAdvice(st,dry){const L=tyreLoss(st.film,st.asph,dry),rainRisk=st.pp/100;const best=(st.film>TH*0.5||L.rain<L.slick)?'rain':(rainRisk>=0.6?'rain?':'slick');
   const c=COMPOUNDS.find(x=>x.id===$('tyrecmp').value)||COMPOUNDS[1];const rain=best==='rain';let press='';
   const MF=rain?null:pModel(c,'F'),MR=rain?null:pModel(c,'R'),man=parseFloat(String($('phot').value).replace(',','.')),tF=!isNaN(man)?man:MF&&MF.hotT,tR=!isNaN(man)?man:MR&&MR.hotT,sess=st.kind;
-  if(MF&&MR&&tF&&tR){const cold=(M,t)=>Math.round((t-(M.a+M.b*(st.asph-30)+(SESS_OFF[sess]||0)))/0.01)*0.01;press=`ant. ${fmt(cold(MF,tF),2)} · post. ${fmt(cold(MR,tR),2)} bar`;}
+  if(MF&&MR&&tF&&tR){const cold=(M,t)=>coldFor(M,t,st.asph,sess,st.ta);press=`ant. ${fmt(cold(MF,tF),2)} · post. ${fmt(cold(MR,tR),2)} bar`;}
   else{const d=pressDelta(c,st.asph,rain);press=Math.abs(d)<0.02?'come la tua base':(d>0?'+':'−')+fmt(Math.abs(d),2)+' bar sulla base';}
   return{best,L,press,cmp:c};}
 async function renderWeekend(){const P=$('pt-weekend');if(!CUR){P.innerHTML='<div class="sub">Scegli una pista.</div>';return;}
@@ -2096,16 +2098,39 @@ const SESS_OFF={prove:0,quali:-0.02,gara:0.02};
 const plogAll=()=>store.get('tc_plog',[]).map(e=>e.id?e:Object.assign(e,{id:'o'+e.ts,coldF:e.coldF??e.cold,coldR:e.coldR??e.cold,hotF:e.hotF??e.hot,hotR:e.hotR??e.hot}));
 const drivers=()=>String(store.get('tc_drivers','')).split(',').map(x=>x.trim()).filter(Boolean);
 const curDrv=()=>$('pdrv').value||'';
-function pModel(c,axle='R'){const all=plogAll().filter(e=>e.cmp===c.id&&e['cold'+axle]!=null&&e['hot'+axle]!=null&&e.asph!=null);if(!all.length)return null;const tid=CUR?CUR.id:'',dv=curDrv();
-  const wt=e=>(e.track===tid?1:0.4)*(!dv||!e.driver||e.driver===dv?1:0.5)*(Date.now()-e.ts>60*864e5?0.5:1);
-  const pts=all.map(e=>({x:e.asph-30,y:(e['hot'+axle]-e['cold'+axle])-(SESS_OFF[e.sess]||0),w:wt(e)}));
-  const W=pts.reduce((s,p)=>s+p.w,0),mx=pts.reduce((s,p)=>s+p.w*p.x,0)/W,my=pts.reduce((s,p)=>s+p.w*p.y,0)/W;
-  const Sxx=pts.reduce((s,p)=>s+p.w*(p.x-mx)**2,0),Sxy=pts.reduce((s,p)=>s+p.w*(p.x-mx)*(p.y-my),0);
-  const b0=c.k/10,L=100;const b=Math.max(0,Math.min(0.03,(Sxy+L*b0)/(Sxx+L))),a=my-b*mx;
-  const res=pts.map(p=>p.y-(a+b*p.x)),sd=pts.length>1?Math.sqrt(res.reduce((s,r)=>s+r*r,0)/(pts.length-1)):0.03;
-  const good=all.filter(e=>e.good),gd=good.filter(e=>!dv||e.driver===dv),gs=gd.length?gd:good;
-  const hotT=gs.length?gs.reduce((s,e)=>s+e['hot'+axle],0)/gs.length:null;
-  return{a,b,n:all.length,nTrack:all.filter(e=>e.track===tid).length,nDrv:dv?all.filter(e=>e.driver===dv).length:0,unc:Math.max(0.01,Math.min(0.06,sd/Math.sqrt(Math.min(pts.length,6))+0.01)),hotT};}
+// --- Modello pressioni v2 ---
+// 1) Legge dei gas: la pressione a freddo dipende dalla temperatura della gomma quando la gonfi. Ogni turno viene riportato a 20 °C.
+// 2) Regressione pesata: salita = a + b·(asfalto−30) + h·(usura treno) + turno; i turni recenti contano di più (dimezzano ogni 60 giorni).
+// 3) Turni sbagliati (es. un 8,2 al posto di 0,82) scartati in automatico; correzioni proprie per pista e pilota, prudenti finché i turni sono pochi.
+const P0=1.013,T20=293.15;
+const toRef=(p,t)=>t==null||isNaN(t)?p:(p+P0)*(T20/(t+273.15))-P0;      // pressione a freddo gonfiata a t °C → equivalente a 20 °C
+const fromRef=(p,t)=>t==null||isNaN(t)?p:(p+P0)*((t+273.15)/T20)-P0;    // equivalente a 20 °C → da mettere gonfiando a t °C
+const tinfOf=e=>e.tinf!=null?e.tinf:e.air!=null?e.air:null;
+const wearX=l=>Math.log1p(Math.max(0,l||0))/Math.log1p(60);
+function solve3(A,b){const M=A.map((r,i)=>[...r,b[i]]);for(let c=0;c<3;c++){let p=c;for(let r=c+1;r<3;r++)if(Math.abs(M[r][c])>Math.abs(M[p][c]))p=r;[M[c],M[p]]=[M[p],M[c]];
+  if(Math.abs(M[c][c])<1e-12)return null;for(let r=0;r<3;r++)if(r!==c){const f=M[r][c]/M[c][c];for(let k=c;k<4;k++)M[r][k]-=f*M[c][k];}}return M.map((r,i)=>r[3]/r[i]);}
+function pModel(c,axle='R',ctx={}){const all=plogAll().filter(e=>e.cmp===c.id&&e['cold'+axle]!=null&&e['hot'+axle]!=null&&e.asph!=null);if(!all.length)return null;
+  const tid=ctx.track!==undefined?ctx.track:(CUR?CUR.id:''),dv=ctx.driver!==undefined?ctx.driver:curDrv(),hNow=wearX(ctx.setLaps||0);
+  let pts=all.map(e=>({e,x:e.asph-30,h:e.set==='usato'||e.setLaps?wearX(e.setLaps||(e.set==='usato'?20:0)):0,
+    y:(e['hot'+axle]-toRef(e['cold'+axle],tinfOf(e)))-(SESS_OFF[e.sess]||0),w:Math.pow(0.5,(Date.now()-e.ts)/(60*864e5))*(e.track===tid?1:0.7)}));
+  const b0=c.k/10;
+  const fit=P=>{const A=[[0,0,0],[0,0,0],[0,0,0]],v=[0,0,0];for(const p of P){const r=[1,p.x,p.h];for(let i=0;i<3;i++){v[i]+=p.w*r[i]*p.y;for(let k=0;k<3;k++)A[i][k]+=p.w*r[i]*r[k];}}
+    const Lb=30,Lh=3;A[1][1]+=Lb;v[1]+=Lb*b0;A[2][2]+=Lh;A[0][0]+=1e-6;const z=solve3(A,v)||[P.reduce((s,p)=>s+p.w*p.y,0)/P.reduce((s,p)=>s+p.w,0),b0,0];
+    z[1]=Math.max(0,Math.min(0.03,z[1]));z[2]=Math.max(-0.08,Math.min(0.08,z[2]));return z;};
+  let z=fit(pts),out=0;
+  if(pts.length>=5){const r=pts.map(p=>p.y-(z[0]+z[1]*p.x+z[2]*p.h)),med=[...r].sort((a,b)=>a-b)[r.length>>1],mad=[...r.map(x=>Math.abs(x-med))].sort((a,b)=>a-b)[r.length>>1];
+    const lim=Math.max(0.06,4.4*mad),keep=pts.filter((p,i)=>Math.abs(r[i]-med)<=lim);out=pts.length-keep.length;if(out&&keep.length>=3){pts=keep;z=fit(pts);}}
+  const res=pts.map(p=>({p,r:p.y-(z[0]+z[1]*p.x+z[2]*p.h)}));
+  const off=f=>{const R=res.filter(q=>f(q.p.e));const W=R.reduce((s,q)=>s+q.p.w,0);return W?R.reduce((s,q)=>s+q.p.w*q.r,0)/(W+2.5*Math.max(...R.map(q=>q.p.w))):0;};
+  const offT=tid?off(e=>e.track===tid):0,offD=dv?off(e=>e.driver===dv):0;
+  const W=res.reduce((s,q)=>s+q.p.w,0),W2=res.reduce((s,q)=>s+q.p.w*q.p.w,0),neff=W*W/W2;
+  const sd=res.length>1?Math.sqrt(res.reduce((s,q)=>s+q.p.w*q.r*q.r,0)/W*res.length/(res.length-1)):0.03;
+  const unc=Math.max(0.01,Math.min(0.06,Math.sqrt(sd*sd/Math.max(1,neff)+0.006*0.006)+(neff<3?0.015:0)));
+  const good=all.filter(e=>e.good),gd=good.filter(e=>!dv||e.driver===dv),gs=gd.length?gd:good,gw=e=>Math.pow(0.5,(Date.now()-e.ts)/(90*864e5))*(e.track===tid?1.5:1);
+  const hotT=gs.length?gs.reduce((s,e)=>s+gw(e)*e['hot'+axle],0)/gs.reduce((s,e)=>s+gw(e),0):null;
+  return{a:z[0]+offT+offD+z[2]*hNow,b:z[1],h:z[2],offT,offD,n:all.length,used:pts.length,out,neff,sd,nTrack:all.filter(e=>e.track===tid).length,nDrv:dv?all.filter(e=>e.driver===dv).length:0,unc,hotT};}
+// pressione a freddo da mettere: obiettivo a caldo − salita prevista, riportata alla temperatura a cui gonfi
+function coldFor(M,hot,asph,sess,tinf){return Math.round(fromRef(hot-(M.a+M.b*(asph-30)+(SESS_OFF[sess]||0)),tinf)/0.01)*0.01;}
 function renderPlog(){fillDrivers();}
 function fillDrivers(){const d=drivers(),opts='<option value="">Tutti / non indicato</option>'+d.map(x=>`<option>${x}</option>`).join('');
   const keep=$('pdrv').value||store.get('tc_pdrv','');$('pdrv').innerHTML=opts;$('pdrv').value=d.includes(keep)?keep:'';
@@ -2134,6 +2159,7 @@ function saveBlob(b,name){const a=document.createElement('a');a.href=URL.createO
   $('psess').value=store.get('tc_psess','prove');$('psess').addEventListener('change',()=>{store.set('tc_psess',$('psess').value);renderSetup();});
   const loadHot=()=>{$('phot').value=store.get('tc_phot_'+$('tyrecmp').value,'');};loadHot();$('tyrecmp').addEventListener('change',loadHot);
   $('phot').addEventListener('input',()=>{store.set('tc_phot_'+$('tyrecmp').value,$('phot').value);renderSetup();});
+  $('ptinf').addEventListener('input',()=>renderSetup());
   fillDrivers();$('pdrv').addEventListener('change',()=>{store.set('tc_pdrv',$('pdrv').value);renderSetup();});
   $('diaryopen').onclick=openDiary;$('dclose').onclick=()=>$('diary').style.display='none';
   $('dteam').addEventListener('input',()=>{store.set('tc_team',$('dteam').value);renderDiary();});
@@ -2141,9 +2167,11 @@ function saveBlob(b,name){const a=document.createElement('a');a.href=URL.createO
   ['dftrk','dfdrv','dfcmp','dcmp'].forEach(id=>$(id).addEventListener('change',renderDiary));
   $('dsave').onclick=()=>{const cf=numv('dcf'),cr=numv('dcr'),hf=numv('dhf'),hr=numv('dhr');
     if((cf==null&&cr==null)||(hf==null&&hr==null)){status('Scrivi almeno una pressione a freddo e una a caldo (in bar).',true);return;}
+    {const vals=[cf,cr,hf,hr].filter(v=>v!=null);if(vals.some(v=>v>4)){if(vals.every(v=>v>4&&v<40)){[['dcf',cf],['dcr',cr],['dhf',hf],['dhr',hr]].forEach(([id,v])=>{if(v!=null)$(id).value=(v/14.504).toFixed(2);});status('Sembravano psi: le ho convertite in bar. Controlla e premi di nuovo Salva.',true);}else status('Una pressione è fuori scala: scrivi i valori in bar (es. 0,62).',true);return;}
+     const hc=[[cf,hf],[cr,hr]].filter(([a,b])=>a!=null&&b!=null);if(hc.some(([a,b])=>b<a-0.05||b-a>0.7)){status('Controlla: la pressione a caldo deve essere più alta di quella a freddo, e di solito non più di 0,5 bar.',true);return;}}
     const w=diaryWx()||{asph:25,air:null,rh:null};const e={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),ts:Date.now(),team:store.get('tc_team',''),driver:$('ddrv').value,
       track:CUR?CUR.id:'',trackName:CUR?CUR.name:'',cmp:$('dcmp').value,sess:$('dsess').value,set:$('dset').value,setLaps:numv('dsetl'),
-      coldF:cf??cr,coldR:cr??cf,hotF:hf??hr,hotR:hr??hf,best:$('dbest').value.trim(),laps:numv('dlaps'),note:$('dnote').value.trim(),good:$('dgood').checked,asph:w.asph,air:w.air,rh:w.rh,rho:w.rho,eng:$('deng').value,jet:numv('djet'),needle:$('dneedle').value.trim(),pin:numv('dpin'),crown:numv('dcrown'),carr:$('dcarr').value.trim()};
+      coldF:cf??cr,coldR:cr??cf,hotF:hf??hr,hotR:hr??hf,tinf:numv('dtinf'),best:$('dbest').value.trim(),laps:numv('dlaps'),note:$('dnote').value.trim(),good:$('dgood').checked,asph:w.asph,air:w.air,rh:w.rh,rho:w.rho,eng:$('deng').value,jet:numv('djet'),needle:$('dneedle').value.trim(),pin:numv('dpin'),crown:numv('dcrown'),carr:$('dcarr').value.trim()};
     mergeEntries([e]);if(e.good){$('tyrecmp').value=e.cmp;store.set('tc_cmp',e.cmp);}
     ['dhf','dhr','dbest','dlaps','dnote'].forEach(id=>$(id).value='');store.set('tc_engine',$('deng').value);$('dgood').checked=false;status('Turno salvato nel diario: le prossime pressioni usano anche questo turno.');renderDiary();renderSetup();};
   $('dexp').onclick=()=>saveBlob(diaryBlob(),dname());
@@ -2350,6 +2378,7 @@ async function sheetPDF(){const btn=$('sh-pdf'),old=btn.textContent;btn.disabled
   $('sh-add').onclick=()=>{const w=diaryWx()||{asph:null,air:null};mergeEntries([{id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),ts:Date.now(),team:store.get('tc_team',''),driver:curDrv(),track:CUR?CUR.id:'',trackName:CUR?CUR.name:'',cmp:$('tyrecmp').value,sess:$('psess').value,set:'nuovo',asph:w.asph,air:w.air,coldF:null,coldR:null,hotF:null,hotR:null}]);renderSheet();
     const last=$('sh-rows').querySelector('tr:last-of-type input[data-k="coldF"]');if(last)last.focus();};
 })();
+function tinfNow(S,i0){const v=parseFloat(String($('ptinf').value).replace(',','.'));return isNaN(v)?S[i0].ta:v;}
 function renderPressure(S,i0,i1,tav,b){
   const c=COMPOUNDS.find(x=>x.id===$('tyrecmp').value)||COMPOUNDS[1];const rain=b==='rain';renderTyreCard(c);{const pk=$('tcolpick');if(pk)pk.onchange=()=>{store.set('tc_tcol_'+c.id,pk.value);renderSetup();};}
   $('tyrecmp').style.borderLeft=`6px solid ${tyreCol(c)||'#5f7088'}`;
@@ -2362,11 +2391,11 @@ function renderPressure(S,i0,i1,tav,b){
     `${word} ${fmt(Math.abs(rd),2)}<span style="font-size:15px;color:var(--ink2)"> bar${!isNaN(bp)?` → ${fmt(bp+rd,2)} bar`:''}</span>`;
   renderPlog();const sess=$('psess').value,MF=rain?null:pModel(c,'F'),MR=rain?null:pModel(c,'R'),man=parseFloat(String($('phot').value).replace(',','.'));
   const tF=!isNaN(man)?man:MF&&MF.hotT,tR=!isNaN(man)?man:MR&&MR.hotT;
-  if(MF&&MR&&tF&&tR){const cold=(M,t,T)=>Math.round((t-(M.a+M.b*(T-30)+(SESS_OFF[sess]||0)))/0.01)*0.01,u=Math.max(MF.unc,MR.unc);
+  if(MF&&MR&&tF&&tR){const ti=tinfNow(S,i0),cold=(M,t,T,tt)=>coldFor(M,t,T,sess,tt==null?ti:tt),u=Math.max(MF.unc,MR.unc);
     $('press').innerHTML=`<span style="font-size:15px;color:var(--ink2)">Ant.</span> ${fmt(cold(MF,tF,tav),2)} <span style="font-size:15px;color:var(--ink2)">Post.</span> ${fmt(cold(MR,tR,tav),2)}<span style="font-size:14px;color:var(--ink2)"> bar a freddo ±${fmt(u,2)}</span>`;
-    const marks=[0,4,8,12].map(o=>S[Math.min(S.length-1,SIM.ni+o)]).filter((p,i,a)=>a.indexOf(p)===i).map(p=>`${hhmm(p)} ${fmt(cold(MF,tF,p.asph),2)}/${fmt(cold(MR,tR,p.asph),2)}`).join(' · ');
+    const marks=[0,4,8,12].map(o=>S[Math.min(S.length-1,SIM.ni+o)]).filter((p,i,a)=>a.indexOf(p)===i).map(p=>`${hhmm(p)} ${fmt(cold(MF,tF,p.asph,$('ptinf').value?ti:p.ta),2)}/${fmt(cold(MR,tR,p.asph,$('ptinf').value?ti:p.ta),2)}`).join(' · ');
     const dv=curDrv();
-    $('pressnote').innerHTML=`Obiettivo a caldo ${fmt(tF,2)} / ${fmt(tR,2)} bar · asfalto medio ${fmt(tav,1)} °C · ${$('psess').selectedOptions[0].text.toLowerCase()}${dv?' · '+dv:''}.<br>Dal <b>diario: ${MR.n} turni</b> con questa gomma${MR.nTrack?`, ${MR.nTrack} su questa pista`:''}${MR.nDrv?`, ${MR.nDrv} di ${dv}`:''}. La gomma sale di circa ${fmt(MF.a+MF.b*(tav-30),2)} (ant.) e ${fmt(MR.a+MR.b*(tav-30),2)} (post.) bar.<br>Nelle prossime ore (ant./post.): ${marks}<br><span style="color:var(--ink3)">Ogni turno salvato nel diario, con asfalti diversi, rende il calcolo più preciso. Ricontrolla sempre a caldo.</span>`;return;}
+    $('pressnote').innerHTML=`Obiettivo a caldo ${fmt(tF,2)} / ${fmt(tR,2)} bar · asfalto medio ${fmt(tav,1)} °C · ${$('psess').selectedOptions[0].text.toLowerCase()}${dv?' · '+dv:''}.<br>Dal <b>diario: ${MR.n} turni</b> con questa gomma${MR.nTrack?`, ${MR.nTrack} su questa pista`:''}${MR.nDrv?`, ${MR.nDrv} di ${dv}`:''}. La gomma sale di circa ${fmt(MF.a+MF.b*(tav-30),2)} (ant.) e ${fmt(MR.a+MR.b*(tav-30),2)} (post.) bar.<br>Pressioni da mettere <b>gonfiando con la gomma a ${fmt(ti,0)} °C</b>${$('ptinf').value?'':' (aria prevista: gomme all\'ombra)'}: ogni 10 °C in più quando gonfi servono circa ${fmt(fromRef(cold(MR,tR,tav,20)+0,30)-fromRef(cold(MR,tR,tav,20),20),2)} bar in più.${Math.abs(MR.offT)>=0.005?` Correzione di questa pista ${sbar(MR.offT)} bar.`:''}${Math.abs(MR.offD)>=0.005?` Correzione del pilota ${sbar(MR.offD)} bar.`:''}${MR.out||MF.out?` ${Math.max(MR.out,MF.out)} turn${Math.max(MR.out,MF.out)>1?'i':'o'} con valori strani ignorat${Math.max(MR.out,MF.out)>1?'i':'o'}.`:''}<br>Nelle prossime ore (ant./post.): ${marks}<br><span style="color:var(--ink3)">Ogni turno salvato nel diario, con asfalti diversi, rende il calcolo più preciso. Ricontrolla sempre a caldo.</span>`;return;}
   const refTxt=!isNaN(bt)?`alla tua base (asfalto a ${fmt(bt,0)} °C)`:`all'asfalto di riferimento di ${cc.ref} °C`;
   const step=(rain?0.04:cc.k)/2;
   // how it changes during the next hours
@@ -2376,7 +2405,7 @@ function renderPressure(S,i0,i1,tav,b){
 function renderRainPressure(c,S,i0,i1,tav,b,bp,bt){
   const base=!isNaN(bp)?bp:c.base,ref=!isNaN(bt)?bt:c.ref;let film=0,n=0;for(let i=i0;i<=i1;i++){film+=S[i].film;n++;}film/=Math.max(1,n);
   const M=pModel(c),man=parseFloat(String($('phot').value).replace(',','.')),hotT=!isNaN(man)?man:M&&M.hotT;
-  const coldAt=T=>{let v;if(M&&hotT)v=hotT-(M.a+M.b*(T-30)+(SESS_OFF[$('psess').value]||0));else v=base+c.k*(ref-T)/10;return Math.min(c.max,Math.max(0.6,Math.round(v/0.01)*0.01));};
+  const ti=tinfNow(S,i0),coldAt=T=>{let v;if(M&&hotT)v=coldFor(M,hotT,T,$('psess').value,ti);else v=base+c.k*(ref-T)/10;return Math.min(c.max,Math.max(0.6,Math.round(v/0.01)*0.01));};
   const v=coldAt(tav),capped=v>=c.max;
   $('press').innerHTML=`${fmt(v,2)}<span style="font-size:15px;color:var(--ink2)"> bar a freddo${!isNaN(bp)?` · tua base ${fmt(bp,2)}`:''}</span>`;
   const marks=[0,4,8,12].map(o=>S[Math.min(S.length-1,SIM.ni+o)]).filter((p,i,a)=>a.indexOf(p)===i).map(p=>`${hhmm(p)} ${fmt(coldAt(p.asph),2)}`).join(' · ');
