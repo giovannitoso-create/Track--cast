@@ -161,9 +161,31 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 #pdfstage{position:fixed;left:-30000px;top:0;width:1123px;background:#fff;color:#111;font:13px system-ui,sans-serif;padding:24px;box-sizing:border-box}
 #pdfstage h1{font-size:24px;margin:0}#pdfstage h2{font-size:16px;margin:16px 0 6px}#pdfstage table{width:100%;border-collapse:collapse;font-size:12px}#pdfstage th{background:#f1f3f6;text-align:left;padding:6px;border-bottom:1px solid #ccc}#pdfstage td{padding:6px;border-bottom:1px solid #e3e6ea}
 #pdfstage .chk{height:10px;background:repeating-conic-gradient(#111 0 25%,#fff 0 50%) 0 0/10px 10px;margin:-24px -24px 14px}#pdfstage .muted{color:#666}
-#boxscr{position:fixed;inset:0;background:#05080d;z-index:7000;display:none;padding:18px;box-sizing:border-box;color:#e8eef7;overflow:auto}
-#boxscr .g{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:14px;height:calc(100% - 70px)}@media(max-width:820px){#boxscr .g{grid-template-columns:1fr 1fr}}@media(max-width:480px){#boxscr .g{grid-template-columns:1fr;height:auto}}#boxscr .t{background:#0f1622;border:1px solid #223047;border-radius:16px;padding:16px;display:flex;flex-direction:column;justify-content:center}
-#boxscr .t .l{font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#7f91aa}#boxscr .t .v{font-size:clamp(28px,4.2vw,64px);font-weight:800;line-height:1.05;margin-top:6px}#boxscr .t .s{font-size:clamp(14px,1.5vw,22px);color:#9fb0c6;margin-top:6px}
+#boxscr{position:fixed;inset:0;background:radial-gradient(1200px 600px at 15% -10%,#13213a 0%,#05080d 60%);z-index:7000;display:none;padding:16px 18px;box-sizing:border-box;color:#e8eef7;overflow:auto;font-variant-numeric:tabular-nums}
+#boxscr .bx-head{display:flex;align-items:center;gap:14px;margin-bottom:12px}#boxscr .bx-dot{width:12px;height:12px;border-radius:50%;background:var(--lvc,#33d17a);box-shadow:0 0 14px var(--lvc,#33d17a)}
+#boxscr[data-lvl=green]{--lvc:#33d17a}#boxscr[data-lvl=amber]{--lvc:#ffb547}#boxscr[data-lvl=red]{--lvc:#ff5c5c}
+#boxscr #bx-title{font-size:clamp(18px,2vw,28px);font-weight:800;letter-spacing:.02em}#boxscr #bx-clock{font-size:clamp(22px,3vw,44px);font-weight:800;margin-left:auto}#boxscr #bx-upd{color:#7f91aa;font-size:14px}
+#boxscr .g{display:grid;gap:12px;grid-template-columns:repeat(5,1fr);grid-template-rows:auto auto auto auto;grid-template-areas:"hero hero hero radar radar" "tl tl tl tl tl" "a b c d e" "tk tk tk tk tk";min-height:calc(100% - 70px)}
+#boxscr .bx-hero{grid-area:hero;display:flex;align-items:center;gap:22px;background:linear-gradient(135deg,color-mix(in srgb,var(--lv) 18%,#0f1622),#0d1420);border:1px solid color-mix(in srgb,var(--lv) 55%,#223047);border-radius:20px;padding:16px 22px;box-shadow:0 0 40px color-mix(in srgb,var(--lv) 18%,transparent) inset}
+#boxscr[data-lvl=red] .bx-hero{animation:bxpulse 1.6s ease-in-out infinite}@keyframes bxpulse{50%{box-shadow:0 0 70px color-mix(in srgb,var(--lv) 45%,transparent) inset}}
+#boxscr .bx-ring{width:clamp(150px,17vw,250px);height:auto;display:block}#boxscr .bx-rbig{font-size:52px;font-weight:900}#boxscr .bx-rsub{font-size:15px;fill:#9fb0c6;font-weight:600}
+#boxscr .bx-st{font-size:clamp(26px,3.6vw,60px);font-weight:900;color:var(--lv);line-height:1;letter-spacing:.01em}#boxscr .bx-ss{font-size:clamp(15px,1.6vw,24px);color:#c6d2e4;margin-top:8px}
+#boxscr .bx-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}#boxscr .bx-chips span{background:#0b1220;border:1px solid #24334d;border-radius:999px;padding:6px 12px;font-size:clamp(12px,1.1vw,16px);color:#b8c6da}
+#boxscr .bx-radar{grid-area:radar;background:#0b1220;border:1px solid #223047;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;min-height:220px;position:relative}
+#boxscr .bx-cap{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#7f91aa;margin-top:4px}#boxscr .bx-lock{color:#7f91aa;font-size:20px}
+#boxscr .bx-tlw{grid-area:tl;background:#0f1622;border:1px solid #223047;border-radius:20px;padding:12px 14px 6px}#boxscr .bx-tl{width:100%;height:auto;max-height:30vh;display:block}#boxscr .bx-ax{font-size:20px;fill:#8ea0b8;font-weight:600}
+#boxscr .l{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#7f91aa}
+#boxscr .bx-t{background:linear-gradient(180deg,#111a29,#0d1420);border:1px solid #223047;border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between;min-height:150px}
+#boxscr .bx-t.slick{border-color:#7a5a1d;box-shadow:0 0 30px rgba(245,166,35,.12) inset}#boxscr .bx-t.rain{border-color:#28508f;box-shadow:0 0 30px rgba(61,139,255,.16) inset}
+#boxscr .bx-t .v{font-size:clamp(28px,3.4vw,58px);font-weight:900;line-height:1.02}#boxscr .bx-t .v small{font-size:.45em;color:#9fb0c6;margin-left:3px}#boxscr .bx-v2{font-size:clamp(20px,2.2vw,36px)!important}
+#boxscr .bx-t .s{font-size:clamp(13px,1.2vw,18px);color:#9fb0c6}#boxscr .bx-tr{font-size:.5em;color:#ffc48a;vertical-align:middle}
+#boxscr .bx-t.slick .v{color:#ffc781}#boxscr .bx-t.rain .v{color:#9cc4ff}#boxscr .bx-tyre,#boxscr .bx-wind{display:flex;align-items:center;gap:12px}#boxscr .bx-comp{width:clamp(70px,6vw,104px);height:auto;flex:none}
+#boxscr .bx-pp{display:flex;gap:14px}#boxscr .bx-pp div{font-size:clamp(28px,3.2vw,54px);font-weight:900;line-height:1}#boxscr .bx-pp i{display:block;font-style:normal;font-size:12px;letter-spacing:.14em;color:#7f91aa;margin-bottom:4px}
+#boxscr .bx-tick{grid-area:tk;overflow:hidden;background:#0b1220;border:1px solid #223047;border-radius:999px;padding:10px 0;white-space:nowrap}#boxscr .bx-tickin{display:inline-block;animation:bxtick 30s linear infinite}
+#boxscr .bx-tickin span{margin-right:60px;font-size:clamp(15px,1.5vw,22px);font-weight:700;color:#dbe5f3}@keyframes bxtick{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){#boxscr .bx-tickin,#boxscr[data-lvl=red] .bx-hero{animation:none}}
+@media(max-width:1000px){#boxscr .g{grid-template-columns:repeat(2,1fr);grid-template-areas:"hero hero" "radar radar" "tl tl" "a b" "c d" "e e" "tk tk"}}
+@media(max-width:560px){#boxscr .g{grid-template-columns:1fr;grid-template-areas:"hero" "radar" "tl" "a" "b" "c" "d" "e" "tk"}#boxscr .bx-hero{flex-direction:column;text-align:center}#boxscr .bx-chips{justify-content:center}}
 #repdlg{position:fixed;inset:0;background:rgba(3,6,12,.72);display:none;align-items:center;justify-content:center;z-index:5000;padding:14px}
 #repdlg .box{background:var(--surface);border:1px solid var(--line);border-radius:12px;max-width:440px;width:100%;padding:16px;max-height:92vh;overflow:auto}
 #repdlg h3{margin:0 0 4px}#repdlg .opt{display:block;width:100%;text-align:left;margin:6px 0;padding:10px 12px;border-radius:9px;border:1px solid var(--line);background:#121a26;color:var(--ink);font-size:14px;cursor:pointer}
@@ -497,7 +519,7 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
 <div class="mdl" id="plans"><div class="box" style="max-width:720px"><div style="display:flex;align-items:center;gap:8px"><h3>⭐ TrackCast Pro</h3><button class="chipb" id="plans-x" style="margin-left:auto">Chiudi</button></div>
   <div class="sub" style="margin:0">Radar avanzato con matrice sensori, nowcast con probabilità, nubi dal satellite e avvisi temporali in anticipo. In arrivo: avvisi “pioggia in pista” sul telefono.</div><div id="plans-body"></div></div></div>
 <div id="pdfstage" aria-hidden="true"></div>
-<div id="boxscr"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><b id="bx-title" style="font-size:22px"></b><span id="bx-clock" style="font-size:22px;color:#9fb0c6;font-variant-numeric:tabular-nums"></span><button class="chipb" id="bx-x" style="margin-left:auto;font-size:15px">Esci</button></div><div class="g" id="bx-grid"></div></div>
+<div id="boxscr" data-lvl="green"><div class="bx-head"><span class="bx-dot"></span><b id="bx-title"></b><span id="bx-upd"></span><span id="bx-clock"></span><button class="chipb" id="bx-x" style="font-size:15px">Esci</button></div><div class="g" id="bx-grid"></div></div>
 <div id="repdlg"><div class="box">
   <h3>Segnala un errore</h3><div class="sub" style="margin:0 0 8px">Dimmi cosa vedi in pista: ricalcolo subito meteo, radar e asfalto con il tuo dato.</div>
   <div id="repstep1">
@@ -772,7 +794,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='20/11/2026 11:30';
+const TC_VER='20/11/2026 12:30';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)return;const ctx=cv.getContext('2d'),W=cv.width,C=W/2;ctx.clearRect(0,0,W,W);
@@ -1212,21 +1234,69 @@ function renderSetupTab(){const P=$('pt-setup');if(!SIM){P.innerHTML='<div class
 const BOX={timer:null,wake:null};
 function renderBoxTab(){$('pt-box').innerHTML=`<div class="sub">Una vista a tutto schermo per il tablet o la TV della tenda: radar, pioggia, nubi, asfalto, gomma e pressioni, aggiornati da soli. Lo schermo resta acceso.</div>
   <div class="pt-row"><button class="btn primary" id="bx-open">📺 Apri lo schermo box</button></div>`;$('bx-open').onclick=openBox;}
-async function openBox(){if(!CUR){status('Scegli prima una pista.',true);return;}$('boxscr').style.display='block';drawBox();clearInterval(BOX.timer);BOX.timer=setInterval(drawBox,15000);
+async function openBox(){if(!CUR){status('Scegli prima una pista.',true);return;}$('boxscr').style.display='block';drawBox();clearInterval(BOX.timer);BOX.timer=setInterval(drawBox,15000);const tick=()=>{$('bx-clock').textContent=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'});};tick();clearInterval(BOX.clk);BOX.clk=setInterval(tick,1000);
   try{await $('boxscr').requestFullscreen?.();}catch(e){}try{BOX.wake=await navigator.wakeLock?.request('screen');}catch(e){}}
-function closeBox(){$('boxscr').style.display='none';clearInterval(BOX.timer);try{document.fullscreenElement&&document.exitFullscreen();}catch(e){}try{BOX.wake&&BOX.wake.release();}catch(e){}}
+function closeBox(){$('boxscr').style.display='none';clearInterval(BOX.timer);clearInterval(BOX.clk);try{document.fullscreenElement&&document.exitFullscreen();}catch(e){}try{BOX.wake&&BOX.wake.release();}catch(e){}}
 function drawBox(){if(!SIM||!CUR)return;const S=SIM.S,ni=SIM.ni,n=S[ni],p30=S[Math.min(S.length-1,ni+2)],dry=dryRef(),L=tyreLoss(n.film,n.asph,dry),best=L.rain<L.slick?'RAIN':'SLICK';
-  $('bx-title').textContent=CUR.name;$('bx-clock').textContent=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-  const r=NC.res,first=r&&r.leads.find(l=>l.p>=0.5),age=r?(Date.now()-r.ms)/6e4:0;
-  const rainTxt=!proOK()?'—':r&&r.here&&r.here.p>=0.5?'PIOVE':first?`tra ${Math.max(0,Math.round(first.L-age))} min`:'nessuna';
-  const t=(l,v,sb,col)=>`<div class="t"${col?` style="border-color:${col}"`:''}><div class="l">${l}</div><div class="v"${col?` style="color:${col}"`:''}>${v}</div><div class="s">${sb}</div></div>`;
-  $('bx-grid').innerHTML=t('Pioggia in pista',rainTxt,r?(first?`probabilità ${Math.round(first.p*100)}% · ${fmt(first.i,1)} mm/h`:r.near&&r.near.d<60?`la più vicina a ${Math.round(r.near.d)} km verso ${dir8(r.near.brg)}`:'nessuna entro 60 km'):'radar non disponibile',first&&first.L-age<=20?'#ff8f8f':null)
-    +t('Cielo',CL.res?(CL.res.leads[0].p>=0.5?'coperto':'sereno'):'—',CL.res?$('cl-sub').textContent.split(' · ')[0]:'satellite non disponibile')
-    +t('Asfalto',`${fmt(n.asph,0)} °C`,`tra 30 min ${fmt(p30.asph,0)} °C · aria ${fmt(n.ta,0)} °C`)
-    +t('Gomma',best,`slick ${fmtS(L.slick)} · rain ${fmtS(L.rain)} al giro`,best==='RAIN'?'#9cc4ff':'#ffc781')
-    +t('Pressioni a freddo',$('press').textContent.replace(/bar a freddo.*$/,'bar').trim()||'—',$('tyrecmp').selectedOptions[0]?$('tyrecmp').selectedOptions[0].text:'')
-    +t('Vento',`${Math.round(n.ws)} km/h`,`raffiche ${Math.round(n.wg||n.ws)} km/h${WX&&WX.current?' · da '+dir8(WX.current.wind_direction_10m):''}`);}
-
+  $('bx-title').textContent=CUR.name;
+  const r=NC.res,age=r?(Date.now()-r.ms)/6e4:0,first=r&&r.leads.find(l=>l.p>=0.5),pro=proOK();
+  const raining=pro&&r&&r.here&&r.here.p>=0.5,mins=first?Math.max(0,Math.round(first.L-age)):null;
+  // stato generale: verde / giallo / rosso
+  const lvl=raining||(mins!=null&&mins<=20)?'red':(mins!=null&&mins<=60)||(S.slice(ni,ni+8).some(p=>p.pp>=50))?'amber':'green';
+  const LV={green:['#33d17a','PISTA ASCIUTTA','nessuna pioggia in arrivo'],amber:['#ffb547','ATTENZIONE',mins!=null?`pioggia in arrivo tra circa ${mins} minuti`:'pioggia possibile nelle prossime ore'],red:['#ff5c5c',raining?'PIOVE IN PISTA':'PIOGGIA IN ARRIVO',raining?'monta le rain':'prepara le rain']}[lvl];
+  $('boxscr').dataset.lvl=lvl;
+  // anello conto alla rovescia (0-60 min)
+  const ring=(()=>{const R=88,C=2*Math.PI*R,f=raining?1:mins==null?0:1-Math.min(60,mins)/60,pp=first?first.p:(r&&r.here?r.here.p:0);
+    const big=!pro?'🔒':raining?'ORA':mins==null?'—':mins+"'",sub=!pro?'radar Pro':raining?`${fmt(r.here.i||0,1)} mm/h`:mins==null?'nessuna entro 60 min':'alla pioggia';
+    return `<svg viewBox="0 0 220 220" class="bx-ring"><defs><linearGradient id="bxg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="${LV[0]}"/><stop offset="1" stop-color="${LV[0]}" stop-opacity=".45"/></linearGradient></defs>
+      <circle cx="110" cy="110" r="${R}" fill="none" stroke="#18233a" stroke-width="16"/>
+      <circle cx="110" cy="110" r="${R}" fill="none" stroke="url(#bxg)" stroke-width="16" stroke-linecap="round" stroke-dasharray="${C*f} ${C}" transform="rotate(-90 110 110)"/>
+      ${[0,15,30,45].map(m=>{const a=(m/60)*2*Math.PI-Math.PI/2;return `<line x1="${110+R*1.12*Math.cos(a)}" y1="${110+R*1.12*Math.sin(a)}" x2="${110+R*1.2*Math.cos(a)}" y2="${110+R*1.2*Math.sin(a)}" stroke="#4a5d7c" stroke-width="2"/>`;}).join('')}
+      <text x="110" y="112" text-anchor="middle" class="bx-rbig" fill="#fff">${big}</text><text x="110" y="146" text-anchor="middle" class="bx-rsub">${sub}</text>
+      ${pro&&(first||raining)?`<text x="110" y="70" text-anchor="middle" class="bx-rsub" fill="${LV[0]}">${Math.round(pp*100)}%</text>`:''}</svg>`;})();
+  // linea del tempo 3 ore: pioggia (barre), probabilità, asfalto (linea), gomma consigliata (banda)
+  const T=S.slice(ni,Math.min(S.length,ni+13)),W=1000,H=230,ml=58,mr=78,mt=30,mb=58,X=i=>ml+i*(W-ml-mr)/Math.max(1,T.length-1),bw=(W-ml-mr)/Math.max(1,T.length-1)*0.56;
+  const aMin=Math.floor(Math.min(...T.map(p=>p.asph))/5)*5,aMax=Math.ceil(Math.max(...T.map(p=>p.asph))/5)*5+(Math.max(...T.map(p=>p.asph))%5?0:5),Ya=v=>mt+(1-(v-aMin)/Math.max(1,aMax-aMin))*(H-mt-mb);
+  const pMax=Math.max(2,...T.map(p=>p.pr)),Yp=v=>H-mb-(v/pMax)*(H-mt-mb);
+  let tl=`<rect x="${ml}" y="${mt}" width="${W-ml-mr}" height="${H-mt-mb}" fill="#0b1220" rx="8"/>`;
+  [0,0.5,1].forEach(f=>{const y=mt+f*(H-mt-mb);tl+=`<line x1="${ml}" x2="${W-mr}" y1="${y}" y2="${y}" stroke="#1d2a40"/>`;});
+  T.forEach((p,i)=>{const x=X(i);if(p.pp>0)tl+=`<rect x="${x-bw/2}" y="${mt}" width="${bw}" height="${(H-mt-mb)}" fill="#2f7fff" opacity="${Math.min(0.28,p.pp/100*0.3)}" rx="4"/>`;
+    if(p.pr>0.05)tl+=`<rect x="${x-bw/2}" y="${Yp(p.pr)}" width="${bw}" height="${H-mb-Yp(p.pr)}" fill="url(#bxrain)" rx="4"/>`;
+    const Lx=tyreLoss(p.film,p.asph,dry),rn=Lx.rain<Lx.slick;tl+=`<rect x="${x-(W-ml-mr)/Math.max(1,T.length-1)/2}" y="${H-mb+8}" width="${(W-ml-mr)/Math.max(1,T.length-1)}" height="12" fill="${rn?'#3d8bff':'#f5a623'}" opacity=".85"/>`;
+    if(i%2===0)tl+=`<text x="${x}" y="${H-12}" text-anchor="middle" class="bx-ax">${i===0?'ora':hhmm(p)}</text>`;});
+  tl+=`<polyline points="${T.map((p,i)=>X(i)+','+Ya(p.asph)).join(' ')}" fill="none" stroke="#ff9f43" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>`;
+  T.forEach((p,i)=>{if(i%4===0&&i>0||i===T.length-1)tl+=`<circle cx="${X(i)}" cy="${Ya(p.asph)}" r="6" fill="#ff9f43" stroke="#05080d" stroke-width="3"/><text x="${X(i)}" y="${Ya(p.asph)-12}" text-anchor="middle" class="bx-ax" fill="#ffc48a">${fmt(p.asph,0)}°</text>`;});
+  tl+=`<text x="${ml-8}" y="${mt+10}" text-anchor="end" class="bx-ax">${aMax}°</text><text x="${ml-8}" y="${H-mb}" text-anchor="end" class="bx-ax">${aMin}°</text><text x="${W-mr+8}" y="${mt+10}" class="bx-ax" fill="#7fb2ff">${fmt(pMax,0)}</text><text x="${W-mr+8}" y="${mt+24}" class="bx-ax" fill="#7fb2ff">mm/h</text>`;
+  const timeline=`<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" class="bx-tl"><defs><linearGradient id="bxrain" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7fb2ff"/><stop offset="1" stop-color="#2f6bff"/></linearGradient></defs>${tl}</svg>`;
+  // gomma, pressioni, getto, vento
+  const c=COMPOUNDS.find(x=>x.id===$('tyrecmp').value);const pt=$('press').textContent.replace(/\s+/g,' ').trim(),pm=pt.match(/Ant\.\s*([\d,]+)\s*Post\.\s*([\d,]+)/),pu=(pt.match(/±\s*[\d,]+/)||[''])[0];
+  const pressHtml=pm?`<div class="bx-pp"><div><i>ANT</i>${pm[1]}</div><div><i>POST</i>${pm[2]}</div></div><div class="s">bar a freddo ${pu}${$('ptinf')&&$('ptinf').value?' · gonfiate a '+$('ptinf').value+' °C':''}</div>`:`<div class="v bx-v2">${esc(pt.replace(/bar a freddo.*$/,'bar'))||'—'}</div><div class="s">${pt.includes('±')?'':'salva i turni nel diario per il valore esatto'}</div>`;
+  const wd=WX&&WX.current?WX.current.wind_direction_10m:null;
+  const compass=`<svg viewBox="0 0 120 120" class="bx-comp"><circle cx="60" cy="60" r="52" fill="#0b1220" stroke="#24334d" stroke-width="3"/>${['N','E','S','O'].map((t,i)=>`<text x="${60+40*Math.sin(i*Math.PI/2)}" y="${64-40*Math.cos(i*Math.PI/2)}" text-anchor="middle" class="bx-ax">${t}</text>`).join('')}
+    ${wd!=null?`<g transform="rotate(${wd+180} 60 60)"><path d="M60 18 L72 66 L60 58 L48 66 Z" fill="#9cc4ff"/></g>`:''}</svg>`;
+  const jet=$('jet')?$('jet').textContent.replace(/\s+/g,' ').trim():'';
+  let ta=0;const tile=(cls,l,body)=>`<div class="bx-t ${cls||''}" style="grid-area:${'abcde'[ta++]}"><div class="l">${l}</div>${body}</div>`;
+  const trend=(a,b)=>b-a>0.7?'▲':a-b>0.7?'▼':'▶';
+  // avvisi in fondo
+  const msgs=[];if(raining)msgs.push('🌧️ Piove in pista: monta le rain');else if(mins!=null)msgs.push(`🌧️ Pioggia tra ${mins} min (probabilità ${Math.round(first.p*100)}%)`);
+  if(CL.res&&CL.res.leads&&CL.res.leads[0]&&CL.res.leads[0].ps>=0.5)msgs.push('⛈️ Nubi temporalesche vicine');
+  if(Math.abs(p30.asph-n.asph)>=3)msgs.push(`🌡️ Asfalto ${p30.asph>n.asph?'in salita':'in calo'}: ${fmt(n.asph,0)} → ${fmt(p30.asph,0)} °C in 30 min`);
+  if((n.wg||n.ws)>=40)msgs.push(`💨 Raffiche fino a ${Math.round(n.wg||n.ws)} km/h`);
+  if(!msgs.length)msgs.push('✅ Nessun avviso: condizioni stabili');
+  $('bx-grid').innerHTML=`
+   <div class="bx-hero" style="--lv:${LV[0]}"><div class="bx-ringw">${ring}</div><div class="bx-status"><div class="bx-st">${LV[1]}</div><div class="bx-ss">${LV[2]}</div>
+      <div class="bx-chips"><span>${r?(r.near&&r.near.d<60?`cella più vicina ${Math.round(r.near.d)} km ${dir8(r.near.brg)}`:'nessuna cella entro 60 km'):'radar non disponibile'}</span><span>${CL.res?(CL.res.leads[0].p>=0.5?'☁️ cielo coperto':'☀️ cielo sereno'):'satellite non disponibile'}</span></div></div></div>
+   <div class="bx-radar">${pro&&$('mtx-c')?'<canvas id="bx-mtx"></canvas><div class="bx-cap">Matrice 2048 sensori</div>':'<div class="bx-lock">🔒 Matrice radar · Pro</div>'}</div>
+   <div class="bx-tlw"><div class="l">Prossime 3 ore · <span style="color:#7fb2ff">■ pioggia</span> <span style="color:#ff9f43">● asfalto</span> · banda: <span style="color:#f5a623">slick</span> / <span style="color:#3d8bff">rain</span></div>${timeline}</div>
+   ${tile('','Asfalto',`<div class="v">${fmt(n.asph,0)}<small>°C</small> <span class="bx-tr">${trend(n.asph,p30.asph)}</span></div><div class="s">tra 30 min ${fmt(p30.asph,0)} °C · aria ${fmt(n.ta,0)} °C</div>`)}
+   ${tile(best==='RAIN'?'rain':'slick','Gomma',`<div class="bx-tyre">${c?tyreIcon(tyreCol(c),64):''}<div><div class="v">${best}</div><div class="s">${c?esc(c.brand+' '+c.slick):''}</div></div></div><div class="s">slick ${fmtS(L.slick)} · rain ${fmtS(L.rain)} al giro</div>`)}
+   ${tile('','Pressioni',pressHtml)}
+   ${tile('','Carburazione',`<div class="v bx-v2">${esc(jet)||'—'}</div><div class="s">${esc(engNow().name.split(' · ')[0])}</div>`)}
+   ${tile('','Vento',`<div class="bx-wind">${compass}<div><div class="v">${Math.round(n.ws)}<small>km/h</small></div><div class="s">raffiche ${Math.round(n.wg||n.ws)}${wd!=null?' · da '+dir8(wd):''}</div></div></div>`)}
+   <div class="bx-tick"><div class="bx-tickin">${msgs.concat(msgs).map(m=>`<span>${esc(m)}</span>`).join('')}</div></div>`;
+  const bc=$('bx-mtx'),src=$('mtx-c');if(bc&&src){const sz=Math.min(bc.parentElement.clientWidth,bc.parentElement.clientHeight-28)||300,dpr=window.devicePixelRatio||1;bc.width=sz*dpr;bc.height=sz*dpr;bc.style.width=bc.style.height=sz+'px';
+    const g=bc.getContext('2d');try{g.drawImage(src,0,0,src.width,src.height,0,0,bc.width,bc.height);}catch(e){}}
+  $('bx-upd').textContent=`aggiornato ${new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}`;}
 // ---------- 7) Avvisi al team ----------
 const ALR={last:{}};
 const alrCfg=()=>Object.assign({on:false,min:20,prob:50,storm:true,sun:false,tgChat:''},store.get('tc_alerts',{}));
