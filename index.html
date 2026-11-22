@@ -719,8 +719,13 @@ const NC={res:null,seq:0,arrow:null};
 const sensLayer=L.layerGroup().addTo(map);
 setTimeout(()=>{const tv=$('tcver');if(tv)tv.textContent='versione '+TC_VER;
   // controllo aggiornamenti: se su GitHub c'è una versione più nuova di quella aperta (cache del browser o app sulla Home), lo dice
-  if(/^https?:$/.test(location.protocol)&&!window.__TC_DEMO){fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const TC_VER='(\d[^']*)'/);
-    if(m&&m[1]!==TC_VER){const b=document.createElement('div');b.id='tcupd';b.innerHTML=`🔄 C'è una versione più nuova del sito (${m[1]}). <button class="btn primary" id="tcupdb">Aggiorna</button>`;document.body.prepend(b);$('tcupdb').onclick=()=>location.replace(location.pathname+'?v='+Date.now());}}).catch(()=>{});}
+  if(/^https?:$/.test(location.protocol)&&!window.__TC_DEMO){
+    // controlla all'apertura, ogni 5 minuti e quando torni sulla pagina (iPad/iPhone riaprono la scheda senza ricaricarla)
+    const busy=()=>{const e=document.activeElement;return!!(e&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.tagName)&&e.value)||!!document.querySelector('dialog[open]');};
+    const chk=auto=>fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const TC_VER='(\d[^']*)'/);if(!m||m[1]===TC_VER)return;
+      const go=()=>location.replace(location.pathname+'?v='+Date.now()+location.hash);if(auto&&!busy())return go();
+      if($('tcupd'))return;const b=document.createElement('div');b.id='tcupd';b.innerHTML=`🔄 C'è una versione più nuova del sito (${m[1]}). <button class="btn primary" id="tcupdb">Aggiorna</button>`;document.body.prepend(b);$('tcupdb').onclick=go;}).catch(()=>{});
+    chk(true);setInterval(()=>chk(document.hidden),5*60e3);document.addEventListener('visibilitychange',()=>{if(!document.hidden)chk(true);});}
   const v=$('mtx-ver');if(v)v.textContent='Versione del sito: '+TC_VER;if(!CUR&&typeof renderMatrix==='function')renderMatrix();},0);
 function renderSensorLayer(){sensLayer.clearLayers();const r=NC.res;if(!r||!r.sens||!CUR)return;
   for(const s of r.sens){if(s.off||s.v<0.2||(!s.hit&&(s.di%4||s.ri%2)))continue;const b=s.brg*Math.PI/180,lat=CUR.lat+Math.cos(b)*s.km/111.2,lon=CUR.lon+Math.sin(b)*s.km/(111.2*Math.cos(CUR.lat*Math.PI/180));const c=tcColor(s.v)||[120,200,255];
@@ -851,7 +856,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='22/11/2026 23:00';
+const TC_VER='22/11/2026 23:10';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
