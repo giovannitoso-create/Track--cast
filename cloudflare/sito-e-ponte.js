@@ -61,10 +61,27 @@ async function ponte(req, env, u) {
   return out;
 }
 
+// /lt-check?url=...  -> dice solo se un sito di live timing si lascia mostrare dentro un altro sito (non scarica né inoltra la pagina)
+async function ltCheck(req, u) {
+  const h = { ...cors(req), 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
+  let t; try { t = new URL(u.searchParams.get('url') || ''); } catch (e) { return new Response('{"error":"url"}', { status: 400, headers: h }); }
+  if (!/^https?:$/.test(t.protocol)) return new Response('{"error":"url"}', { status: 400, headers: h });
+  try {
+    const r = await fetch(t.toString(), { redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0 TrackCast-check' }, signal: AbortSignal.timeout(8000) });
+    try { r.body && r.body.cancel(); } catch (e) {}
+    const xfo = (r.headers.get('X-Frame-Options') || '').toLowerCase();
+    const csp = r.headers.get('Content-Security-Policy') || '';
+    const fa = (csp.match(/frame-ancestors([^;]*)/i) || [, ''])[1].trim().toLowerCase();
+    const blocked = /deny|sameorigin/.test(xfo) || (fa && !/(^|\s)\*(\s|$)|https:/.test(fa));
+    return new Response(JSON.stringify({ ok: r.ok, status: r.status, final: r.url, https: r.url.startsWith('https:'), blocked: !!blocked }), { headers: h });
+  } catch (e) { return new Response(JSON.stringify({ error: 'fetch', message: String(e && e.message || e) }), { headers: h }); }
+}
+
 export default {
   async fetch(req, env) {
     const u = new URL(req.url);
     if (u.pathname.startsWith('/dpc/') || u.pathname.startsWith('/dpcs3/')) return ponte(req, env, u);
+    if (u.pathname === '/lt-check') return ltCheck(req, u);
     if (u.pathname === '/ponte') return new Response('TrackCast Kart · ponte radar attivo', { headers: { 'Content-Type': 'text/plain; charset=utf-8', ...cors(req) } });
     const res = await env.ASSETS.fetch(req);
     // la pagina del sito non resta in memoria: ogni modifica pubblicata si vede subito
