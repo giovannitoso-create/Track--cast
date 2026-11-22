@@ -196,16 +196,17 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 #boxscr .bx-pp{display:flex;gap:14px}#boxscr .bx-pp div{font-size:clamp(28px,3.2vw,54px);font-weight:900;line-height:1}#boxscr .bx-pp i{display:block;font-style:normal;font-size:12px;letter-spacing:.14em;color:#7f91aa;margin-bottom:4px}
 #boxscr .bx-tick{grid-area:tk;overflow:hidden;background:#0b1220;border:1px solid #223047;border-radius:999px;padding:10px 0;white-space:nowrap}#boxscr .bx-tickin{display:inline-block;animation:bxtick 30s linear infinite}
 #boxscr .bx-tickin span{margin-right:60px;font-size:clamp(15px,1.5vw,22px);font-weight:700;color:#dbe5f3}@keyframes bxtick{to{transform:translateX(-50%)}}
-#boxscr .bx-body{display:block}#boxscr.lt .bx-body{display:grid;grid-template-columns:minmax(0,1fr) var(--ltw,44%);gap:12px;align-items:start}
-#boxscr.lt[data-ltw="2"]{--ltw:62%}#boxscr.lt[data-ltw="3"] .bx-body{grid-template-columns:1fr}#boxscr.lt[data-ltw="3"] #bx-grid{display:none}
-#boxscr.lt .g{grid-template-columns:repeat(2,1fr);grid-template-areas:"hero hero" "radar radar" "tl tl" "a b" "c d" "e e" "tk tk"}
-#boxscr .bx-lt{position:sticky;top:0;display:flex;flex-direction:column;height:calc(100vh - 86px);background:#0b1220;border:1px solid #223047;border-radius:20px;overflow:hidden}
+#boxscr .bx-body{display:flex;flex-direction:column;gap:12px}
+#boxscr .g.gtop{grid-template-areas:"hero hero hero radar radar" "tl tl tl tl tl";min-height:0}#boxscr .g.gbot{grid-template-areas:"a b c d e" "tk tk tk tk tk";min-height:0}
+@media(max-width:1000px){#boxscr .g.gtop{grid-template-areas:"hero hero" "radar radar" "tl tl"}#boxscr .g.gbot{grid-template-areas:"a b" "c d" "e e" "tk tk"}}
+@media(max-width:560px){#boxscr .g.gtop{grid-template-areas:"hero" "radar" "tl"}#boxscr .g.gbot{grid-template-areas:"a" "b" "c" "d" "e" "tk"}}
+#boxscr.lt[data-ltw="2"] .bx-lt{height:85vh}#boxscr.lt[data-ltw="3"] .g{display:none}#boxscr.lt[data-ltw="3"] .bx-lt{height:calc(100vh - 86px)}
+#boxscr .bx-lt{position:relative;display:flex;flex-direction:column;height:60vh;min-height:360px;background:#0b1220;border:1px solid #223047;border-radius:20px;overflow:hidden}
 #boxscr .bx-ltbar{display:flex;gap:6px;align-items:center;padding:8px;background:#0f1828;border-bottom:1px solid #223047;flex-wrap:wrap}
 #boxscr .bx-ltbar select{max-width:34%}#boxscr .bx-ltbar select,#boxscr .bx-ltbar input{background:#070d17;border:1px solid #2a3c5a;color:#e8eef7;border-radius:8px;padding:7px 9px;font:500 14px Inter}#boxscr .bx-ltbar input{flex:1;min-width:150px}
 #boxscr .bx-ltmsg{font-size:13px;color:#ffc781;padding:0 10px}#boxscr .bx-ltmsg:not(:empty){padding:8px 10px;border-bottom:1px solid #223047;background:#1d1608}
 #boxscr .bx-ltf{position:relative;flex:1;background:#fff}#boxscr .bx-ltf iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
 #boxscr .bx-lt0{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;background:#0b1220;color:#9fb0c6;font-size:16px;line-height:1.5}
-@media(max-width:1000px){#boxscr.lt .bx-body{grid-template-columns:1fr}#boxscr .bx-lt{position:relative;height:62vh;order:-1}#boxscr.lt[data-ltw="2"] #bx-grid,#boxscr.lt[data-ltw="3"] #bx-grid{display:none}#boxscr.lt[data-ltw] .bx-lt{height:calc(100vh - 86px)}}
 @media (prefers-reduced-motion:reduce){#boxscr .bx-tickin,#boxscr[data-lvl=red] .bx-hero{animation:none}}
 @media(max-width:1000px){#boxscr .g{grid-template-columns:repeat(2,1fr);grid-template-areas:"hero hero" "radar radar" "tl tl" "a b" "c d" "e e" "tk tk"}}
 @media(max-width:560px){#boxscr .g{grid-template-columns:1fr;grid-template-areas:"hero" "radar" "tl" "a" "b" "c" "d" "e" "tk"}#boxscr .bx-hero{flex-direction:column;text-align:center}#boxscr .bx-chips{justify-content:center}}
@@ -567,9 +568,9 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
 <div class="mdl" id="plans"><div class="box" style="max-width:720px"><div style="display:flex;align-items:center;gap:8px"><h3>⭐ TrackCast Pro</h3><button class="chipb" id="plans-x" style="margin-left:auto">Chiudi</button></div>
   <div class="sub" style="margin:0">Radar avanzato con matrice sensori, nowcast con probabilità, nubi dal satellite e avvisi temporali in anticipo. In arrivo: avvisi “pioggia in pista” sul telefono.</div><div id="plans-body"></div></div></div>
 <div id="pdfstage" aria-hidden="true"></div>
-<div id="boxscr" data-lvl="green"><div class="bx-head"><span class="bx-dot"></span><b id="bx-title"></b><span id="bx-upd"></span><span id="bx-clock"></span><button class="chipb" id="bx-ltb" style="font-size:15px" title="Apri un sito di live timing accanto al meteo">🌐 Live timing</button><button class="chipb" id="bx-x" style="font-size:15px">Esci</button></div><div class="bx-body"><div class="g" id="bx-grid"></div>
-<div class="bx-lt" id="bx-lt" hidden><div class="bx-ltbar"><b>🌐</b><select id="bx-ltp" title="Siti di live timing"></select><input id="bx-ltu" type="url" inputmode="url" placeholder="Incolla l'indirizzo del live timing della gara…" autocomplete="off"><button class="chipb" id="bx-ltgo">Apri</button><button class="chipb" id="bx-ltr" title="Ricarica">↻</button><button class="chipb" id="bx-ltw" title="Dimensione della finestra">◧</button><button class="chipb" id="bx-lto" title="Apri in una nuova scheda">↗</button><button class="chipb" id="bx-ltx" title="Chiudi">✕</button></div>
-<div class="bx-ltmsg" id="bx-ltmsg"></div><div class="bx-ltf"><iframe id="bx-ltif" title="Live timing" referrerpolicy="no-referrer-when-downgrade" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" allow="fullscreen"></iframe><div class="bx-lt0" id="bx-lt0">Scegli un sito dall'elenco o incolla l'indirizzo del live timing della tua gara (lo trovi sul sito della pista o dell'organizzatore).<br>Il sito resta salvato per questa pista.</div></div></div></div></div>
+<div id="boxscr" data-lvl="green"><div class="bx-head"><span class="bx-dot"></span><b id="bx-title"></b><span id="bx-upd"></span><span id="bx-clock"></span><button class="chipb" id="bx-ltb" style="font-size:15px" title="Apri un sito di live timing accanto al meteo">🌐 Live timing</button><button class="chipb" id="bx-x" style="font-size:15px">Esci</button></div><div class="bx-body"><div class="g gtop" id="bx-grid"></div>
+<div class="bx-lt" id="bx-lt" hidden><div class="bx-ltbar"><b>🌐</b><select id="bx-ltp" title="Siti di live timing"></select><input id="bx-ltu" type="url" inputmode="url" placeholder="Incolla l'indirizzo del live timing della gara…" autocomplete="off"><button class="chipb" id="bx-ltgo">Apri</button><button class="chipb" id="bx-ltr" title="Ricarica">↻</button><button class="chipb" id="bx-ltw" title="Altezza della finestra">◧</button><button class="chipb" id="bx-lto" title="Apri in una nuova scheda">↗</button><button class="chipb" id="bx-ltx" title="Chiudi">✕</button></div>
+<div class="bx-ltmsg" id="bx-ltmsg"></div><div class="bx-ltf"><iframe id="bx-ltif" title="Live timing" referrerpolicy="no-referrer-when-downgrade" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" allow="fullscreen"></iframe><div class="bx-lt0" id="bx-lt0">Scegli un sito dall'elenco o incolla l'indirizzo del live timing della tua gara (lo trovi sul sito della pista o dell'organizzatore).<br>Il sito resta salvato per questa pista.</div></div></div><div class="g gbot" id="bx-grid2"></div></div></div>
 <div id="vgun"><div class="box">
   <div style="display:flex;align-items:center;gap:8px"><h3 style="margin:0">🔫 Pistola virtuale</h3><button class="chipb" id="vg-x" style="margin-left:auto">Chiudi</button></div>
   <div class="vg-read"><span id="vg-dot"></span><div><div id="vg-val">--</div><div id="vg-unc"></div></div></div>
@@ -868,7 +869,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='22/11/2026 23:45';
+const TC_VER='22/11/2026 23:55';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1477,6 +1478,7 @@ function drawBox(){if(!SIM||!CUR)return;const S=SIM.S,ni=SIM.ni,n=S[ni],p30=S[Ma
    ${tile('','Carburazione',`<div class="v bx-v2">${esc(jet)||'—'}</div><div class="s">${esc(engNow().name.split(' · ')[0])}</div>`)}
    ${tile('','Vento',`<div class="bx-wind">${compass}<div><div class="v">${Math.round(n.ws)}<small>km/h</small></div><div class="s">raffiche ${Math.round(n.wg||n.ws)}${wd!=null?' · da '+dir8(wd):''}</div></div></div>`)}
    <div class="bx-tick"><div class="bx-tickin">${msgs.concat(msgs).map(m=>`<span>${esc(m)}</span>`).join('')}</div></div>`;
+  {const g=$('bx-grid'),g2=$('bx-grid2');g2.innerHTML='';[...g.children].slice(3).forEach(e=>g2.appendChild(e));}
   const bc=$('bx-mtx'),src=$('mtx-c');if(bc&&src){const sz=Math.min(bc.parentElement.clientWidth,bc.parentElement.clientHeight-28)||300,dpr=window.devicePixelRatio||1;bc.width=sz*dpr;bc.height=sz*dpr;bc.style.width=bc.style.height=sz+'px';
     const g=bc.getContext('2d');try{g.drawImage(src,0,0,src.width,src.height,0,0,bc.width,bc.height);}catch(e){}}
   $('bx-upd').textContent=`aggiornato ${new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}`;}
@@ -1503,7 +1505,7 @@ $('bx-ltgo').onclick=()=>ltOpen($('bx-ltu').value);$('bx-ltu').addEventListener(
 $('bx-ltp').onchange=e=>{if(e.target.value)ltOpen(e.target.value);};
 $('bx-ltr').onclick=()=>{const f=$('bx-ltif');if(f.src){const u=f.src;f.src='about:blank';setTimeout(()=>f.src=u,60);}};
 $('bx-lto').onclick=()=>{const u=ltNorm($('bx-ltu').value);if(u)window.open(u,'_blank','noopener');};
-$('bx-ltw').onclick=()=>{LT.w=LT.w%3+1;$('boxscr').dataset.ltw=LT.w;$('bx-ltw').textContent=['◧','◨','⬛'][LT.w-1];$('bx-ltw').title=['Metà schermo','Più grande','Tutto lo schermo'][LT.w-1];setTimeout(()=>{try{drawBox();}catch(e){}},50);};
+$('bx-ltw').onclick=()=>{LT.w=LT.w%3+1;$('boxscr').dataset.ltw=LT.w;$('bx-ltw').textContent=['◧','◨','⬛'][LT.w-1];$('bx-ltw').title=['Altezza normale','Più alta','Tutto lo schermo'][LT.w-1];setTimeout(()=>{try{drawBox();}catch(e){}},50);};
 // ---------- 7) Avvisi al team ----------
 const ALR={last:{}};
 const alrCfg=()=>Object.assign({on:false,min:20,prob:50,storm:true,sun:false,tgChat:''},store.get('tc_alerts',{}));
