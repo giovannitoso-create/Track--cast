@@ -186,6 +186,8 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 @media (prefers-reduced-motion:reduce){#boxscr .bx-tickin,#boxscr[data-lvl=red] .bx-hero{animation:none}}
 @media(max-width:1000px){#boxscr .g{grid-template-columns:repeat(2,1fr);grid-template-areas:"hero hero" "radar radar" "tl tl" "a b" "c d" "e e" "tk tk"}}
 @media(max-width:560px){#boxscr .g{grid-template-columns:1fr;grid-template-areas:"hero" "radar" "tl" "a" "b" "c" "d" "e" "tk"}#boxscr .bx-hero{flex-direction:column;text-align:center}#boxscr .bx-chips{justify-content:center}}
+.jt-scr{display:flex;align-items:center;gap:6px;margin:4px 0}.jt-scr span{width:64px;color:var(--ink2);font-size:13px}.jt-scr input{width:58px}.jt-scr select{flex:1}.jt-scr i{font-style:normal;color:var(--ink3);font-size:12px}
+.jt-chk{margin:4px 0}.jt-chk summary{cursor:pointer;color:var(--ink2);font-size:13px}#jetrefrow{flex-direction:column;align-items:stretch}#jetrefrow .chipb{align-self:flex-start;margin-top:4px}
 .jt-k{font-size:14px;font-weight:600;color:var(--ink2);margin-right:4px}
 .jt-cmp{margin:6px 0;padding:8px 10px;border-radius:9px;background:rgba(127,145,170,.10);color:var(--ink)}.jt-cmp.ok{background:rgba(51,209,122,.12)}.jt-cmp.up{background:rgba(255,159,67,.13)}.jt-cmp.dn{background:rgba(61,139,255,.13)}
 .jt-next{display:flex;gap:6px;margin:6px 0}.jt-next span{flex:1;text-align:center;background:rgba(127,145,170,.10);border-radius:8px;padding:4px 0;font-weight:800;color:var(--ink)}.jt-next i{display:block;font-style:normal;font-weight:500;font-size:11px;color:var(--ink3)}
@@ -815,7 +817,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='22/11/2026 19:30';
+const TC_VER='22/11/2026 20:30';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)return;const ctx=cv.getContext('2d'),W=cv.width,C=W/2;ctx.clearRect(0,0,W,W);
@@ -1216,12 +1218,50 @@ function jetRef(eng){const good=plogAll().filter(e=>e.good&&e.eng===eng.id&&e.je
 function jetRound(eng,j){if(eng.series){const s=eng.series;const up=s.find(x=>x>=j-0.3);return eng.roundUp?(up||s[s.length-1]):s.reduce((a,b)=>Math.abs(b-j)<Math.abs(a-j)?b:a);}
   const st=eng.step||1;return Math.round(j/st)*st;}
 function jetAdvice(eng,pct){const r=jetRef(eng),raw=r.k*Math.sqrt(pct);return{raw,jet:jetRound(eng,raw),src:r.src,learned:r.learned};}
-function membraneAdvice(eng,pct){const good=plogAll().filter(e=>e.good&&e.eng===eng.id&&e.rho>0),man=store.get('tc_mref_'+eng.id,null),lastG=good.length?Math.max(...good.map(e=>e.ts)):0;
-  const ref=man&&man.ts>=lastG?{rho:man.rho,ts:man.ts}:good.length?{rho:good.reduce((a,e)=>a+e.rho,0)/good.length,ts:lastG,n:good.length}:null,base=ref?ref.rho:100,d=pct-base;
-  const when=ref?(ref.n?`${ref.n} turni buoni del diario`:new Date(ref.ts).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})):'';
-  const what=Math.abs(d)<1?'come il riferimento':d>0?'più grassa (apri H)':'più magra (chiudi H)';
-  const how=Math.abs(d)<1?'nessuna correzione':Math.abs(d)<3?'un passo piccolo, circa 5\'':'due passi da 5\', poi controlla';
-  return{d,base,what,how,hasRef:!!ref,when};}
+// ---- Carburatore a membrana: viti H/L a minuti (5' = 1/12 di giro) ----
+const fmtScrew=m=>{if(m==null||isNaN(m))return'—';m=Math.max(0,Math.round(m));const g=Math.floor(m/60),r=m%60;return g?(`${g} gir${g>1?'i':'o'}`+(r?` e ${r}'`:'')):`${r}'`;};
+const screwOf=eng=>Object.assign({H:null,L:null,pop:null,plug:'',egt:null},store.get('tc_screw_'+eng.id,{}));
+function membRefs(eng){const man=store.get('tc_mrefs_'+eng.id,[]);const di=plogAll().filter(e=>e.good&&e.eng===eng.id&&e.rho>0).map(e=>({rho:e.rho,H:e.scrH??null,L:e.scrL??null,pop:e.pop??null,egt:e.egt??null,ts:e.ts,diary:true}));
+  const old=store.get('tc_mref_'+eng.id,null);const all=man.concat(di);if(old&&!man.some(r=>r.ts===old.ts))all.push(Object.assign({H:null},old));return all.sort((a,b)=>a.ts-b.ts);}
+const MEMB_K=2.5; // minuti di vite H per ogni 1% di densità dell'aria: regola pratica finché il sito non impara il tuo carburatore
+function membraneAdvice(eng,pct){const R=membRefs(eng);if(!R.length)return{hasRef:false,d:0,k:MEMB_K,learned:false};
+  const withH=R.filter(r=>r.H!=null),base=(withH.length?withH:R)[ (withH.length?withH:R).length-1];
+  let k=MEMB_K,learned=false,n=0;
+  if(withH.length>=2){const w=withH.map(r=>Math.pow(0.5,(Date.now()-r.ts)/(120*864e5))),W=w.reduce((a,b)=>a+b,0),mx=withH.reduce((s,r,i)=>s+w[i]*r.rho,0)/W,my=withH.reduce((s,r,i)=>s+w[i]*r.H,0)/W;
+    const sxx=withH.reduce((s,r,i)=>s+w[i]*(r.rho-mx)**2,0),sxy=withH.reduce((s,r,i)=>s+w[i]*(r.rho-mx)*(r.H-my),0),span=Math.max(...withH.map(r=>r.rho))-Math.min(...withH.map(r=>r.rho));
+    if(span>=1&&sxx>0){n=withH.length;const kf=Math.max(0,Math.min(10,sxy/sxx));k=(n*kf+3*MEMB_K)/(n+3);learned=true;}}
+  const d=pct-base.rho,dm=Math.round(k*d/5)*5,target=base.H!=null?Math.max(0,base.H+dm):null;
+  const when=new Date(base.ts).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+(base.diary?' (diario)':'');
+  const what=Math.abs(dm)<5?'come il riferimento':dm>0?'più grassa (apri H)':'più magra (chiudi H)';
+  return{hasRef:true,d,base,k,learned,n,dm,target,when,what,how:Math.abs(dm)<5?'nessuna correzione':`${dm>0?'apri':'chiudi'} ${Math.abs(dm)}'`};}
+function membraneUI(eng,ad,why){const m=membraneAdvice(eng,ad.pct),sc=screwOf(eng),cur=sc.H;
+  let big,cmp;
+  if(!m.hasRef){big='<span class="jt-k">Vite H</span> serve un riferimento';cmp=`<div class="jt-cmp">Scrivi dove sono le viti e, quando il motore va bene, premi <b>“✓ Andava bene così”</b>. Da lì ti dico la posizione esatta della H quando cambia il meteo.</div>`;}
+  else if(m.target!=null){big=`<span class="jt-k">Vite H a</span> ${fmtScrew(m.target)}`;const diff=cur!=null?m.target-cur:null;
+    cmp=(diff==null?`<div class="jt-cmp">Scrivi dove è adesso la H per sapere quanto girarla.</div>`:diff===0?`<div class="jt-cmp ok">✅ La tua H (${fmtScrew(cur)}) è già giusta: non toccarla.</div>`
+      :`<div class="jt-cmp ${diff>0?'up':'dn'}">${diff>0?'⬆️ Apri':'⬇️ Chiudi'} la H di <b>${Math.abs(diff)}'</b> (${diff>0?'antiorario, più benzina':'orario, meno benzina'}): da ${fmtScrew(cur)} a ${fmtScrew(m.target)}.</div>`);}
+  else{big=Math.abs(m.dm)<5?'<span class="jt-k">Vite H</span> lasciala così':`<span class="jt-k">Vite H</span> ${m.dm>0?'apri':'chiudi'} ${Math.abs(m.dm)}'`;cmp=`<div class="jt-cmp">Scrivi dove sono le viti e premi di nuovo “✓ Andava bene così”: ti darò la posizione esatta, non solo quanto girare.</div>`;}
+  const warn=[];
+  if(m.hasRef&&sc.pop&&m.base.pop&&Math.abs(sc.pop-m.base.pop)>=0.05)warn.push(`⚠️ Pop-off diverso dal riferimento (${fmt(sc.pop,2)} contro ${fmt(m.base.pop,2)} bar): le posizioni delle viti non sono confrontabili. Rifai il riferimento con questa membrana.`);
+  if(sc.plug==='chiara')warn.push('⚠️ Candela chiara o bianca: sei <b>magro</b>, rischio di grippaggio. Apri la H di 5\' e ricontrolla dopo 2-3 giri.');
+  if(sc.plug==='nera')warn.push('⚠️ Candela nera o umida: sei <b>grasso</b>. Chiudi la H di 5\' e ricontrolla.');
+  if(sc.egt&&m.hasRef&&m.base.egt){const de=sc.egt-m.base.egt;if(de>25)warn.push(`⚠️ Scarico a ${Math.round(sc.egt)} °C, ${Math.round(de)} °C più caldo di quando andava bene: tendenza <b>magra</b>, apri la H di 5'.`);else if(de<-25)warn.push(`⚠️ Scarico a ${Math.round(sc.egt)} °C, ${Math.round(-de)} °C più freddo di quando andava bene: tendenza <b>grassa</b>, chiudi la H di 5'.`);}
+  else if(sc.egt&&!(m.hasRef&&m.base.egt))warn.push('Per usare la temperatura allo scarico, scrivila anche quando premi “Andava bene così”: diventa il tuo valore giusto.');
+  const info=m.hasRef?`<div class="t3">Riferimento: ${m.when}${m.base.H!=null?`, H a ${fmtScrew(m.base.H)}`:''}${m.base.L!=null?`, L a ${fmtScrew(m.base.L)}`:''}. Aria ${Math.abs(m.d)<0.1?'uguale':`${m.d>0?'più pesante':'più leggera'} del ${fmt(Math.abs(m.d),1)}%`} → ${m.how}. ${m.learned?`Il tuo carburatore: <b>${fmt(m.k,1)}' di H per ogni 1%</b> d'aria, imparato da ${m.n} riferimenti.`:`Uso ${fmt(MEMB_K,1)}' per ogni 1% d'aria (regola pratica): con riferimenti in giornate diverse il sito impara il valore del tuo carburatore.`} La L di solito non si tocca col meteo: si regola sulla ripresa dalle curve lente.</div>`:'';
+  return{big,note:cmp+warn.map(w=>`<div class="jt-cmp dn" style="background:rgba(255,92,92,.12)">${w}</div>`).join('')+info+why,m};}
+function membraneInputs(eng){const sc=screwOf(eng),g=m=>m==null?'':Math.floor(m/60),mi=m=>m==null?'':m%60;
+  return`<div class="jt-scr"><span>Vite H</span><input type="number" id="scHg" min="0" max="5" value="${g(sc.H)}" placeholder="giri"><i>giri</i><input type="number" id="scHm" min="0" max="55" step="5" value="${mi(sc.H)}" placeholder="min"><i>'</i></div>
+   <div class="jt-scr"><span>Vite L</span><input type="number" id="scLg" min="0" max="5" value="${g(sc.L)}" placeholder="giri"><i>giri</i><input type="number" id="scLm" min="0" max="55" step="5" value="${mi(sc.L)}" placeholder="min"><i>'</i></div>
+   <details class="jt-chk"${sc.pop||sc.plug||sc.egt?' open':''}><summary>Controlli: pop-off, candela, scarico</summary>
+    <div class="jt-scr"><span>Pop-off</span><input type="number" id="scPop" step="0.01" value="${sc.pop??''}" placeholder="bar"><i>bar</i></div>
+    <div class="jt-scr"><span>Candela</span><select id="scPlug"><option value="">—</option><option value="ok"${sc.plug==='ok'?' selected':''}>nocciola / marrone chiaro</option><option value="chiara"${sc.plug==='chiara'?' selected':''}>chiara / bianca</option><option value="nera"${sc.plug==='nera'?' selected':''}>nera / umida</option></select></div>
+    <div class="jt-scr"><span>Scarico</span><input type="number" id="scEgt" step="5" value="${sc.egt??''}" placeholder="°C"><i>°C</i></div></details>
+   <button class="chipb" id="jetgood">✓ Andava bene così</button>`;}
+function membraneWire(eng,ad){const rd=(a,b)=>{const x=$(a).value,y=$(b).value;return x===''&&y===''?null:(+x||0)*60+(+y||0);};
+  const save=()=>{const sc=screwOf(eng);sc.H=rd('scHg','scHm');sc.L=rd('scLg','scLm');sc.pop=$('scPop').value===''?null:+$('scPop').value;sc.plug=$('scPlug').value;sc.egt=$('scEgt').value===''?null:+$('scEgt').value;store.set('tc_screw_'+eng.id,sc);renderSetup();};
+  ['scHg','scHm','scLg','scLm','scPop','scPlug','scEgt'].forEach(id=>$(id).onchange=save);
+  $('jetgood').onclick=()=>{const sc=screwOf(eng);const r={rho:+ad.pct.toFixed(1),H:sc.H,L:sc.L,pop:sc.pop,egt:sc.egt,ts:Date.now()};const L=store.get('tc_mrefs_'+eng.id,[]);L.push(r);store.set('tc_mrefs_'+eng.id,L.slice(-30));store.set('tc_mref_'+eng.id,r);
+    sc.plug='';store.set('tc_screw_'+eng.id,sc);status(sc.H!=null?`Salvato: H a ${fmtScrew(sc.H)} con aria al ${fmt(ad.pct,1)}%.`:'Salvato. Scrivi anche la posizione della H per avere la posizione esatta.');renderSetup();};}
 const asphLogKey=id=>'tc_asphlog_'+id;
 function logAsph(measured){if(!CUR||!SIM)return;const n=SIM.S[SIM.ni];const L=store.get(asphLogKey(CUR.id),[]);
   L.push({ts:Date.now(),measured,model:+(n.ts_asph-(n.bias||0)).toFixed(2),sw:Math.round(n.sw||0)});store.set(asphLogKey(CUR.id),L.slice(-60));try{cloudPushAsph&&cloudPushAsph(L[L.length-1]);}catch(e){}}
@@ -1237,7 +1277,7 @@ function renderSetupTab(){const P=$('pt-setup');if(!SIM){P.innerHTML='<div class
   P.innerHTML=`<div class="pt-row">Motore <select id="su-eng">${ENGINES.map(e=>`<option value="${e.id}"${e.id===eng.id?' selected':''}>${e.name}</option>`).join('')}</select></div>
     <div class="kpi3"><div><div class="l">Densità aria ora</div><div class="big">${fmt(now,1)}%</div><div class="sub">100% = aria standard (15 °C, 1013 hPa)</div></div>
     ${eng.jet?`<div><div class="l">Getto consigliato ora</div><div class="big">${jetAdvice(eng,now).jet}</div><div class="sub">da ${ref.src}</div></div>`:
-      `<div><div class="l">Carburazione</div><div class="big">${now>101?'più grassa':now<99?'più magra':'come il riferimento'}</div><div class="sub">aria ${now>100?'più densa':'meno densa'} del ${fmt(Math.abs(now-100),1)}%: ${Math.abs(now-100)<1?'nessuna correzione':'correggi le viti di poco, un passo alla volta'}</div></div>`}
+      (()=>{const m=membraneAdvice(eng,now);return`<div><div class="l">Vite H</div><div class="big">${!m.hasRef?'—':m.target!=null?fmtScrew(m.target):m.how}</div><div class="sub">${!m.hasRef?'premi “Andava bene così” nel riquadro Carburazione':m.learned?`${fmt(m.k,1)}' per 1% d'aria, dal tuo carburatore`:'regola pratica: 2,5\' per 1% d\'aria'}</div></div>`;})()}
     <div><div class="l">Asfalto tarato dal team</div><div class="big">${b?(b.sun>=0?'+':'−')+fmt(Math.abs(b.sun),1)+' °C':'—'}</div><div class="sub">${b?`correzione al sole da ${b.n} misure col termometro (all'ombra ${(b.shade>=0?'+':'−')+fmt(Math.abs(b.shade),1)} °C)`:'nessuna misura salvata: usa “Tara” con il termometro'}</div></div></div>
     <table><thead><tr><th>Ora</th>${hrs.map(p=>`<th>${lblTime(p.label)}</th>`).join('')}</tr></thead><tbody>
       <tr><td>Densità</td>${hrs.map(p=>`<td>${fmt((p.air||airDensity(p)).pct,1)}%</td>`).join('')}</tr>
@@ -2289,7 +2329,7 @@ function saveBlob(b,name){const a=document.createElement('a');a.href=URL.createO
      const hc=[[cf,hf],[cr,hr]].filter(([a,b])=>a!=null&&b!=null);if(hc.some(([a,b])=>b<a-0.05||b-a>0.7)){status('Controlla: la pressione a caldo deve essere più alta di quella a freddo, e di solito non più di 0,5 bar.',true);return;}}
     const w=diaryWx()||{asph:25,air:null,rh:null};const e={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),ts:Date.now(),team:store.get('tc_team',''),driver:$('ddrv').value,
       track:CUR?CUR.id:'',trackName:CUR?CUR.name:'',cmp:$('dcmp').value,sess:$('dsess').value,set:$('dset').value,setLaps:numv('dsetl'),
-      coldF:cf??cr,coldR:cr??cf,hotF:hf??hr,hotR:hr??hf,tinf:numv('dtinf'),best:$('dbest').value.trim(),laps:numv('dlaps'),note:$('dnote').value.trim(),good:$('dgood').checked,asph:w.asph,air:w.air,rh:w.rh,rho:w.rho,eng:$('deng').value,jet:numv('djet'),needle:$('dneedle').value.trim(),pin:numv('dpin'),crown:numv('dcrown'),carr:$('dcarr').value.trim()};
+      coldF:cf??cr,coldR:cr??cf,hotF:hf??hr,hotR:hr??hf,tinf:numv('dtinf'),best:$('dbest').value.trim(),laps:numv('dlaps'),note:$('dnote').value.trim(),good:$('dgood').checked,asph:w.asph,air:w.air,rh:w.rh,rho:w.rho,eng:$('deng').value,...(()=>{const E=ENGINES.find(x=>x.id===$('deng').value);if(!E||E.jet)return{};const sc=screwOf(E);return{scrH:sc.H,scrL:sc.L,pop:sc.pop,egt:sc.egt};})(),jet:numv('djet'),needle:$('dneedle').value.trim(),pin:numv('dpin'),crown:numv('dcrown'),carr:$('dcarr').value.trim()};
     mergeEntries([e]);if(e.good){$('tyrecmp').value=e.cmp;store.set('tc_cmp',e.cmp);}
     ['dhf','dhr','dbest','dlaps','dnote'].forEach(id=>$(id).value='');store.set('tc_engine',$('deng').value);$('dgood').checked=false;status('Turno salvato nel diario: le prossime pressioni usano anche questo turno.');renderDiary();renderSetup();};
   $('dexp').onclick=()=>saveBlob(diaryBlob(),dname());
@@ -2538,7 +2578,7 @@ function renderJet(ad,st,S,i0){const eng=engNow(),P=ad.station?st:S[i0];
   const fx=(v,lbl)=>`<span class="jt-f ${v>0.3?'up':v<-0.3?'dn':''}">${lbl} <b>${v>=0?'+':'−'}${fmt(Math.abs(v),1)}%</b></span>`;
   const heavy=ad.pct>=101,light=ad.pct<=99;
   const why=`<div class="jt-air"><div class="jt-bar"><span style="left:${Math.max(0,Math.min(100,(ad.pct-85)/25*100))}%"></span></div><div class="jt-scale"><span>aria leggera</span><span>normale</span><span>aria pesante</span></div>
-    <div>Oggi l'aria è <b>${heavy?'più pesante':light?'più leggera':'come quella normale'}</b> (${fmt(ad.pct,1)}% della normale): ${heavy?'entra più ossigeno nel motore, quindi serve <b>più benzina</b>':light?'entra meno ossigeno nel motore, quindi serve <b>meno benzina</b>':'la carburazione standard va bene'}.</div>
+    <div>Rispetto all'aria normale (15 °C, 1013 hPa) oggi è <b>${heavy?'più pesante':light?'più leggera':'uguale'}</b> (${fmt(ad.pct,1)}%): ${heavy?'entra più ossigeno nel motore, quindi serve <b>più benzina</b>':light?'entra meno ossigeno nel motore, quindi serve <b>meno benzina</b>':'la carburazione standard va bene'}.</div>
     <div class="jt-fs">${fx(fT,P.ta>15?`🌡️ caldo ${fmt(P.ta,0)} °C`:`🌡️ freddo ${fmt(P.ta,0)} °C`)}${fx(fP,`🧭 pressione ${Math.round(P.ps)} hPa`)}${fx(fH,`💧 umidità ${Math.round(P.rh)}%`)}</div>
     <div class="t3">${ad.station?'Dati dalla stazione del team':'Previsione per le '+hhmm(S[i0])}</div></div>`;
   const nxt=[0,4,8,12].map(o=>S[Math.min(S.length-1,i0+o)]).filter((p,i,a)=>a.indexOf(p)===i);
@@ -2550,15 +2590,12 @@ function renderJet(ad,st,S,i0){const eng=engNow(),P=ad.station?st:S[i0];
       :`<div class="jt-cmp ${d>0?'up':'dn'}">${d>0?'⬆️':'⬇️'} Rispetto al tuo <b>${mnt}</b>: <b>${d>0?'+':'−'}${Math.abs(d)}</b> → ${d>0?'più grasso (più benzina)':'più magro (meno benzina)'}${d<0&&eng.roundUp?'. Rotax: mai sotto il getto della tabella.':''}</div>`;}
     $('jetnote').innerHTML=`${cmp}<div class="jt-next">${nxt.map(p=>{const j=jetAdvice(eng,airDensity(p).pct).jet;return`<span><i>${p===S[i0]?'ora':hhmm(p)}</i>${j}</span>`;}).join('')}</div>
       <div class="t3">Calcolato da: ${a.src}.${eng.roundUp?' Arrotondato al getto più grande.':''}</div>${why}`;}
-  else{const m=membraneAdvice(eng,ad.pct);
-    $('jet').innerHTML=m.hasRef?(Math.abs(m.d)<1?'<span class="jt-k">Vite H</span> lasciala così':`<span class="jt-k">Vite H</span> ${m.d>0?'apri':'chiudi'} ${Math.abs(m.d)<3?"5'":"10'"}`):'<span class="jt-k">Vite H</span> serve un riferimento';
-    $('jetnote').innerHTML=`${m.hasRef?`<div class="jt-cmp ${Math.abs(m.d)<1?'ok':m.d>0?'up':'dn'}">Rispetto a quando andava bene (${m.when}): ${Math.abs(m.d)<0.1?'aria uguale':`aria ${m.d>=0?'più pesante':'più leggera'} del ${fmt(Math.abs(m.d),1)}%`} → ${Math.abs(m.d)<1?'nessuna correzione':m.d>0?'un po\' più benzina: <b>apri</b> la H':'un po\' meno benzina: <b>chiudi</b> la H'}${Math.abs(m.d)>=1?`, a passi da 5' e controllando la candela`:''}.</div>`
-      :`<div class="jt-cmp">Quando il motore va bene, premi <b>“✓ Andava bene così”</b> qui sotto: da quel momento ti dico quanto girare la vite H quando cambia il meteo.</div>`}${why}`;}
+  else{const u=membraneUI(eng,ad,why);$('jet').innerHTML=u.big;$('jetnote').innerHTML=u.note;}
   $('jetrefrow').innerHTML=eng.jet?`<label>Getto montato ora <input type="number" id="jetmnt" value="${mnt||''}" placeholder="es. 128" style="width:70px"></label><button class="chipb" id="jetgood">✓ Andava bene così</button>`
-    :`<button class="chipb" id="jetgood">✓ Andava bene così</button>`;
+    :membraneInputs(eng);
   $('jetrefrow').style.display='';
   const jm=$('jetmnt');if(jm)jm.onchange=()=>{const v=+jm.value;if(v>0)store.set('tc_jetmnt_'+eng.id,v);else localStorage.removeItem('tc_jetmnt_'+eng.id);renderSetup();};
-  $('jetgood').onclick=()=>{if(eng.jet){const v=+($('jetmnt')&&$('jetmnt').value)||jetAdvice(eng,ad.pct).jet;store.set('tc_jet_'+eng.id,{jr:v,rr:+ad.pct.toFixed(1),ts:Date.now()});store.set('tc_jetmnt_'+eng.id,v);}
+  if(!eng.jet)membraneWire(eng,ad);else $('jetgood').onclick=()=>{if(eng.jet){const v=+($('jetmnt')&&$('jetmnt').value)||jetAdvice(eng,ad.pct).jet;store.set('tc_jet_'+eng.id,{jr:v,rr:+ad.pct.toFixed(1),ts:Date.now()});store.set('tc_jetmnt_'+eng.id,v);}
     else store.set('tc_mref_'+eng.id,{rho:+ad.pct.toFixed(1),ts:Date.now()});status('Salvato: da ora la carburazione parte da qui.');renderSetup();};
   $('jetinfo').innerHTML=`<details><summary>📘 ${esc(eng.carb)} · dati e consigli</summary>${esc(eng.official)}${eng.std?'<br>'+esc(eng.std):''}${eng.tips&&eng.tips.length?'<br>'+eng.tips.map(esc).join('<br>'):''}</details>`;}
 (function initJet(){const sel=$('jeteng');sel.innerHTML=ENGINES.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');sel.value=engNow().id;
