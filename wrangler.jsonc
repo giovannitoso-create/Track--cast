@@ -1,0 +1,12 @@
+// Cloudflare Workers: pubblica il sito (file statici) + il ponte radar della Protezione Civile.
+// Cloudflare lo usa da solo a ogni modifica su GitHub (comando "npx wrangler deploy").
+{
+  "name": "track--cast",
+  "main": "cloudflare/sito-e-ponte.js",
+  "compatibility_date": "2026-11-19",
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS",
+    "run_worker_first": ["/dpc/*", "/dpcs3/*", "/ponte"]
+  }
+}

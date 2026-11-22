@@ -620,7 +620,7 @@ function clearRadar(){stopRadarAnim();RAD.layers.forEach(l=>map.removeLayer(l));
 // Direct call first; if the browser refuses it (CORS/origin), go through the site's own bridge /dpc/* (Netlify _redirects, server-side)
 // Radar bridge: on Netlify the site's own /dpc and /dpcs3; elsewhere (e.g. GitHub Pages) the free Cloudflare bridge.
 // A different bridge can be set once with ?ponte=https://… in the address.
-const PONTE_DEFAULT='';
+const PONTE_DEFAULT=(/github\.io$/.test(location.hostname)?'https://track--cast.giovannitoso.workers.dev':'');
 (()=>{try{const q=new URLSearchParams(location.search).get('ponte');if(q&&/^https:\/\//.test(q))localStorage.setItem('tc_ponte',JSON.stringify(q.replace(/\/+$/,'')));}catch(e){}})();
 const PONTE=/netlify\.app$/.test(location.hostname)?location.origin:(store.get('tc_ponte','')||PONTE_DEFAULT||(/^https?:$/.test(location.protocol)&&!/github\.io$/.test(location.hostname)?location.origin:''));
 const DPC_PROXY=PONTE?PONTE+'/dpc':null;let DPC_VIA=store.get('tc_dpc_via','direct');
@@ -830,7 +830,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='22/11/2026 21:15';
+const TC_VER='22/11/2026 21:30';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)return;const ctx=cv.getContext('2d'),W=cv.width,C=W/2;ctx.clearRect(0,0,W,W);
