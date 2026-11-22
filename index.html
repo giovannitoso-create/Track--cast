@@ -188,6 +188,7 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 @media(max-width:560px){#boxscr .g{grid-template-columns:1fr;grid-template-areas:"hero" "radar" "tl" "a" "b" "c" "d" "e" "tk"}#boxscr .bx-hero{flex-direction:column;text-align:center}#boxscr .bx-chips{justify-content:center}}
 .jt-scr{display:flex;align-items:center;gap:6px;margin:4px 0}.jt-scr span{width:64px;color:var(--ink2);font-size:13px}.jt-scr input{width:58px}.jt-scr select{flex:1}.jt-scr i{font-style:normal;color:var(--ink3);font-size:12px}
 .jt-chk{margin:4px 0}.jt-chk summary{cursor:pointer;color:var(--ink2);font-size:13px}#jetrefrow{flex-direction:column;align-items:stretch}#jetrefrow .chipb{align-self:flex-start;margin-top:4px}
+#tcupd{position:sticky;top:0;z-index:6000;background:#12324f;color:#dbeaff;padding:8px 12px;display:flex;gap:10px;align-items:center;justify-content:center;font-size:14px}
 .jt-help{margin-top:8px}.jt-help summary{cursor:pointer;color:var(--ink2);font-weight:600;font-size:12.5px}.jt-help ol{margin:6px 0 8px 18px;padding:0;font-size:12.5px;color:var(--ink2)}.jt-help li{margin:2px 0}.jt-help img{width:100%;max-width:360px;border-radius:10px;border:1px solid var(--line);display:block;margin:4px auto}
 .jt-k{font-size:14px;font-weight:600;color:var(--ink2);margin-right:4px}
 .jt-cmp{margin:6px 0;padding:8px 10px;border-radius:9px;background:rgba(127,145,170,.10);color:var(--ink)}.jt-cmp.ok{background:rgba(51,209,122,.12)}.jt-cmp.up{background:rgba(255,159,67,.13)}.jt-cmp.dn{background:rgba(61,139,255,.13)}
@@ -317,7 +318,8 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
     <button class="btn primary" id="gps">📍 Vicino a me</button>
     <button class="btn" id="area" title="Cerca le piste di kart nella zona inquadrata dalla mappa">Cerca nella mappa</button>
   </div>
-  <button class="btn" id="acctbtn" style="margin-left:auto">👤 Accedi</button>
+  <span id="tcver" class="sub" style="margin:0 0 0 auto;font-size:11px;white-space:nowrap"></span>
+  <button class="btn" id="acctbtn">👤 Accedi</button>
   <div class="status" id="status">Caricamento della banca dati delle piste…</div>
 </header>
 <div class="near" id="near"></div>
@@ -694,7 +696,11 @@ $('cl-show').addEventListener('change',()=>{if($('cl-show').checked){drawCloudLa
 // 4) advect the newest frame to the track for each lead time; uncertainty radius grows with lead time.
 const NC={res:null,seq:0,arrow:null};
 const sensLayer=L.layerGroup().addTo(map);
-setTimeout(()=>{const v=$('mtx-ver');if(v)v.textContent='Versione del sito: '+TC_VER;if(!CUR&&typeof renderMatrix==='function')renderMatrix();},0);
+setTimeout(()=>{const tv=$('tcver');if(tv)tv.textContent='versione '+TC_VER;
+  // controllo aggiornamenti: se su GitHub c'è una versione più nuova di quella aperta (cache del browser o app sulla Home), lo dice
+  if(/^https?:$/.test(location.protocol)&&!window.__TC_DEMO){fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const TC_VER='(\d[^']*)'/);
+    if(m&&m[1]!==TC_VER){const b=document.createElement('div');b.id='tcupd';b.innerHTML=`🔄 C'è una versione più nuova del sito (${m[1]}). <button class="btn primary" id="tcupdb">Aggiorna</button>`;document.body.prepend(b);$('tcupdb').onclick=()=>location.replace(location.pathname+'?v='+Date.now());}}).catch(()=>{});}
+  const v=$('mtx-ver');if(v)v.textContent='Versione del sito: '+TC_VER;if(!CUR&&typeof renderMatrix==='function')renderMatrix();},0);
 function renderSensorLayer(){sensLayer.clearLayers();const r=NC.res;if(!r||!r.sens||!CUR)return;
   for(const s of r.sens){if(s.off||s.v<0.2||(!s.hit&&(s.di%4||s.ri%2)))continue;const b=s.brg*Math.PI/180,lat=CUR.lat+Math.cos(b)*s.km/111.2,lon=CUR.lon+Math.sin(b)*s.km/(111.2*Math.cos(CUR.lat*Math.PI/180));const c=tcColor(s.v)||[120,200,255];
     sensLayer.addLayer(L.circleMarker([lat,lon],{radius:s.hit?6:4,weight:s.hit?2:1,color:s.hit?'#fff':'#0b1220',fillColor:`rgb(${c[0]|0},${c[1]|0},${c[2]|0})`,fillOpacity:.95}).bindTooltip(`Sensore ${fmt(s.km,s.km<10?1:0)} km ${dir8(s.brg)} · ${fmt(s.v,1)} mm/h${s.hit?` · in rotta, arriva tra ~${Math.round(s.eta)} min`:''}${s.tr>0.4?' · rinforza':s.tr<-0.4?' · cala':''}`));}}
@@ -824,7 +830,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='22/11/2026 21:00';
+const TC_VER='22/11/2026 21:15';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)return;const ctx=cv.getContext('2d'),W=cv.width,C=W/2;ctx.clearRect(0,0,W,W);
@@ -2604,6 +2610,7 @@ function renderJet(ad,st,S,i0){const eng=engNow(),P=ad.station?st:S[i0];
   const jm=$('jetmnt');if(jm)jm.onchange=()=>{const v=+jm.value;if(v>0)store.set('tc_jetmnt_'+eng.id,v);else localStorage.removeItem('tc_jetmnt_'+eng.id);renderSetup();};
   if(!eng.jet)membraneWire(eng,ad);else $('jetgood').onclick=()=>{if(eng.jet){const v=+($('jetmnt')&&$('jetmnt').value)||jetAdvice(eng,ad.pct).jet;store.set('tc_jet_'+eng.id,{jr:v,rr:+ad.pct.toFixed(1),ts:Date.now()});store.set('tc_jetmnt_'+eng.id,v);}
     else store.set('tc_mref_'+eng.id,{rho:+ad.pct.toFixed(1),ts:Date.now()});status('Salvato: da ora la carburazione parte da qui.');renderSetup();};
+  {const h=$('jethelp');if(h&&!h.dataset.w){h.dataset.w=1;if(!store.get('tc_jethelp_seen',false))h.open=true;h.addEventListener('toggle',()=>{if(!h.open)store.set('tc_jethelp_seen',true);});}}
   $('jetinfo').innerHTML=`<details><summary>📘 ${esc(eng.carb)} · dati e consigli</summary>${esc(eng.official)}${eng.std?'<br>'+esc(eng.std):''}${eng.tips&&eng.tips.length?'<br>'+eng.tips.map(esc).join('<br>'):''}</details>`;}
 (function initJet(){const sel=$('jeteng');sel.innerHTML=ENGINES.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');sel.value=engNow().id;
   sel.addEventListener('change',()=>{store.set('tc_engine',sel.value);renderSetup();try{if(PT.tab==='setup')renderSetupTab();}catch(e){}});})();
