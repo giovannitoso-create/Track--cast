@@ -23,12 +23,11 @@ I file per il database (Supabase) e i pagamenti (Stripe) **non** stanno qui: son
 
 Ogni modifica a `index.html` su `main` viene pubblicata da sola.
 
-## Ponte del radar
+## Ponte del radar (Cloudflare)
 
-GitHub Pages non può fare da ponte verso i server della Protezione Civile, quindi il radar a sensori ha bisogno del Worker Cloudflare (gratis):
+Il sito è pubblicato anche su **Cloudflare Workers**, collegato a questo repository: a ogni modifica su `main` Cloudflare lo ripubblica da solo.
 
-1. Cloudflare › **Workers & Pages › Create › Worker** › incolla `cloudflare/ponte-radar.js` › **Deploy**.
-2. Copia l'indirizzo del worker (es. `https://trackcast-ponte.<nome>.workers.dev`).
-3. Mettilo in `index.html` nella riga `const PONTE_DEFAULT='';`, oppure apri il sito una volta con `?ponte=<indirizzo>`.
-
-Il worker accetta già le richieste dai siti `*.github.io`.
+- Sito + ponte radar: **https://track--cast.giovannitoso.workers.dev**
+- Il Worker (`cloudflare/sito-e-ponte.js`, configurato da `wrangler.jsonc`) serve i file del sito e fa da ponte verso i dati della Protezione Civile (`/dpc/*` e `/dpcs3/*`).
+- La versione su GitHub Pages usa lo stesso ponte.
+- `.assetsignore` tiene fuori dal sito pubblicato le cartelle che non servono (firmware, prototipo, codice del Worker).
