@@ -45,12 +45,25 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 .toggles{display:flex;gap:6px;margin-left:auto}
 .toggles button{background:none;border:1px solid var(--line2);color:var(--ink2);border-radius:6px;padding:4px 9px;font:600 12px Inter;cursor:pointer}
 .toggles button.on{background:var(--surface2);color:var(--ink);border-color:var(--ink3)}
-.radarbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;padding:8px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--ink2)}
-.radarbar .btn{padding:5px 10px}
-.radarbar input[type=range]{accent-color:var(--rain)}
-#rb-range{flex:1;min-width:140px}
-#rb-time{font:600 14px "JetBrains Mono";color:var(--ink);min-width:118px}
-.radarbar select{background:var(--bg);border:1px solid var(--line2);color:var(--ink);border-radius:5px;padding:4px 6px;font:500 12px Inter}
+.radarbar{margin-top:8px;padding:10px 12px 8px;background:linear-gradient(180deg,#101b2b,#0c1522);border:1px solid #1f3350;border-radius:12px;font-size:12px;color:var(--ink2)}
+.rb-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rb-play{width:38px;height:38px;border-radius:50%;border:none;background:linear-gradient(135deg,#3d8bff,#2a63d6);color:#fff;font-size:15px;cursor:pointer;box-shadow:0 2px 10px rgba(61,139,255,.35);flex:none}
+.rb-play:hover{filter:brightness(1.1)}
+.rb-clock{display:flex;flex-direction:column;line-height:1.1;min-width:92px}#rb-time{font:700 20px "JetBrains Mono";color:var(--ink)}
+.rb-tag{display:inline-block;margin-top:3px;font:700 10px Inter;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:999px;background:#1c2b40;color:#9fb0c6;align-self:flex-start}
+.rb-tag.now{background:rgba(51,209,122,.16);color:#6fe3a0}.rb-tag.fut{background:rgba(255,181,71,.16);color:#ffc781}
+.radarbar select{background:#0a121d;border:1px solid #24395a;color:var(--ink);border-radius:8px;padding:6px 8px;font:500 12px Inter;max-width:100%}
+.rb-tools{display:flex;align-items:center;gap:6px;margin-left:auto}.rb-op{display:flex;align-items:center;gap:4px;color:var(--ink3)}.rb-op input{width:70px;accent-color:var(--rain)}
+.rb-tl{position:relative;margin:10px 2px 0;height:26px}.rb-ticks{position:absolute;inset:6px 0 6px 0;display:flex;gap:2px;pointer-events:none}
+.rb-ticks i{flex:1;border-radius:3px;background:#22344f;transition:transform .15s}.rb-ticks i.fut{background:repeating-linear-gradient(135deg,#5a4520 0 4px,#7a5c26 4px 8px)}
+.rb-ticks i.now{background:#33d17a}.rb-ticks i.sel{transform:scaleY(1.6);background:#fff}.rb-ticks i.fut.sel{background:#ffc781}.rb-ticks i.wet{box-shadow:inset 0 -4px 0 #3d8bff}
+#rb-range{position:absolute;inset:0;width:100%;margin:0;opacity:0;cursor:pointer}
+.rb-tlab{position:relative;height:13px;display:flex;justify-content:space-between;font:600 10px Inter;color:var(--ink3);margin:2px 2px 0}
+.rb-src{display:block;margin-top:6px;font-size:10.5px;color:var(--ink3)}
+.rb-badge{position:absolute;top:10px;left:50px;z-index:500;background:rgba(8,14,24,.82);backdrop-filter:blur(4px);border:1px solid #24395a;border-radius:10px;padding:5px 10px;color:#e8eef7;font:700 13px "JetBrains Mono";pointer-events:none}
+.rb-badge small{font:700 9.5px Inter;letter-spacing:.08em;margin-left:6px;color:#9fb0c6}.rb-badge.fut small{color:#ffc781}.rb-badge.now small{color:#6fe3a0}
+.rleg{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:8px}.rleg div{display:flex;flex-direction:column;gap:3px}.rleg i{height:8px;border-radius:4px}
+.rleg b{font:700 10.5px Inter;color:var(--ink2)}.rleg span{font:500 9.5px Inter;color:var(--ink3)}
 .nowc{margin-top:10px;padding:12px;border-radius:10px;background:#0d1724;border:1px solid #1d3550}
 .nowc h3{margin:0 0 4px;font-size:16px;text-transform:uppercase}
 .nowc .big{font:700 22px/1.2 "Barlow Condensed";color:var(--ink)}
@@ -343,16 +356,18 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
       <h2 id="tname" style="margin:0">Seleziona una pista</h2>
       <div class="toggles"><button id="tg-radar" class="on">Radar pioggia</button><button id="tg-sat" class="on">Satellite</button></div>
     </div>
-    <div style="position:relative"><div id="map"></div><div class="overlay" id="mapov" style="display:none"></div></div>
+    <div style="position:relative"><div id="map"></div><div class="overlay" id="mapov" style="display:none"></div><div id="rb-badge" class="rb-badge" style="display:none"></div></div>
     <div class="radarbar" id="radarbar">
-      <button class="btn" id="rb-play" title="Animazione dell'ultima ora">▶</button>
-      <input type="range" id="rb-range" min="0" max="0" value="0" aria-label="Fotogramma radar">
-      <span id="rb-time">radar —</span>
-      <select id="rb-prod" title="Radar"><option value="tc">Radar TrackCast · con previsione 60 min</option><option value="sri">Ufficiale · pioggia al suolo</option><option value="vmi">Ufficiale · riflettività</option></select>
-      <label>Opacità <input type="range" id="rb-op" min="20" max="100" value="70" style="width:70px"></label>
-      <button class="chipb" id="rb-out">Vista 40 km</button><button class="chipb" id="rb-in">Vista pista</button>
-      <span id="rb-src" class="sub" style="margin:0"></span>
-      <div id="rb-legend" style="width:100%;display:none"></div>
+      <div class="rb-top">
+        <button class="rb-play" id="rb-play" title="Animazione: ultima ora e previsione">▶</button>
+        <div class="rb-clock"><b id="rb-time">radar —</b><span id="rb-tag" class="rb-tag"></span></div>
+        <select id="rb-prod" title="Radar"><option value="tc">Radar TrackCast · con previsione 60 min</option><option value="sri">Ufficiale · pioggia al suolo</option><option value="vmi">Ufficiale · riflettività</option></select>
+        <div class="rb-tools"><label class="rb-op" title="Trasparenza del radar">Opacità <input type="range" id="rb-op" min="20" max="100" value="70"></label><button class="chipb" id="rb-out" title="Vista larga 40 km">🔭 40 km</button><button class="chipb" id="rb-in" title="Vista sulla pista">🏁 Pista</button></div>
+      </div>
+      <div class="rb-tl"><div id="rb-ticks" class="rb-ticks"></div><input type="range" id="rb-range" min="0" max="0" value="0" aria-label="Fotogramma radar"></div>
+      <div class="rb-tlab"><span id="rb-l0">−1 h</span><span id="rb-l1" style="position:absolute;transform:translateX(-50%);color:#6fe3a0">ora</span><span id="rb-l2">+1 h</span></div>
+      <div id="rb-legend" style="display:none"></div>
+      <span id="rb-src" class="rb-src"></span>
     </div>
     <div class="nowc" id="nowc"><div id="pro-lock" style="display:none"><h3 style="margin:0 0 6px">🔒 Radar avanzato · piano Pro</h3>
       <div class="sub" style="margin:0 0 10px">Matrice sensori a 2048 occhi, nowcast con probabilità minuto per minuto, nubi dal satellite con avviso temporali in anticipo, e presto gli avvisi sul telefono. Il radar sulla mappa e tutto il resto del sito restano gratis.</div>
@@ -668,12 +683,18 @@ function renderRadarBar(){
   if(!n){$('rb-time').textContent='radar —';return;}
   const d=RAD.frames[RAD.idx],ago=Math.round((Date.now()-d)/60e3),hm=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   const fut=RAD.future&&RAD.future[RAD.idx];
-  $('rb-time').innerHTML=fut?`${hm} · <span style="color:#ffd08a">previsione</span>`:`${hm} · ${ago<=1?'adesso':ago+' min fa'}`;
+  const nowI=RAD.nowIdx!=null?RAD.nowIdx:n-1,isNow=RAD.idx===nowI&&!fut,lead=Math.round((d-RAD.frames[nowI])/60e3);
+  const tag=fut?`previsione +${lead}'`:isNow?(ago<=6?'adesso':`ultimo · ${ago}' fa`):`${ago}' fa`,cls=fut?'fut':isNow?'now':'';
+  $('rb-time').textContent=hm;const tg=$('rb-tag');tg.textContent=tag;tg.className='rb-tag '+cls;
+  const tk=$('rb-ticks');if(tk.children.length!==n)tk.innerHTML=RAD.frames.map((_,k)=>`<i class="${RAD.future&&RAD.future[k]?'fut':''}${k===nowI?' now':''}"></i>`).join('');
+  [...tk.children].forEach((e,k)=>e.classList.toggle('sel',k===RAD.idx));
+  const past=nowI,futN=n-1-nowI;$('rb-l0').textContent=past?`−${Math.round((RAD.frames[nowI]-RAD.frames[0])/60e3)}'`:'';$('rb-l1').textContent='ora';$('rb-l1').style.left=((nowI+0.5)/n*100)+'%';$('rb-l2').textContent=futN?`+${Math.round((RAD.frames[n-1]-RAD.frames[nowI])/60e3)}'`:'';
+  const bd=$('rb-badge');if(RAD.on){bd.style.display='';bd.className='rb-badge '+cls;bd.innerHTML=`${hm}<small>${tag}</small>`;}else bd.style.display='none';
   $('rb-src').textContent=RAD.src==='tc'?'Radar TrackCast · dati delle antenne della Protezione Civile rielaborati da noi · 1 km':RAD.src==='dpc'?(RAD.product==='tc'?'Radar ufficiale Protezione Civile (il radar TrackCast è in elaborazione)':'Radar ufficiale Protezione Civile · 1 km · ogni 5 min'):'RainViewer · bassa risoluzione fuori Italia';
   renderTCLegend();
 }
 function stopRadarAnim(){clearInterval(RAD.timer);RAD.timer=null;$('rb-play').textContent='▶';}
-$('rb-play').onclick=()=>{if(RAD.timer){stopRadarAnim();return;}if(!RAD.layers.length)return;$('rb-play').textContent='❚❚';let pause=0;
+$('rb-play').onclick=()=>{if(RAD.timer){stopRadarAnim();return;}if(!RAD.layers.length)return;$('rb-play').textContent='❚❚';if(RAD.idx>=RAD.layers.length-1)showRadarFrame(0);let pause=0;
   RAD.timer=setInterval(()=>{if(RAD.idx>=RAD.layers.length-1){if(++pause<3)return;pause=0;showRadarFrame(0);}else showRadarFrame(RAD.idx+1);},500);};
 $('rb-range').addEventListener('input',e=>{stopRadarAnim();showRadarFrame(+e.target.value);});
 $('rb-op').addEventListener('input',e=>{RAD.opacity=+e.target.value/100;showRadarFrame(RAD.idx);});
@@ -830,7 +851,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='22/11/2026 21:30';
+const TC_VER='22/11/2026 22:00';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)return;const ctx=cv.getContext('2d'),W=cv.width,C=W/2;ctx.clearRect(0,0,W,W);
@@ -919,7 +940,9 @@ function buildTCRadar(){
   RAD.layers=items.map(i=>L.imageOverlay(renderField(f0,i.data),B,{opacity:0,interactive:false,attribution:'Radar TrackCast · dati Radar-DPC Protezione Civile (CC BY-SA)'}));
   if(RAD.on)RAD.layers.forEach(l=>l.addTo(map));showRadarFrame(RAD.nowIdx);drawRings();renderTCLegend();return true;}
 function renderTCLegend(){const el=$('rb-legend');if(RAD.src!=='tc'){el.style.display='none';return;}el.style.display='';
-  const stops=TC_PAL.slice(0,8);el.innerHTML=`<div class="tclegend">${stops.map(p=>`<span class="sw" style="background:rgba(${p[1][0]},${p[1][1]},${p[1][2]},${p[1][3]/255})"></span>`).join('')}</div><div class="lb">${stops.map(p=>`<span>${String(p[0]).replace('.',',')}</span>`).join('')}<span>mm/h</span></div>`;}
+  const cat=[[0.2,1,'debole'],[1,4,'moderata'],[4,16,'forte'],[16,32,'molto forte'],[32,90,'nubifragio']],rgba=c=>`rgba(${c.slice(0,3).map(Math.round).join(',')},${Math.min(1,c[3]/255+0.15)})`;
+  const g=(a,b)=>{const st=[0,0.5,1].map(t=>rgba(tcColor(a*Math.pow(b/a,t*0.98))||TC_PAL[0][1]));return`linear-gradient(90deg,${st.join(',')})`;};
+  el.innerHTML=`<div class="rleg">${cat.map(([a,b,n])=>`<div><i style="background:${g(a,b)}"></i><b>${n}</b><span>${b<90?`${String(a).replace('.',',')}–${b}`:`oltre ${a}`} mm/h</span></div>`).join('')}</div>`;}
 
 // blend the radar nowcast into the 15-minute series for the first hour (weight falls with lead time)
 
