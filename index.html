@@ -868,7 +868,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='22/11/2026 23:40';
+const TC_VER='22/11/2026 23:45';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1494,7 +1494,7 @@ async function ltOpen(u,save=true){u=ltNorm(u);const msg=$('bx-ltmsg'),f=$('bx-l
   const base=/workers\.dev$/.test(location.hostname)?location.origin:'https://track--cast.giovannitoso.workers.dev';
   try{const r=await fetch(base+'/lt-check?url='+encodeURIComponent(u),{cache:'no-store'});const j=await r.json();if($('bx-ltu').value!==u)return;
     if(j.blocked)msg.innerHTML=`Questo sito non si lascia mostrare dentro altri siti (lo decide chi lo gestisce). <a href="${esc(u)}" target="_blank" rel="noopener" style="color:#9fc6ff">Aprilo in una nuova scheda ↗</a> e tieni le due finestre affiancate (su iPad: Split View).`;
-    else if(j.error||!j.ok)msg.textContent=j.status?`Il sito risponde con errore ${j.status}: controlla l'indirizzo.`:'';}catch(e){}}
+    else if(j.status===404||j.status===410)msg.textContent='Questa pagina non esiste: controlla l\'indirizzo.';}catch(e){}}
 function ltToggle(on){const b=$('boxscr');on=on==null?!b.classList.contains('lt'):on;b.classList.toggle('lt',on);$('bx-lt').hidden=!on;$('bx-ltb').classList.toggle('on',on);store.set('tc_lt_on',on);
   if(on){ltFill();const u=CUR&&store.get('tc_lt_'+CUR.id,'');if(u&&$('bx-ltif').src!==u)ltOpen(u,false);else if(!u){$('bx-lt0').style.display='';$('bx-ltu').value='';}}
   b.dataset.ltw=LT.w;setTimeout(()=>{try{drawBox();}catch(e){}},50);}
