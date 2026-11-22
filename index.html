@@ -186,6 +186,12 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 @media (prefers-reduced-motion:reduce){#boxscr .bx-tickin,#boxscr[data-lvl=red] .bx-hero{animation:none}}
 @media(max-width:1000px){#boxscr .g{grid-template-columns:repeat(2,1fr);grid-template-areas:"hero hero" "radar radar" "tl tl" "a b" "c d" "e e" "tk tk"}}
 @media(max-width:560px){#boxscr .g{grid-template-columns:1fr;grid-template-areas:"hero" "radar" "tl" "a" "b" "c" "d" "e" "tk"}#boxscr .bx-hero{flex-direction:column;text-align:center}#boxscr .bx-chips{justify-content:center}}
+.jt-k{font-size:14px;font-weight:600;color:var(--ink2);margin-right:4px}
+.jt-cmp{margin:6px 0;padding:8px 10px;border-radius:9px;background:rgba(127,145,170,.10);color:var(--ink)}.jt-cmp.ok{background:rgba(51,209,122,.12)}.jt-cmp.up{background:rgba(255,159,67,.13)}.jt-cmp.dn{background:rgba(61,139,255,.13)}
+.jt-next{display:flex;gap:6px;margin:6px 0}.jt-next span{flex:1;text-align:center;background:rgba(127,145,170,.10);border-radius:8px;padding:4px 0;font-weight:800;color:var(--ink)}.jt-next i{display:block;font-style:normal;font-weight:500;font-size:11px;color:var(--ink3)}
+.jt-air{margin-top:8px}.jt-bar{position:relative;height:8px;border-radius:4px;background:linear-gradient(90deg,#3d8bff,#9fb0c6 50%,#ff9f43)}.jt-bar span{position:absolute;top:-4px;width:4px;height:16px;border-radius:2px;background:#fff;box-shadow:0 0 0 2px #0b1220;transform:translateX(-50%)}
+.jt-scale{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink3);margin:2px 0 6px}.jt-fs{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 2px}.jt-f{font-size:11.5px;padding:3px 7px;border-radius:999px;background:rgba(127,145,170,.12);color:var(--ink2)}.jt-f.up{color:#ffc48a}.jt-f.dn{color:#9cc4ff}
+#jetinfo summary{cursor:pointer;color:var(--ink2);font-weight:600}
 #vgun{position:fixed;inset:0;background:rgba(3,6,12,.72);display:none;align-items:center;justify-content:center;z-index:5000;padding:14px}
 #vgun .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;max-width:480px;width:100%;padding:16px;max-height:94vh;overflow:auto}
 #vgun .vg-read{display:flex;align-items:center;gap:14px;margin:12px 0 6px}#vg-val{font-size:56px;font-weight:900;line-height:1;color:var(--asph);font-variant-numeric:tabular-nums}#vg-val small{font-size:.4em;color:var(--ink2);margin-left:4px}
@@ -390,8 +396,8 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
         </div>
         <div class="sbox"><div class="t1">Carburazione</div>
           <div class="inl"><select id="jeteng" style="max-width:100%"></select></div>
-          <div class="sv" id="jet">—</div><div class="t3" id="jetnote"></div>
-          <div class="inl" id="jetrefrow"><label>Il tuo getto <input type="number" id="jetref" placeholder="—"></label><label>a densità <input type="number" id="rhoref" placeholder="100" step="0.5">%</label></div>
+          <div class="sv" id="jet">—</div>
+          <div class="inl" id="jetrefrow"></div><div class="t3" id="jetnote"></div>
           <div class="t3" id="jetinfo" style="margin-top:6px"></div></div>
         <div class="sbox"><div class="t1">Pressione gomme · quanto correggere</div>
           <div class="inl"><select id="tyrecmp" style="max-width:100%"></select></div>
@@ -809,7 +815,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='20/11/2026 13:30';
+const TC_VER='22/11/2026 19:30';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)return;const ctx=cv.getContext('2d'),W=cv.width,C=W/2;ctx.clearRect(0,0,W,W);
@@ -1210,10 +1216,12 @@ function jetRef(eng){const good=plogAll().filter(e=>e.good&&e.eng===eng.id&&e.je
 function jetRound(eng,j){if(eng.series){const s=eng.series;const up=s.find(x=>x>=j-0.3);return eng.roundUp?(up||s[s.length-1]):s.reduce((a,b)=>Math.abs(b-j)<Math.abs(a-j)?b:a);}
   const st=eng.step||1;return Math.round(j/st)*st;}
 function jetAdvice(eng,pct){const r=jetRef(eng),raw=r.k*Math.sqrt(pct);return{raw,jet:jetRound(eng,raw),src:r.src,learned:r.learned};}
-function membraneAdvice(eng,pct){const good=plogAll().filter(e=>e.good&&e.eng===eng.id&&e.rho>0),ref=good.length?{rho:good.reduce((a,e)=>a+e.rho,0)/good.length}:null,base=ref?ref.rho:100,d=pct-base;
+function membraneAdvice(eng,pct){const good=plogAll().filter(e=>e.good&&e.eng===eng.id&&e.rho>0),man=store.get('tc_mref_'+eng.id,null),lastG=good.length?Math.max(...good.map(e=>e.ts)):0;
+  const ref=man&&man.ts>=lastG?{rho:man.rho,ts:man.ts}:good.length?{rho:good.reduce((a,e)=>a+e.rho,0)/good.length,ts:lastG,n:good.length}:null,base=ref?ref.rho:100,d=pct-base;
+  const when=ref?(ref.n?`${ref.n} turni buoni del diario`:new Date(ref.ts).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})):'';
   const what=Math.abs(d)<1?'come il riferimento':d>0?'più grassa (apri H)':'più magra (chiudi H)';
   const how=Math.abs(d)<1?'nessuna correzione':Math.abs(d)<3?'un passo piccolo, circa 5\'':'due passi da 5\', poi controlla';
-  return{d,base,what,how,hasRef:!!ref};}
+  return{d,base,what,how,hasRef:!!ref,when};}
 const asphLogKey=id=>'tc_asphlog_'+id;
 function logAsph(measured){if(!CUR||!SIM)return;const n=SIM.S[SIM.ni];const L=store.get(asphLogKey(CUR.id),[]);
   L.push({ts:Date.now(),measured,model:+(n.ts_asph-(n.bias||0)).toFixed(2),sw:Math.round(n.sw||0)});store.set(asphLogKey(CUR.id),L.slice(-60));try{cloudPushAsph&&cloudPushAsph(L[L.length-1]);}catch(e){}}
@@ -2524,24 +2532,37 @@ function renderRainPressure(c,S,i0,i1,tav,b,bp,bt){
   renderPlog();
   $('pressnote').innerHTML=`${state}${M&&hotT?`Dal <b>diario: ${M.n} turni</b> con questa rain, obiettivo a caldo ${fmt(hotT,2)} bar.`:`Partenza ${!isNaN(bp)?'dalla tua base':(c.baseSrc.startsWith('costruttore')?'dal valore del costruttore':'dal valore tipico')} di ${fmt(base,2)} bar con asfalto bagnato a ${fmt(ref,0)} °C; asfalto medio in sessione ${fmt(tav,1)} °C: ogni 5 °C in meno ${sbar(c.k/2)} bar.`}${capped?` Non salire oltre ${fmt(c.max,2)} bar.`:''}<br>Nelle prossime ore: ${marks}<br><span style="color:var(--ink3)">Sulle rain le pressioni cambiano molto da pista a pista e con la quantità d'acqua: salva i turni nel diario, il sito impara la tua rain. Ricontrolla sempre a caldo.</span>`;
   const tl=$('tolsl');if(tl)tl.onclick=ev=>{ev.preventDefault();const id=store.get('tc_lastslick','mx_prime');$('tyrecmp').value=id;store.set('tc_cmp',id);$('tyrecmp').dispatchEvent(new Event('change'));};}
-function renderJet(ad,st,S,i0){const eng=engNow();
-  const src=ad.station?`densità aria ${fmt(ad.pct,1)}% dalla tua stazione · ${fmt(st.ta,1)} °C · ${Math.round(st.rh)}% · ${Math.round(st.ps)} hPa`:`densità aria ${fmt(ad.pct,1)}% alle ${hhmm(S[i0])} · ${fmt(S[i0].ta,1)} °C · ${Math.round(S[i0].rh)}% · ${Math.round(S[i0].ps)} hPa`;
-  const later=S[Math.min(S.length-1,i0+8)],pl=airDensity(later).pct;
-  if(eng.jet){const a=jetAdvice(eng,ad.pct),b2=jetAdvice(eng,pl);
-    $('jet').innerHTML=`${a.jet}<span style="font-size:15px;color:var(--ink2)"> getto max${eng.roundUp?' (arrotondato in su)':''}</span>`;
-    $('jetnote').innerHTML=`${src}<br>Riferimento: ${a.src}.${b2.jet!==a.jet?` Alle ${hhmm(later)} servirà il ${b2.jet}.`:''}`;
-    $('jetrefrow').style.display='';}
-  else{const m=membraneAdvice(eng,ad.pct),dl=pl-ad.pct,trend=Math.abs(dl)<0.5?'resta uguale':dl>0?`diventa più densa del ${fmt(dl,1)}% (serve un po' più benzina: H più aperta)`:`diventa meno densa del ${fmt(-dl,1)}% (serve un po' meno benzina: H più chiusa)`;
-    if(m.hasRef){$('jet').innerHTML=`${m.what.split(' (')[0]}<span style="font-size:15px;color:var(--ink2)">${m.what.includes('(')?' · '+m.what.split('(')[1].replace(')',''):''}</span>`;
-      $('jetnote').innerHTML=`${src}<br>Rispetto ai tuoi turni buoni (densità ${fmt(m.base,1)}%): ${m.d>=0?'+':'−'}${fmt(Math.abs(m.d),1)}% → ${m.how}. Fino alle ${hhmm(later)} l'aria ${trend}.`;}
-    else{$('jet').innerHTML=`${fmt(ad.pct,1)}%<span style="font-size:15px;color:var(--ink2)"> densità aria</span>`;
-      $('jetnote').innerHTML=`${src}<br>Fino alle ${hhmm(later)} l'aria ${trend}.<br>Per dirti quanto girare la vite H mi serve un tuo riferimento: dopo un turno in cui il motore andava bene, salvalo nel diario con “andava bene”.`;}
-    $('jetrefrow').style.display='none';}
-  $('jetinfo').innerHTML=`<b>${esc(eng.carb)}</b> · ${esc(eng.official)}${eng.std?'<br>'+esc(eng.std):''}${eng.tips&&eng.tips.length?'<br>'+eng.tips.map(esc).join('<br>'):''}`;}
+function renderJet(ad,st,S,i0){const eng=engNow(),P=ad.station?st:S[i0];
+  // perché: l'aria rispetto a quella standard (15 °C, 1013 hPa, secca), divisa nei tre fattori
+  const fT=(288.15/(P.ta+273.15)-1)*100,fP=(P.ps/1013.25-1)*100,fH=ad.pct-100-fT-fP;
+  const fx=(v,lbl)=>`<span class="jt-f ${v>0.3?'up':v<-0.3?'dn':''}">${lbl} <b>${v>=0?'+':'−'}${fmt(Math.abs(v),1)}%</b></span>`;
+  const heavy=ad.pct>=101,light=ad.pct<=99;
+  const why=`<div class="jt-air"><div class="jt-bar"><span style="left:${Math.max(0,Math.min(100,(ad.pct-85)/25*100))}%"></span></div><div class="jt-scale"><span>aria leggera</span><span>normale</span><span>aria pesante</span></div>
+    <div>Oggi l'aria è <b>${heavy?'più pesante':light?'più leggera':'come quella normale'}</b> (${fmt(ad.pct,1)}% della normale): ${heavy?'entra più ossigeno nel motore, quindi serve <b>più benzina</b>':light?'entra meno ossigeno nel motore, quindi serve <b>meno benzina</b>':'la carburazione standard va bene'}.</div>
+    <div class="jt-fs">${fx(fT,P.ta>15?`🌡️ caldo ${fmt(P.ta,0)} °C`:`🌡️ freddo ${fmt(P.ta,0)} °C`)}${fx(fP,`🧭 pressione ${Math.round(P.ps)} hPa`)}${fx(fH,`💧 umidità ${Math.round(P.rh)}%`)}</div>
+    <div class="t3">${ad.station?'Dati dalla stazione del team':'Previsione per le '+hhmm(S[i0])}</div></div>`;
+  const nxt=[0,4,8,12].map(o=>S[Math.min(S.length-1,i0+o)]).filter((p,i,a)=>a.indexOf(p)===i);
+  const mnt=+store.get('tc_jetmnt_'+eng.id,0)||0;
+  if(eng.jet){const a=jetAdvice(eng,ad.pct),own=a.learned||!!store.get('tc_jet_'+eng.id,null),generic=!own&&/scrivi/.test(eng.refSrc);
+    $('jet').innerHTML=`<span class="jt-k">${generic?'Getto indicativo':'Monta il getto'}</span> ${a.jet}`;
+    let cmp='';if(generic)cmp=`<div class="jt-cmp">Per la ${esc(eng.name.split(' · ')[0])} non esiste un getto ufficiale di partenza: ogni motore è diverso. Quando il motore va bene premi <b>“✓ Andava bene così”</b> (con il getto montato): da lì ti dico esattamente come cambiarlo col meteo.</div>`;
+    else if(mnt>0){const d=a.jet-mnt;cmp=d===0?`<div class="jt-cmp ok">✅ Il tuo <b>${mnt}</b> va già bene: non cambiare.</div>`
+      :`<div class="jt-cmp ${d>0?'up':'dn'}">${d>0?'⬆️':'⬇️'} Rispetto al tuo <b>${mnt}</b>: <b>${d>0?'+':'−'}${Math.abs(d)}</b> → ${d>0?'più grasso (più benzina)':'più magro (meno benzina)'}${d<0&&eng.roundUp?'. Rotax: mai sotto il getto della tabella.':''}</div>`;}
+    $('jetnote').innerHTML=`${cmp}<div class="jt-next">${nxt.map(p=>{const j=jetAdvice(eng,airDensity(p).pct).jet;return`<span><i>${p===S[i0]?'ora':hhmm(p)}</i>${j}</span>`;}).join('')}</div>
+      <div class="t3">Calcolato da: ${a.src}.${eng.roundUp?' Arrotondato al getto più grande.':''}</div>${why}`;}
+  else{const m=membraneAdvice(eng,ad.pct);
+    $('jet').innerHTML=m.hasRef?(Math.abs(m.d)<1?'<span class="jt-k">Vite H</span> lasciala così':`<span class="jt-k">Vite H</span> ${m.d>0?'apri':'chiudi'} ${Math.abs(m.d)<3?"5'":"10'"}`):'<span class="jt-k">Vite H</span> serve un riferimento';
+    $('jetnote').innerHTML=`${m.hasRef?`<div class="jt-cmp ${Math.abs(m.d)<1?'ok':m.d>0?'up':'dn'}">Rispetto a quando andava bene (${m.when}): ${Math.abs(m.d)<0.1?'aria uguale':`aria ${m.d>=0?'più pesante':'più leggera'} del ${fmt(Math.abs(m.d),1)}%`} → ${Math.abs(m.d)<1?'nessuna correzione':m.d>0?'un po\' più benzina: <b>apri</b> la H':'un po\' meno benzina: <b>chiudi</b> la H'}${Math.abs(m.d)>=1?`, a passi da 5' e controllando la candela`:''}.</div>`
+      :`<div class="jt-cmp">Quando il motore va bene, premi <b>“✓ Andava bene così”</b> qui sotto: da quel momento ti dico quanto girare la vite H quando cambia il meteo.</div>`}${why}`;}
+  $('jetrefrow').innerHTML=eng.jet?`<label>Getto montato ora <input type="number" id="jetmnt" value="${mnt||''}" placeholder="es. 128" style="width:70px"></label><button class="chipb" id="jetgood">✓ Andava bene così</button>`
+    :`<button class="chipb" id="jetgood">✓ Andava bene così</button>`;
+  $('jetrefrow').style.display='';
+  const jm=$('jetmnt');if(jm)jm.onchange=()=>{const v=+jm.value;if(v>0)store.set('tc_jetmnt_'+eng.id,v);else localStorage.removeItem('tc_jetmnt_'+eng.id);renderSetup();};
+  $('jetgood').onclick=()=>{if(eng.jet){const v=+($('jetmnt')&&$('jetmnt').value)||jetAdvice(eng,ad.pct).jet;store.set('tc_jet_'+eng.id,{jr:v,rr:+ad.pct.toFixed(1),ts:Date.now()});store.set('tc_jetmnt_'+eng.id,v);}
+    else store.set('tc_mref_'+eng.id,{rho:+ad.pct.toFixed(1),ts:Date.now()});status('Salvato: da ora la carburazione parte da qui.');renderSetup();};
+  $('jetinfo').innerHTML=`<details><summary>📘 ${esc(eng.carb)} · dati e consigli</summary>${esc(eng.official)}${eng.std?'<br>'+esc(eng.std):''}${eng.tips&&eng.tips.length?'<br>'+eng.tips.map(esc).join('<br>'):''}</details>`;}
 (function initJet(){const sel=$('jeteng');sel.innerHTML=ENGINES.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');sel.value=engNow().id;
-  const load=()=>{const my=store.get('tc_jet_'+engNow().id,null);$('jetref').value=my?my.jr:'';$('rhoref').value=my&&my.rr?my.rr:'';};load();
-  sel.addEventListener('change',()=>{store.set('tc_engine',sel.value);load();renderSetup();try{if(PT.tab==='setup')renderSetupTab();}catch(e){}});
-  ['jetref','rhoref'].forEach(id=>$(id).addEventListener('input',()=>{const jr=+$('jetref').value;if(jr>0)store.set('tc_jet_'+engNow().id,{jr,rr:+$('rhoref').value||100});else localStorage.removeItem('tc_jet_'+engNow().id);renderSetup();}));})();
+  sel.addEventListener('change',()=>{store.set('tc_engine',sel.value);renderSetup();try{if(PT.tab==='setup')renderSetupTab();}catch(e){}});})();
 function renderSetup(){
   $('dryref').placeholder=fmt((CUR&&CUR.lenKm||1.2)*40,1);
   if(!SIM)return;const S=SIM.S;const i0=+$('sstart').value||SIM.ni,dur=+$('sdur').value;const i1=Math.min(S.length-1,i0+Math.ceil(dur/15));
@@ -2779,7 +2800,7 @@ $('k-export').onclick=()=>{const rows=['tipo;giro;tempo_s;ora;lat;lon;velocita_k
 // ================= Start =================
 (async()=>{
   $('staddr').value=store.get('tc_staddr','');if($('staddr').value)$('stconn').click();
-  {const jr=store.get('tc_jet',null);if(jr&&jr.jr&&!store.get('tc_jet_'+engNow().id,null)&&jr.jr!==118){store.set('tc_jet_'+engNow().id,{jr:jr.jr,rr:jr.rr||100});$('jetref').value=jr.jr;$('rhoref').value=jr.rr||100;}}
+  {const jr=store.get('tc_jet',null);if(jr&&jr.jr&&!store.get('tc_jet_'+engNow().id,null)&&jr.jr!==118){store.set('tc_jet_'+engNow().id,{jr:jr.jr,rr:jr.rr||100});}}
   await loadTrackDB();
   // a link like https://…/#lonato or #adria-karting opens that track directly (used by the chat)
   const want=decodeURIComponent((location.hash||'').slice(1)).replace(/[-_+]/g,' ').trim();
