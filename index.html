@@ -69,7 +69,7 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 .nowc .big{font:700 22px/1.2 "Barlow Condensed";color:var(--ink)}
 .nowc .st{font-size:12px;color:var(--ink3);margin-top:4px}
 .ncstrip{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin-top:10px}
-.mtx{margin-top:12px;border-top:1px solid #1f2a3a;padding-top:10px}.mtxw{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.mtxw canvas{width:230px;height:230px;flex:none}
+.mtx{margin-top:12px;border-top:1px solid #1f2a3a;padding-top:10px}.mtxw{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.mtxs{position:relative;width:300px;max-width:100%;aspect-ratio:1;flex:none;border-radius:50%;background:radial-gradient(circle,#0e1a2c 0%,#08101c 70%,#050a12 100%);box-shadow:0 0 0 1px #1d2f48,0 0 0 6px #0a1422,0 0 0 7px #23395a,0 10px 30px rgba(0,0,0,.55),inset 0 0 40px rgba(61,139,255,.08)}.mtxs canvas{width:100%;height:100%;display:block;border-radius:50%}
 .mtxl{flex:1;min-width:180px;font-size:13px;line-height:1.45}.mtxl b{color:#e8eef7}.mtxk{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:#8ea0b8;margin-top:6px}.mtxk i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
 .repbtn{background:#2a1d10;border:1px solid #6b4a1e;color:#ffc56b;border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer;font-weight:600}.repbtn:hover{background:#3a2814}
 #diary{position:fixed;inset:0;background:rgba(3,6,12,.78);display:none;align-items:flex-start;justify-content:center;z-index:5000;padding:10px;overflow:auto}
@@ -382,7 +382,7 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
         <div id="cl-strip" style="display:flex;gap:3px"></div><div id="cl-lbl" style="display:flex;gap:3px;font-size:10px;color:#7f91aa"></div>
         <div style="display:flex;gap:8px;align-items:center;margin-top:6px"><label style="font-size:12px;color:#9fb0c6;cursor:pointer"><input type="checkbox" id="cl-show"> Mostra le nubi sulla mappa</label><span class="st" id="cl-status" style="margin:0"></span></div></div>
       <div class="mtx" id="mtx"><h3>Matrice sensori · 2048 occhi virtuali intorno alla pista</h3><div class="sub" id="mtx-ver" style="margin:-4px 0 6px"></div>
-        <div class="mtxw"><canvas id="mtx-c" width="460" height="460"></canvas><div class="mtxl" id="mtx-l">In attesa del radar…</div></div>
+        <div class="mtxw"><div class="mtxs"><canvas id="mtx-c" width="720" height="720"></canvas></div><div class="mtxl" id="mtx-l">In attesa del radar…</div></div>
         <div class="mtxk"><span><i style="background:#1a2230"></i>asciutto</span><span><i style="background:#28c76e"></i>pioggia (colore = mm/h)</span><span><i style="border:2px solid #fff;width:7px;height:7px"></i>in rotta verso la pista</span><span><i style="background:rgba(170,182,200,.55)"></i>nubi (satellite)</span><span>▲ rinforza · ▼ cala</span></div></div>
     </div>
     <div class="trackinfo" id="tinfo"></div>
@@ -851,23 +851,49 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='22/11/2026 22:00';
+const TC_VER='22/11/2026 22:30';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
-function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)return;const ctx=cv.getContext('2d'),W=cv.width,C=W/2;ctx.clearRect(0,0,W,W);
-  if(!r||!r.sens){if(!CUR)mtxMsg('Scegli una pista (cerca il nome o tocca un puntino sulla mappa): la matrice si accende intorno alla pista scelta.');return;}
-  const R0=26,RS=(C-28-R0)/MTX_RINGS.length,gap=Math.PI/MTX_DIRS*0.12;
-  for(const s of r.sens){const a0=(s.brg-90-360/MTX_DIRS/2)*Math.PI/180+gap,a1=(s.brg-90+360/MTX_DIRS/2)*Math.PI/180-gap,ri0=R0+s.ri*RS+0.4,ri1=R0+(s.ri+1)*RS-0.4;
-    ctx.beginPath();ctx.arc(C,C,ri1,a0,a1);ctx.arc(C,C,ri0,a1,a0,true);ctx.closePath();
-    const col=s.off?null:tcColor(s.v),cc=CL.res&&CL.res.sens?CL.res.sens[s.ri*MTX_DIRS+s.di]:null;ctx.fillStyle=s.off?'#0d121a':col?`rgba(${col[0]|0},${col[1]|0},${col[2]|0},${Math.max(.55,col[3]/255)})`:cc!=null&&cc>0.15?`rgba(170,182,200,${(0.15+0.5*cc).toFixed(2)})`:'#1a2230';ctx.fill();
-    if(s.hit){ctx.lineWidth=1;ctx.strokeStyle='#ffffff';ctx.stroke();}
-    if(!s.off&&s.v>=0.5&&Math.abs(s.tr)>0.4&&RS>14){const am=(a0+a1)/2,rm=(ri0+ri1)/2;ctx.fillStyle='#0b1220';ctx.font='bold 15px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.tr>0?'▲':'▼',C+Math.cos(am)*rm,C+Math.sin(am)*rm);}}
-  ctx.fillStyle='#ffd23f';ctx.beginPath();ctx.arc(C,C,9,0,7);ctx.fill();ctx.fillStyle='#0b1220';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🏁',C,C+1);
-  ctx.fillStyle='#8ea0b8';ctx.font='bold 18px system-ui';[['N',0],['E',90],['S',180],['O',270]].forEach(([t,b])=>{const a=(b-90)*Math.PI/180;ctx.fillText(t,C+Math.cos(a)*(C-12),C+Math.sin(a)*(C-12));});
-  ctx.font='13px system-ui';ctx.fillStyle='#5f7088';[2,10,25,50].forEach(k=>{const i=MTX_RINGS.reduce((b,v,j)=>Math.abs(v-k)<Math.abs(MTX_RINGS[b]-k)?j:b,0);ctx.fillText(k+' km',C+6,C-(R0+(i+1)*RS)+9);});
-  if(r.moving&&r.speed>3){const a=(r.from-90)*Math.PI/180,x0=C+Math.cos(a)*(C-30),y0=C+Math.sin(a)*(C-30),x1=C+Math.cos(a)*(R0+6),y1=C+Math.sin(a)*(R0+6);
-    ctx.strokeStyle='rgba(127,182,255,.9)';ctx.lineWidth=3;ctx.setLineDash([10,7]);ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();ctx.setLineDash([]);
-    const h=Math.atan2(y1-y0,x1-x0);ctx.fillStyle='rgba(127,182,255,.95)';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x1-14*Math.cos(h-0.45),y1-14*Math.sin(h-0.45));ctx.lineTo(x1-14*Math.cos(h+0.45),y1-14*Math.sin(h+0.45));ctx.fill();}
+const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
+function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)return;const W=cv.width,C=W/2,k=W/460;
+  if(!r||!r.sens){cancelAnimationFrame(MTXA.raf);MTXA.raf=0;cv.getContext('2d').clearRect(0,0,W,W);if(!CUR)mtxMsg('Scegli una pista (cerca il nome o tocca un puntino sulla mappa): la matrice si accende intorno alla pista scelta.');return;}
+  const B=MTXA.base&&MTXA.base.width===W?MTXA.base:Object.assign(document.createElement('canvas'),{width:W,height:W});MTXA.base=B;
+  const ctx=B.getContext('2d');ctx.clearRect(0,0,W,W);
+  const R0=30*k,RS=(C-34*k-R0)/MTX_RINGS.length,gap=Math.PI/MTX_DIRS*0.10,Rout=R0+MTX_RINGS.length*RS;Object.assign(MTXA,{C,k,R0,RS,Rout});
+  // fondo: disco con vignettatura
+  let g=ctx.createRadialGradient(C,C,R0,C,C,Rout);g.addColorStop(0,'#10203a');g.addColorStop(1,'#091321');ctx.fillStyle=g;ctx.beginPath();ctx.arc(C,C,Rout,0,7);ctx.fill();
+  // celle: prima quelle spente (tenui), poi le nuvole, poi la pioggia con bagliore
+  const cell=s=>{const a0=(s.brg-90-360/MTX_DIRS/2)*Math.PI/180+gap,a1=(s.brg-90+360/MTX_DIRS/2)*Math.PI/180-gap,ri0=R0+s.ri*RS+0.5*k,ri1=R0+(s.ri+1)*RS-0.5*k;
+    ctx.beginPath();ctx.arc(C,C,ri1,a0,a1);ctx.arc(C,C,ri0,a1,a0,true);ctx.closePath();return[a0,a1,ri0,ri1];};
+  const wetC=[],hits=[];
+  for(const s of r.sens){const cc=CL.res&&CL.res.sens?CL.res.sens[s.ri*MTX_DIRS+s.di]:null;
+    if(!s.off&&tcColor(s.v)){wetC.push(s);continue;}
+    cell(s);ctx.fillStyle=s.off?'rgba(5,9,15,.9)':cc!=null&&cc>0.15?`rgba(150,170,200,${(0.10+0.38*cc).toFixed(2)})`:`rgba(40,70,110,${s.ri%2?0.20:0.28})`;ctx.fill();}
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  for(const s of wetC){const col=tcColor(s.v),c=`rgba(${col[0]|0},${col[1]|0},${col[2]|0},`;cell(s);ctx.shadowColor=c+'0.9)';ctx.shadowBlur=(s.v>=4?14:7)*k;ctx.fillStyle=c+Math.max(.6,col[3]/255)+')';ctx.fill();}
+  ctx.restore();ctx.shadowBlur=0;
+  for(const s of wetC){const[a0,a1,ri0,ri1]=cell(s);if(s.hit){hits.push(s);}
+    if(s.v>=0.5&&Math.abs(s.tr)>0.4&&RS>14*k){const am=(a0+a1)/2,rm=(ri0+ri1)/2;ctx.fillStyle='rgba(5,10,18,.85)';ctx.font=`bold ${13*k}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.tr>0?'▲':'▼',C+Math.cos(am)*rm,C+Math.sin(am)*rm);}}
+  MTXA.hits=hits.map(s=>{const a0=(s.brg-90-360/MTX_DIRS/2)*Math.PI/180+gap,a1=(s.brg-90+360/MTX_DIRS/2)*Math.PI/180-gap;return[a0,a1,R0+s.ri*RS+0.5*k,R0+(s.ri+1)*RS-0.5*k];});
+  // anelli di distanza e raggi
+  ctx.lineWidth=1*k;[2,10,25,50].forEach(km=>{const i=MTX_RINGS.reduce((b,v,j)=>Math.abs(v-km)<Math.abs(MTX_RINGS[b]-km)?j:b,0),rr=R0+(i+1)*RS;
+    ctx.strokeStyle='rgba(120,200,255,.35)';ctx.setLineDash(km===50?[]:[3*k,4*k]);ctx.beginPath();ctx.arc(C,C,rr,0,7);ctx.stroke();ctx.setLineDash([]);
+    const lx=C+Math.cos(-Math.PI/4)*rr,ly=C+Math.sin(-Math.PI/4)*rr,t=km+' km';ctx.font=`600 ${11*k}px Inter,system-ui`;const tw=ctx.measureText(t).width+10*k;
+    ctx.fillStyle='rgba(6,12,22,.85)';ctx.strokeStyle='rgba(120,200,255,.45)';ctx.beginPath();ctx.roundRect(lx-tw/2,ly-8*k,tw,16*k,8*k);ctx.fill();ctx.stroke();ctx.fillStyle='#bfe3ff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,lx,ly+0.5*k);});
+  ctx.strokeStyle='rgba(120,200,255,.14)';for(let b=0;b<360;b+=45){const a=(b-90)*Math.PI/180;ctx.beginPath();ctx.moveTo(C+Math.cos(a)*R0,C+Math.sin(a)*R0);ctx.lineTo(C+Math.cos(a)*Rout,C+Math.sin(a)*Rout);ctx.stroke();}
+  // ghiera graduata
+  for(let b=0;b<360;b+=5){const a=(b-90)*Math.PI/180,L=b%45===0?10:b%15===0?6:3;ctx.strokeStyle=b%45===0?'rgba(190,225,255,.8)':'rgba(120,170,220,.45)';ctx.lineWidth=(b%45===0?1.6:1)*k;
+    ctx.beginPath();ctx.moveTo(C+Math.cos(a)*(Rout+3*k),C+Math.sin(a)*(Rout+3*k));ctx.lineTo(C+Math.cos(a)*(Rout+3*k+L*k),C+Math.sin(a)*(Rout+3*k+L*k));ctx.stroke();}
+  ctx.textAlign='center';ctx.textBaseline='middle';[['N',0],['NE',45],['E',90],['SE',135],['S',180],['SO',225],['O',270],['NO',315]].forEach(([t,b])=>{const a=(b-90)*Math.PI/180,rr=C-9*k;
+    ctx.font=`${t.length>1?600:800} ${(t.length>1?10:15)*k}px Inter,system-ui`;ctx.fillStyle=t==='N'?'#ff6b6b':t.length>1?'#6f86a6':'#cfe3ff';ctx.fillText(t,C+Math.cos(a)*rr,C+Math.sin(a)*rr);});
+  // freccia di arrivo
+  if(r.moving&&r.speed>3){const a=(r.from-90)*Math.PI/180,x0=C+Math.cos(a)*(Rout-4*k),y0=C+Math.sin(a)*(Rout-4*k),x1=C+Math.cos(a)*(R0+10*k),y1=C+Math.sin(a)*(R0+10*k);
+    const lg=ctx.createLinearGradient(x0,y0,x1,y1);lg.addColorStop(0,'rgba(127,182,255,0)');lg.addColorStop(1,'rgba(160,205,255,.95)');
+    ctx.strokeStyle=lg;ctx.lineWidth=4*k;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();ctx.lineCap='butt';
+    const h=Math.atan2(y1-y0,x1-x0);ctx.fillStyle='#cfe3ff';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x1-14*k*Math.cos(h-0.45),y1-14*k*Math.sin(h-0.45));ctx.lineTo(x1-14*k*Math.cos(h+0.45),y1-14*k*Math.sin(h+0.45));ctx.fill();
+    const t=`${Math.round(r.speed)} km/h`,mx=C+Math.cos(a)*(Rout*0.62),my=C+Math.sin(a)*(Rout*0.62);ctx.font=`700 ${11*k}px Inter,system-ui`;const tw=ctx.measureText(t).width+12*k;
+    ctx.fillStyle='rgba(6,12,22,.9)';ctx.strokeStyle='rgba(160,205,255,.7)';ctx.beginPath();ctx.roundRect(mx-tw/2,my-9*k,tw,18*k,9*k);ctx.fill();ctx.stroke();ctx.fillStyle='#e3f0ff';ctx.fillText(t,mx,my+0.5*k);}
+  if(!MTXA.raf)MTXA.raf=requestAnimationFrame(mtxFrame);
   const live=r.sens.filter(s=>!s.off),wet=live.filter(s=>s.v>=0.2),hit=wet.filter(s=>s.hit).sort((a,b)=>a.eta-b.eta),up=wet.filter(s=>s.tr>0.4).length,dn=wet.filter(s=>s.tr<-0.4).length;
   let h=`<b>${wet.length}</b> sensori su ${live.length} vedono pioggia`;
   if(hit.length){const f=hit[Math.min(hit.length-1,hit.length>=5?2:0)],mx=hit.reduce((a,s)=>s.v>a.v?s:a,hit[0]);h+=`<br><b>${hit.length}</b> in rotta verso la pista: il primo a <b>${fmt(f.km,f.km<10?1:0)} km verso ${dir8(f.brg)}</b>, arriva tra circa <b>${Math.max(0,Math.round(f.eta-(Date.now()-r.ms)/60e3))} min</b><br>Il più intenso: ${fmt(mx.v,1)} mm/h a ${fmt(mx.km,mx.km<10?1:0)} km`;
@@ -875,6 +901,22 @@ function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)retur
   else if(wet.length)h+=`<br>Nessuna cella in rotta verso la pista`;else h+=`<br>Cielo pulito su tutti i settori fino a 50 km`;
   if(up||dn)h+=`<br>${up?`▲ ${up} in rinforzo`:''}${up&&dn?' · ':''}${dn?`▼ ${dn} in calo`:''}`;
   lbl.innerHTML=h;}
+function mtxFrame(now){const cv=$('mtx-c');if(!cv||!MTXA.base||!NC.res){MTXA.raf=0;return;}MTXA.raf=requestAnimationFrame(mtxFrame);
+  if(document.hidden||!MTXA.vis)return;if(now-(MTXA.last||0)<33)return;MTXA.last=now;
+  const ctx=cv.getContext('2d'),W=cv.width,{C,k,R0,Rout}=MTXA,t=(now-MTXA.t0)/1000;ctx.clearRect(0,0,W,W);ctx.drawImage(MTXA.base,0,0);
+  // fascio rotante (un giro ogni 4 s)
+  const ang=(t/4%1)*Math.PI*2-Math.PI/2;ctx.save();ctx.beginPath();ctx.arc(C,C,Rout,0,7);ctx.clip();
+  if(ctx.createConicGradient){const cg=ctx.createConicGradient(ang-0.9,C,C);cg.addColorStop(0,'rgba(90,200,255,0)');cg.addColorStop(0.143,'rgba(90,200,255,.22)');cg.addColorStop(0.1432,'rgba(90,200,255,0)');cg.addColorStop(1,'rgba(90,200,255,0)');
+    ctx.fillStyle=cg;ctx.beginPath();ctx.moveTo(C,C);ctx.arc(C,C,Rout,ang-0.9,ang);ctx.closePath();ctx.fill();}
+  ctx.strokeStyle='rgba(140,220,255,.8)';ctx.lineWidth=1.5*k;ctx.beginPath();ctx.moveTo(C+Math.cos(ang)*R0,C+Math.sin(ang)*R0);ctx.lineTo(C+Math.cos(ang)*Rout,C+Math.sin(ang)*Rout);ctx.stroke();ctx.restore();
+  // celle in rotta: bordo che pulsa
+  const pu=0.5+0.5*Math.sin(t*4);ctx.strokeStyle=`rgba(255,255,255,${(0.45+0.55*pu).toFixed(2)})`;ctx.lineWidth=(1+1.2*pu)*k;
+  for(const[a0,a1,ri0,ri1]of MTXA.hits){ctx.beginPath();ctx.arc(C,C,ri1,a0,a1);ctx.arc(C,C,ri0,a1,a0,true);ctx.closePath();ctx.stroke();}
+  // pista al centro con onda
+  const w=(t%2)/2;ctx.strokeStyle=`rgba(255,210,63,${(0.7*(1-w)).toFixed(2)})`;ctx.lineWidth=2*k;ctx.beginPath();ctx.arc(C,C,R0*0.45+R0*0.9*w,0,7);ctx.stroke();
+  const gg=ctx.createRadialGradient(C,C-3*k,1,C,C,R0*0.55);gg.addColorStop(0,'#ffe48a');gg.addColorStop(1,'#f0a800');ctx.fillStyle=gg;ctx.shadowColor='rgba(255,200,60,.8)';ctx.shadowBlur=12*k;ctx.beginPath();ctx.arc(C,C,R0*0.55,0,7);ctx.fill();ctx.shadowBlur=0;
+  ctx.font=`${13*k}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🏁',C,C+1*k);}
+(()=>{const cv=document.getElementById('mtx-c');if(cv&&'IntersectionObserver' in window)new IntersectionObserver(e=>{MTXA.vis=e[0].isIntersecting;}).observe(cv);})();
 const dir8=d=>['N','NE','E','SE','S','SO','O','NO'][Math.round(d/45)%8];
 async function runNowcast(){
   const my=++NC.seq;const t=CUR;if(!t)return;if(!proOK()){applyProGate();return;}const st=$('nc-status');
