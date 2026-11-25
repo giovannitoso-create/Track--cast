@@ -179,6 +179,10 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 .wkc-list{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}.wkc-s{flex:none;min-width:148px;padding:9px 11px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);font-size:12.5px;position:relative}.wkc-s b{display:block;font-size:13.5px}.wkc-s .t{font:700 15px "JetBrains Mono"}
 .wkc-s.past{opacity:.45}.wkc-s.now{border-color:#33d17a;box-shadow:0 0 0 2px rgba(51,209,122,.25)}.wkc-s.next{border-color:#ffd23f}.wkc-s .x{position:absolute;top:4px;right:6px;background:none;border:0;color:var(--ink3);cursor:pointer}
 .wkc-form{margin-top:10px;padding:10px;border-radius:10px;background:var(--surface2);border:1px solid var(--line)}.wkc-form input,.wkc-form select,.wkc-form textarea{background:#0f1622;border:1px solid var(--line2);color:var(--ink);border-radius:8px;padding:7px 8px;font:inherit}
+.dl-imp{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px}.dl-imp input,.dl-imp select,.dl-imp textarea{background:#0f1622;border:1px solid var(--line2);color:var(--ink);border-radius:8px;padding:7px 8px;font:inherit}
+.dl-brands{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.dl-brands span{padding:3px 9px;border-radius:999px;background:#1c2b40;font:600 12px Inter;color:#cfe3ff}
+.dl-drop{display:block;border:2px dashed var(--line2);border-radius:12px;padding:16px;text-align:center;color:var(--ink2);cursor:pointer;margin:8px 0}.dl-drop.over{border-color:var(--rain);background:rgba(61,139,255,.08)}
+.dl-tab td,.dl-tab th{padding:5px 8px;font-size:13px}.dl-tab .best{color:#c58cff;font-weight:800}.dl-tab .out{opacity:.45}.dl-kpi{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}.dl-kpi div{background:#0d1626;border:1px solid #24395a;border-radius:10px;padding:8px 12px}.dl-kpi b{display:block;font:800 20px "JetBrains Mono"}.dl-kpi span{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
 .mdl{position:fixed;inset:0;background:rgba(3,6,12,.78);display:none;align-items:flex-start;justify-content:center;z-index:5500;padding:14px;overflow:auto}
 .mdl .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;padding:18px;margin:20px 0}
 .mdl input,.mdl select{background:#0f1622;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 10px;font:inherit}.mdl input:focus,.mdl select:focus{outline:none;border-color:#ffb547}.mdl h3{margin:0 0 4px}.mdl label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink2);margin:8px 0}.mdl input{width:100%;box-sizing:border-box}
@@ -595,7 +599,7 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
   </div></div></div>
 <div class="mdl" id="acct"><div class="box"><div style="display:flex;align-items:center;gap:8px"><h3>👤 Il tuo account</h3><button class="chipb" id="acct-x" style="margin-left:auto">Chiudi</button></div><div id="acct-body"></div></div></div>
 <div class="mdl" id="modepick"><div class="box" style="max-width:760px"><h3 style="margin:0 0 4px">Come usi TrackCast?</h3><div class="sub" style="margin:0 0 14px">Scegli la dashboard adatta a te. Puoi cambiarla quando vuoi dal pulsante in alto.</div>
-<div class="mp-grid"><button class="mp-card" data-m="am"><span class="mp-ic">🏁</span><b>Amatore / domenicale</b><span>Vai in pista per divertirti o per le gare del club e il motore lo curi tu.</span><ul><li>Meteo, pioggia e slick o rain, matrice radar a 128 occhi</li><li>Pressioni e carburazione semplici</li><li>Cura del motore: ore, revisioni, consigli</li><li>Giri con il GPS del telefono</li></ul></button>
+<div class="mp-grid"><button class="mp-card" data-m="am"><span class="mp-ic">🏁</span><b>Amatore / domenicale</b><span>Vai in pista per divertirti o per le gare del club e il motore lo curi tu.</span><ul><li>Meteo, pioggia e slick o rain, matrice radar a 128 occhi</li><li>Pressioni e carburazione semplici</li><li>Cura del motore: ore, revisioni, consigli</li><li>Tempi dal tuo MyChron, Alfano o Unipro legati al meteo</li></ul></button>
 <button class="mp-card" data-m="pro"><span class="mp-ic">⭐</span><b>Team / pilota Pro</b><span>Corri nei campionati, hai un team e un meccanico.</span><ul><li>Radar avanzato, matrice a 2048 occhi, modelli a confronto</li><li>Strategia, dossier weekend, report</li><li>Schermo box con live timing, avvisi al team</li><li>Stazione meteo in pista</li></ul></button></div></div></div>
 <div class="mdl" id="dashcfg"><div class="box" style="max-width:620px"><div style="display:flex;align-items:center;gap:8px"><h3 style="margin:0">⚙️ La tua dashboard · <span id="dc-mode"></span></h3><button class="chipb" id="dc-x" style="margin-left:auto">Fatto</button></div>
 <div class="sub" style="margin:6px 0 10px">Accendi o spegni i riquadri. Ogni dashboard (Amatore e Team Pro) ricorda le sue scelte.</div><div id="dc-list"></div>
@@ -913,7 +917,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='25/11/2026 10:40';
+const TC_VER='25/11/2026 11:15';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1550,6 +1554,87 @@ $('bx-ltp').onchange=e=>{if(e.target.value)ltOpen(e.target.value);};
 $('bx-ltr').onclick=()=>{const f=$('bx-ltif');if(f.src){const u=f.src;f.src='about:blank';setTimeout(()=>f.src=u,60);}};
 $('bx-lto').onclick=()=>{const u=ltNorm($('bx-ltu').value);if(u)window.open(u,'_blank','noopener');};
 $('bx-ltw').onclick=()=>{LT.w=LT.w%3+1;$('boxscr').dataset.ltw=LT.w;$('bx-ltw').textContent=['◧','◨','⬛'][LT.w-1];$('bx-ltw').title=['Altezza normale','Più alta','Tutto lo schermo'][LT.w-1];setTimeout(()=>{try{drawBox();}catch(e){}},50);};
+// ---------- Tempi dal data logger: MyChron (AiM), Alfano, Unipro e altri, da file CSV/testo ----------
+const DL={sel:null,pend:null};
+const dlKey=()=>'tc_dl_'+(CUR?CUR.id:'x');const dlList=()=>store.get(dlKey(),[]);
+function dlTime(t){t=String(t).trim().replace(/^"|"$/g,'').replace(',','.');let m=t.match(/^(?:(\d{1,2}):)?(\d{1,3})(?:[.](\d{1,4}))?$/);if(!m)return null;
+  const v=(m[1]?+m[1]*60:0)+ +m[2]+(m[3]?+('0.'+m[3]):0);return isFinite(v)?v:null;}
+const dlOk=v=>v!=null&&v>=15&&v<=600;
+function dlSplit(l){const bare=l.replace(/"[^"]*"/g,'');const d=bare.includes('\t')?'\t':(bare.split(';').length>bare.split(',').length?';':',');const out=[];let cur='',q=false;
+  for(const ch of l){if(ch==='"'){q=!q;continue;}if(ch===d&&!q){out.push(cur.trim());cur='';continue;}cur+=ch;}out.push(cur.trim());return out;}
+function dlParse(text,name){const lines=String(text).replace(/\r/g,'').split('\n').filter(l=>l.trim());const out={src:'File',laps:[],start:null,name};if(!lines.length)return out;
+  // AiM (Race Studio): righe "Segment Times" / "Beacon Markers" + Date/Time
+  const row=k=>lines.find(l=>new RegExp('^"?'+k+'"?\\s*[,;\\t]','i').test(l));
+  if(/AiM CSV/i.test(lines[0])||row('Segment Times')||row('Beacon Markers')){out.src='AiM / MyChron';
+    const seg=row('Segment Times');if(seg)out.laps=dlSplit(seg).slice(1).map(dlTime).filter(v=>v!=null);
+    if(!out.laps.length){const bm=row('Beacon Markers');if(bm){const c=dlSplit(bm).slice(1).map(x=>parseFloat(x)).filter(isFinite);out.laps=c.map((v,i)=>v-(i?c[i-1]:0));}}
+    const d=row('Date'),t=row('Time');if(d){const ds=dlSplit(d)[1]+' '+(t?dlSplit(t)[1]:'12:00');const ms=Date.parse(ds.replace(/^\w+,\s*/,''));if(isFinite(ms))out.start=ms-new Date(ms).getTimezoneOffset()*60e3;}
+    if(out.laps.length)return out;}
+  // tabella con colonna del tempo sul giro (Unipro/Off Camber, Alfano, fogli Excel…)
+  for(let h=0;h<Math.min(lines.length,40);h++){const H=dlSplit(lines[h]).map(x=>x.toLowerCase());
+    const ti=H.findIndex(x=>/^(lap ?time|laptime|tempo( giro| sul giro)?|tempo|time|temps( au tour)?|zeit|rundenzeit|best)$/.test(x)||/lap ?time|tempo giro|temps tour/.test(x));
+    const li=H.findIndex(x=>/^(lap|giro|tour|runde|n|#|nr|n°|lap ?#|lap ?nr)$/.test(x));
+    if(ti<0||(li<0&&!/lap|giro|tour/.test(H[ti])))continue;
+    const vals=lines.slice(h+1).map(l=>dlSplit(l)[ti]).map(dlTime);const good=vals.filter(dlOk);
+    if(good.length>=2){out.src=/temps|tour/.test(H.join(' '))?'Alfano':'Tabella giri';out.laps=good;return out;}
+    // serie temporale di un solo giro (es. Alfano: un file per giro)
+    const num=vals.filter(v=>v!=null);if(num.length>20&&num[num.length-1]>num[0]){const lap=num[num.length-1]-num[0];if(dlOk(lap)){out.src='Alfano (un file per giro)';out.laps=[lap];out.single=true;return out;}}}
+  // testo libero: il primo tempo plausibile di ogni riga ("1  48.123", "Giro 3 0:48.12"…)
+  for(const l of lines){const toks=l.match(/\d{1,2}:\d{2}[.,]\d{1,4}|\d{2,3}[.,]\d{2,4}/g)||[];const v=toks.map(dlTime).find(dlOk);if(v!=null)out.laps.push(v);}
+  out.src=/unipro/i.test(text)?'Unipro':/alfano/i.test(text)?'Alfano':/mychron|aim/i.test(text)?'AiM / MyChron':'Lista tempi';return out;}
+function dlCond(ts){const pick=S=>{if(!S||!S.length||ts<S[0].ts-3600e3||ts>S[S.length-1].ts+3600e3)return null;let b=S[0];for(const p of S)if(Math.abs(p.ts-ts)<Math.abs(b.ts-ts))b=p;return b;};
+  const p=pick(SIM&&SIM.S)||pick(WKC.W&&WKC.W.S);return p?{asph:+(+p.asph).toFixed(1),ta:+(+p.ta).toFixed(1),film:+(+(p.film||0)).toFixed(2),rh:p.rh!=null?Math.round(p.rh):null}:null;}
+function dlStats(laps){const v=laps.map(l=>l.s),srt=[...v].sort((a,b)=>a-b),med=srt[Math.floor(srt.length/2)]||0;laps.forEach(l=>l.out=l.s>med*1.07);
+  const ok=laps.filter(l=>!l.out),best=ok.length?Math.min(...ok.map(l=>l.s)):null,b3=ok.map(l=>l.s).sort((a,b)=>a-b).slice(0,3);
+  return{best,avg3:b3.length?b3.reduce((a,b)=>a+b,0)/b3.length:null,avg:ok.length?ok.reduce((a,l)=>a+l.s,0)/ok.length:null,n:laps.length};}
+async function dlReadFiles(files){const res=[];for(const f of files){try{res.push(dlParse(await f.text(),f.name));}catch(e){}}
+  const singles=res.filter(r=>r.single).sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{numeric:true}));const multi=res.filter(r=>!r.single);
+  const r=multi.find(x=>x.laps.length)||{src:singles[0]?singles[0].src:'File',laps:[],start:null};if(singles.length)r.laps=r.laps.concat(singles.flatMap(x=>x.laps));return r;}
+function renderDL(){const B=$('dl-box');if(!B)return;if(!CUR){B.innerHTML='<div class="sub">Scegli una pista.</div>';return;}
+  const L=dlList(),today=new Date(wkNowP()).toISOString().slice(0,10),wk=wkList().slice().sort((a,b)=>(a.day+a.time).localeCompare(b.day+b.time)),ds=drivers();
+  const P=DL.pend;let h=`<div class="dl-imp"><h3 style="margin:0 0 4px">📥 Tempi dal data logger</h3><div class="sub" style="margin:0">Carica il file esportato dal tuo cronometro: ogni giro viene legato all'asfalto, all'aria e alla pioggia di quel momento, così vedi quanto è il pilota e quanto le condizioni.</div>
+   <div class="dl-brands"><span>AiM MyChron</span><span>Alfano</span><span>Unipro</span><span>Off Camber</span><span>qualsiasi CSV o lista tempi</span></div>
+   <label class="dl-drop" id="dl-drop">📂 Tocca per scegliere il file (.csv, .txt) — anche più file insieme<br><span class="sub" style="margin:0">oppure trascinalo qui</span><input type="file" id="dl-file" accept=".csv,.txt,.tsv,text/csv,text/plain" multiple hidden></label>
+   <details><summary class="sub" style="cursor:pointer;margin:0">…oppure incolla i tempi (uno per riga)</summary><textarea id="dl-txt" rows="4" style="width:100%;margin-top:6px" placeholder="1  48.512\n2  47.903\n3  47.811"></textarea><button class="chipb" id="dl-txtok" style="margin-top:6px">Leggi i tempi</button></details>
+   <details style="margin-top:6px"><summary class="sub" style="cursor:pointer;margin:0">Come esporto il file?</summary><div class="sub" style="margin:6px 0 0;line-height:1.55"><b>MyChron (AiM):</b> scarica la sessione in Race Studio 3, apri l'analisi ed esporta in CSV/Excel.<br><b>Alfano:</b> scarica la sessione con l'app Alfano ADA (Bluetooth) o il programma per PC ed esporta i giri.<br><b>Unipro:</b> scarica con il programma per PC (Unipro Analyser / Off Camber) ed esporta in CSV.<br>Se non trovi l'esportazione, copia la lista dei tempi e incollala qui sopra.</div></details>`;
+  if(P){h+=`<div style="margin-top:10px;padding:10px;border-radius:10px;background:#0d1626;border:1px solid #24395a"><b>${P.laps.length} giri letti</b> <span class="sub" style="margin:0">(${esc(P.src)}) · migliore ${fmt(Math.min(...P.laps),3)} s</span>
+     <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px">Turno <select id="dl-turn"><option value="">— scegli l'orario —</option>${wk.map((x,i)=>`<option value="${i}">${esc(lblDay(x.day+'T00:00'))} ${esc(x.time)} · ${esc(x.type)}</option>`).join('')}</select>
+     partenza <input type="date" id="dl-day" value="${P.start?new Date(P.start).toISOString().slice(0,10):today}"><input type="time" id="dl-time" value="${P.start?new Date(P.start).toISOString().slice(11,16):''}">
+     pilota <input id="dl-drv" list="dl-drvs" value="${esc(store.get('tc_live_drv','')||ds[0]||'')}" style="width:120px"><datalist id="dl-drvs">${ds.map(d=>`<option>${esc(d)}</option>`).join('')}</datalist>
+     <button class="btn primary" id="dl-save">Salva la sessione</button><button class="chipb" id="dl-cancel">Annulla</button></div><div class="sub" id="dl-msg" style="margin:6px 0 0"></div></div>`;}
+  h+='</div>';
+  if(L.length){const sel=L.find(x=>x.id===DL.sel)||L[0];DL.sel=sel.id;const st=dlStats(sel.laps);
+    h+=`<div style="margin-top:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>Sessioni importate</b><select id="dl-ses">${L.map(x=>`<option value="${x.id}"${x.id===sel.id?' selected':''}>${esc(x.label)}</option>`).join('')}</select><button class="chipb" id="dl-del">🗑️ Cancella</button></div>
+     <div class="dl-kpi"><div><span>Miglior giro</span><b style="color:#c58cff">${st.best?fmt(st.best,3):'—'}</b></div><div><span>Media 3 migliori</span><b>${st.avg3?fmt(st.avg3,3):'—'}</b></div><div><span>Media giri buoni</span><b>${st.avg?fmt(st.avg,3):'—'}</b></div>${sel.laps[0]&&sel.laps[0].c?`<div><span>Asfalto</span><b>${fmt(sel.laps[0].c.asph,0)}→${fmt(sel.laps[sel.laps.length-1].c.asph,0)}°</b></div>`:''}</div>
+     ${dlChart(sel.laps,st)}
+     <table class="dl-tab" style="margin-top:8px"><thead><tr><th>Giro</th><th>Tempo</th><th>Distacco</th><th>Ora</th><th>Asfalto</th><th>Aria</th><th>Pista</th></tr></thead><tbody>${sel.laps.map(l=>`<tr class="${l.s===st.best?'best':''}${l.out?' out':''}"><td>${l.n}</td><td class="mono">${fmt(l.s,3)}</td><td class="mono">${st.best&&!l.out?'+'+fmt(l.s-st.best,3):l.out?'lento / box':''}</td><td>${new Date(l.ts).toISOString().slice(11,16)}</td><td>${l.c?fmt(l.c.asph,1)+' °C':'—'}</td><td>${l.c?fmt(l.c.ta,1)+' °C':'—'}</td><td>${l.c?(l.c.film>0.05?'💧 bagnata':'asciutta'):'—'}</td></tr>`).join('')}</tbody></table>`;
+    const withC=L.filter(x=>x.laps.some(l=>l.c));if(withC.length>=2){const rows=withC.map(x=>{const s=dlStats(x.laps),ok=x.laps.filter(l=>!l.out&&l.c);return{x,best:s.best,asph:ok.length?ok.reduce((a,l)=>a+l.c.asph,0)/ok.length:null};}).filter(r=>r.best&&r.asph!=null);
+      if(rows.length>=2){const byD={};rows.forEach(r=>(byD[r.x.driver||'—']=byD[r.x.driver||'—']||[]).push(r));
+        h+=`<h4 style="margin:16px 0 6px">Migliori giri e asfalto, sessione per sessione</h4><table class="dl-tab"><thead><tr><th>Sessione</th><th>Pilota</th><th>Asfalto medio</th><th>Miglior giro</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.x.label)}</td><td>${esc(r.x.driver||'')}</td><td>${fmt(r.asph,1)} °C</td><td class="mono">${fmt(r.best,3)}</td></tr>`).join('')}</tbody></table>
+        <div class="sub" style="margin:6px 0 0">${Object.entries(byD).filter(([,a])=>a.length>=3).map(([d,a])=>{const n=a.length,mx=a.reduce((s,r)=>s+r.asph,0)/n,my=a.reduce((s,r)=>s+r.best,0)/n,sxx=a.reduce((s,r)=>s+(r.asph-mx)**2,0);if(sxx<4)return'';const k=a.reduce((s,r)=>s+(r.asph-mx)*(r.best-my),0)/sxx;return`<b>${esc(d)}</b>: ogni 5 °C di asfalto in più il miglior giro cambia di ${k*5>=0?'+':'−'}${fmt(Math.abs(k*5),2)} s (da ${n} sessioni).`;}).filter(Boolean).join('<br>')||'Con almeno 3 sessioni dello stesso pilota a temperature diverse calcolo quanto pesa l\'asfalto sul tempo.'}</div>`;}}}
+  else if(!P)h+='<div class="sub" style="margin-top:10px">Nessuna sessione importata per questa pista.</div>';
+  B.innerHTML=h;
+  const take=async files=>{if(!files||!files.length)return;const r=await dlReadFiles([...files]);if(!r.laps.length){DL.pend=null;renderDL();$('dl-box').insertAdjacentHTML('beforeend','<div class="sub err" style="margin-top:6px">Non trovo tempi sul giro in questo file. Prova a esportare in CSV o incolla la lista dei tempi.</div>');return;}DL.pend=r;renderDL();};
+  $('dl-file').onchange=e=>take(e.target.files);const dr=$('dl-drop');dr.ondragover=e=>{e.preventDefault();dr.classList.add('over');};dr.ondragleave=()=>dr.classList.remove('over');dr.ondrop=e=>{e.preventDefault();dr.classList.remove('over');take(e.dataTransfer.files);};
+  $('dl-txtok').onclick=()=>{const r=dlParse($('dl-txt').value,'incollato');if(!r.laps.length){alertMsg();return;}DL.pend=r;renderDL();};
+  const alertMsg=()=>$('dl-box').insertAdjacentHTML('beforeend','<div class="sub err">Non trovo tempi: scrivi un tempo per riga (es. 48.512 oppure 0:48.512).</div>');
+  if(P){$('dl-turn').onchange=e=>{const x=wk[+e.target.value];if(x){$('dl-day').value=x.day;$('dl-time').value=x.time;}};$('dl-cancel').onclick=()=>{DL.pend=null;renderDL();};
+    $('dl-save').onclick=()=>{const day=$('dl-day').value,tm=$('dl-time').value;if(!day||!tm){$('dl-msg').textContent='Scegli il turno o scrivi l\'ora di partenza: serve per legare i giri al meteo.';return;}
+      const t0=Date.parse(`${day}T${tm}:00Z`),drv=$('dl-drv').value.trim();let acc=0;const laps=P.laps.map((s,i)=>{acc+=s;const ts=t0+acc*1000;return{n:i+1,s:+s.toFixed(3),ts,c:dlCond(ts)};});
+      const tsel=$('dl-turn').value!==''?wk[+$('dl-turn').value]:null,id=Date.now().toString(36);
+      const label=`${lblDay(day+'T00:00')} ${tm}${tsel?' · '+tsel.type:''}${drv?' · '+drv:''}`;const l=dlList();l.unshift({id,src:P.src,label,driver:drv,start:t0,laps});store.set(dlKey(),l.slice(0,60));
+      if(drv&&!drivers().includes(drv))store.set('tc_drivers',drivers().concat(drv).join(', '));DL.pend=null;DL.sel=id;renderDL();};}
+  if(L.length){$('dl-ses').onchange=e=>{DL.sel=e.target.value;renderDL();};$('dl-del').onclick=()=>{if(!confirmDel())return;store.set(dlKey(),dlList().filter(x=>x.id!==DL.sel));DL.sel=null;renderDL();};}
+  function confirmDel(){const b=$('dl-del');if(b.dataset.sure){return true;}b.dataset.sure=1;b.textContent='Tocca di nuovo per cancellare';setTimeout(()=>{if(b.isConnected){b.textContent='🗑️ Cancella';delete b.dataset.sure;}},3000);return false;}}
+function dlChart(laps,st){const ok=laps.filter(l=>!l.out);if(ok.length<2)return'';const W=640,H=150,pad=34,mn=Math.min(...ok.map(l=>l.s)),mx=Math.max(...ok.map(l=>l.s)),rg=Math.max(0.3,mx-mn);
+  const x=i=>pad+i*(W-pad-8)/Math.max(1,laps.length-1),y=v=>12+(H-34)*(v-mn)/rg;const as=laps.filter(l=>l.c).map(l=>l.c.asph),amn=Math.min(...as),amx=Math.max(...as),ar=Math.max(1,amx-amn),ya=v=>12+(H-34)*(1-(v-amn)/ar);
+  return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto;background:#0b1220;border:1px solid #1f2a3a;border-radius:10px">
+   <text x="4" y="16" fill="#7f91aa" font-size="10">${fmt(mn,2)}</text><text x="4" y="${H-22}" fill="#7f91aa" font-size="10">${fmt(mn+rg,2)}</text>
+   ${as.length>1?`<polyline fill="none" stroke="#ff9f43" stroke-width="1.5" stroke-dasharray="4 3" points="${laps.map((l,i)=>l.c?`${x(i)},${ya(l.c.asph)}`:'').filter(Boolean).join(' ')}"/>`:''}
+   <polyline fill="none" stroke="#7fb2ff" stroke-width="2" points="${laps.map((l,i)=>l.out?'':`${x(i)},${y(l.s)}`).filter(Boolean).join(' ')}"/>
+   ${laps.map((l,i)=>l.out?'':`<circle cx="${x(i)}" cy="${y(l.s)}" r="${l.s===st.best?5:3}" fill="${l.s===st.best?'#c58cff':'#7fb2ff'}"><title>Giro ${l.n}: ${fmt(l.s,3)} s${l.c?' · asfalto '+fmt(l.c.asph,1)+' °C':''}</title></circle>`).join('')}
+   ${laps.map((l,i)=>`<text x="${x(i)}" y="${H-6}" fill="#5f7390" font-size="9" text-anchor="middle">${l.n}</text>`).join('')}
+   <text x="${W-8}" y="14" fill="#7fb2ff" font-size="10" text-anchor="end">— tempo sul giro (in alto = più veloce)</text>${as.length>1?`<text x="${W-8}" y="27" fill="#ff9f43" font-size="10" text-anchor="end">- - asfalto ${fmt(amn,0)}–${fmt(amx,0)} °C</text>`:''}</svg>`;}
 // ---------- Programma del weekend in cima alla pagina: turni, conto alla rovescia, avvisi 20' prima ----------
 const WKC={W:null,wAt:0,wTrk:'',loading:false,form:''};
 const wkNowP=()=>Date.now()-new Date().getTimezoneOffset()*60e3; // ora locale nella stessa convenzione dei turni
@@ -1690,10 +1775,10 @@ const DASH=[
  ['Strumenti',[
   ['t_strat','tab:strat','Slick o rain · strategia','',1,1],['t_weekend','tab:weekend','Dossier del weekend','',0,1],['t_storico','tab:storico','Storico meteo','',1,1],
   ['t_cal','tab:cal','Calendario gare','',1,1],['t_setup','tab:setup','Assetto','',1,0],['t_motore','tab:motore','Cura del motore','ore, revisioni, consigli di manutenzione',1,0],
-  ['t_giri','tab:giri','Analisi giri','',1,1],['t_box','tab:box','Schermo box + live timing','',0,1],['t_live','tab:live','Team live','pressioni, gomme e note condivise in tempo reale',0,1],['t_avvisi','tab:avvisi','Avvisi al team','',0,1],['t_report','tab:report','Report','',0,1]]],
+  ['t_giri','tab:giri','Analisi giri','tempi dal data logger (MyChron, Alfano, Unipro) legati al meteo',1,1],['t_box','tab:box','Schermo box + live timing','',0,1],['t_live','tab:live','Team live','pressioni, gomme e note condivise in tempo reale',0,1],['t_avvisi','tab:avvisi','Avvisi al team','',0,1],['t_report','tab:report','Report','',0,1]]],
  ['In pista',[
   ['carb','#carbbox','Carburazione','getto consigliato, vite del carburatore a membrana',1,0],
-  ['gps','#kartcard','GPS sul kart','conta i giri con il telefono',1,0],
+  ['gps','#kartcard','GPS sul kart (telefono)','conta i giri con il telefono sul kart',0,0],
   ['st','#stcard','Stazione meteo in pista','i tuoi sensori collegati',0,1]]]];
 const DMODE=()=>store.get('tc_mode','')||'pro';
 function dashState(m){const def={};DASH.forEach(([,it])=>it.forEach(x=>def[x[0]]=!!x[m==='am'?4:5]));return Object.assign(def,store.get('tc_dash_'+m,{}));}
@@ -1774,8 +1859,8 @@ function lapTrace(ses,lap){const t0=lap.start,t1=lap.start+lap.ms,P=ses.pts.filt
   const a=tr.findIndex(q=>q.t>=0),b=tr.length-1-tr.slice().reverse().findIndex(q=>q.t<=lap.ms/1000);const seg=tr.slice(Math.max(0,a),b+1);if(seg.length<5)return null;
   const D0=seg[0].d,DL=seg[seg.length-1].d-D0||1;seg.forEach(q=>q.f=(q.d-D0)/DL);return{pts:seg,len:DL,ms:lap.ms};}
 function timeAt(tr,f){const p=tr.pts;for(let i=1;i<p.length;i++)if(p[i].f>=f){const u=(f-p[i-1].f)/((p[i].f-p[i-1].f)||1);return p[i-1].t+u*(p[i].t-p[i-1].t);}return tr.ms/1000;}
-function renderGiri(){const P=$('pt-giri'),S=giriSessions();
-  if(!S.length){P.innerHTML='<div class="sub">Registra una sessione con il GPS (riquadro “Cronometro GPS”, ▶ Avvia sessione): qui vedrai tempi, settori, velocità lungo il tracciato e il confronto tra i giri.</div>';return;}
+function renderGiri(){const G=$('pt-giri');if(!$('dl-box'))G.innerHTML='<div id="dl-box"></div><div id="pt-giri-gps" style="margin-top:16px"></div>';renderDL();const P=$('pt-giri-gps'),S=giriSessions();
+  if(!S.length){P.innerHTML='';return;}
   const sid=PT.gSes&&S.find(x=>x.id===PT.gSes)?PT.gSes:S[0].id,ses=S.find(x=>x.id===sid);PT.gSes=sid;
   const T=ses.laps.map(l=>({l,tr:lapTrace(ses,l)})).filter(x=>x.tr);
   if(!T.length){P.innerHTML='<div class="pt-row">Sessione <select id="g-ses">'+S.map(x=>`<option value="${x.id}"${x.id===sid?' selected':''}>${esc(x.label)}</option>`).join('')+'</select></div><div class="sub">Questa sessione non ha abbastanza punti GPS per l\'analisi.</div>';$('g-ses').onchange=()=>{PT.gSes=$('g-ses').value;renderGiri();};return;}
@@ -1841,7 +1926,7 @@ const _storeSet=store.set.bind(store);store.set=(k,v)=>{_storeSet(k,v);if(k==='t
 setInterval(()=>{if(document.visibilityState==='visible')cloudSyncDiary();},30000);
 // ===== dati personali salvati nell'account (tutti gli utenti, anche gratis) =====
 const UD={busy:false,soon:null,at:0,err:'',n:0};
-const UD_KEYS=/^tc_(plog|calendar|alerts|drivers|engine|jet|cmp|pdrv|psess|pt_dur|reports|team|shmode|staddr|sessions_.+|calib_.+|pbase_.+|dry_.+|sens_.+|tcol_.+|phot_.+|pos_.+|motor_.+|jet_.+|mode|dash_am|dash_pro|live_me|wknd_.+|wk_bell)$/;
+const UD_KEYS=/^tc_(plog|calendar|alerts|drivers|engine|jet|cmp|pdrv|psess|pt_dur|reports|team|shmode|staddr|sessions_.+|calib_.+|pbase_.+|dry_.+|sens_.+|tcol_.+|phot_.+|pos_.+|motor_.+|jet_.+|mode|dash_am|dash_pro|live_me|wknd_.+|wk_bell|dl_.+)$/;
 const udMod=()=>store.get('tc_mod',{});
 const udLastK=()=>'tc_usync_'+(ACCT.session?ACCT.session.user.id:'x');
 function udLocalKeys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(UD_KEYS.test(k))o.push(k);}return o;}
