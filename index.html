@@ -609,6 +609,8 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
   <div style="display:flex;justify-content:space-between;margin-top:10px"><button class="chipb" id="repback" style="display:none">← Indietro</button><button class="chipb" id="repclose" style="margin-left:auto">Chiudi</button></div>
 </div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>/* se la libreria della mappa non si carica (rete, blocchi), il resto del sito deve funzionare lo stesso */
+if(!window.L){const P=new Proxy(function(){},{get:(t,k)=>k===Symbol.toPrimitive?(()=>0):k==='then'?undefined:k==='toString'?(()=>''):P,apply:()=>P,construct:()=>P});window.L=P;window.__NOMAP=true;}</script>
 <script>
 (()=>{
 const $=id=>document.getElementById(id);
@@ -891,7 +893,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='25/11/2026 09:20';
+const TC_VER='25/11/2026 09:30';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
