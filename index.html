@@ -163,6 +163,16 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 .mdl .dc-i{display:flex!important;flex-direction:row!important;text-align:left;justify-content:flex-start;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;margin-top:6px;cursor:pointer}.mdl .dc-i input{padding:0;margin:0;width:18px;height:18px;accent-color:var(--rain);flex:none}.dc-i>div{flex:1;min-width:0}.dc-i b{font-size:14px}.dc-i small{display:block;color:var(--ink3);font-size:12px}
 .dc-i .dc-def{margin-left:auto;font-size:10.5px;color:var(--ink3);white-space:nowrap}
 .dash-off{display:none!important}#carbbox.dash-off~.sbox:has(#tyrecmp){grid-column:1/-1}.row2.dash-one,.row3.dash-one{grid-template-columns:1fr!important}
+.lv-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.lv-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font:600 12px Inter;background:var(--surface2);border:1px solid var(--line2)}
+.lv-pill i{width:8px;height:8px;border-radius:50%;background:#7f91aa}.lv-pill.on i{background:#33d17a;box-shadow:0 0 0 0 rgba(51,209,122,.6);animation:lvp 1.6s infinite}@keyframes lvp{70%{box-shadow:0 0 0 8px rgba(51,209,122,0)}100%{box-shadow:0 0 0 0 rgba(51,209,122,0)}}
+.lv-drv{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin:6px 0 14px}.lv-c{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;transition:border-color .3s,box-shadow .3s}
+.lv-c.flash{border-color:#33d17a;box-shadow:0 0 0 3px rgba(51,209,122,.25)}.lv-c h4{margin:0 0 6px;font-size:15px;display:flex;gap:6px;align-items:center}.lv-c .lv-r{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:3px 0;border-top:1px dashed var(--line)}.lv-c .lv-r span{color:var(--ink3)}
+.lv-tyre{display:grid;grid-template-columns:1fr 1fr;gap:3px;font:600 13px "JetBrains Mono";text-align:center}.lv-tyre b{background:#0c1522;border-radius:5px;padding:3px}
+.lv-f{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px}.lv-k{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0}.lv-k button.on{background:var(--rain);color:#fff;border-color:var(--rain)}
+.lv-f input,.lv-f select,.lv-f textarea{background:#0f1622;border:1px solid var(--line2);color:var(--ink);border-radius:8px;padding:8px 9px;font:inherit}.lv-w{display:grid;grid-template-columns:repeat(4,minmax(60px,1fr));gap:6px}.lv-w label{display:flex;flex-direction:column;font-size:11px;color:var(--ink3);gap:3px}
+.lv-feed{display:flex;flex-direction:column;gap:6px}.lv-e{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);font-size:13px}.lv-e.new{animation:lvn 2.5s}@keyframes lvn{from{background:rgba(51,209,122,.25)}}
+.lv-e .ic{font-size:18px}.lv-e .m{color:var(--ink3);font-size:11.5px}.lv-e .x{margin-left:auto;background:none;border:0;color:var(--ink3);cursor:pointer}
+#lv-toast{position:fixed;right:14px;bottom:14px;z-index:7000;max-width:330px;background:#0f2a1c;border:1px solid #2e7d50;color:#d9ffe8;border-radius:12px;padding:10px 12px;font-size:13.5px;box-shadow:0 8px 30px rgba(0,0,0,.5);display:none}
 .mdl{position:fixed;inset:0;background:rgba(3,6,12,.78);display:none;align-items:flex-start;justify-content:center;z-index:5500;padding:14px;overflow:auto}
 .mdl .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;padding:18px;margin:20px 0}
 .mdl input,.mdl select{background:#0f1622;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 10px;font:inherit}.mdl input:focus,.mdl select:focus{outline:none;border-color:#ffb547}.mdl h3{margin:0 0 4px}.mdl label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink2);margin:8px 0}.mdl input{width:100%;box-sizing:border-box}
@@ -485,9 +495,9 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
     <div id="pt-body"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">⭐ Strumenti Pro</h3></div>
     <div class="pt-tabs" id="pt-tabs">
       <button data-t="strat" class="on">🏁 Slick o rain</button><button data-t="weekend">📅 Weekend</button><button data-t="storico">🕰️ Storico</button><button data-t="cal">🗓️ Calendario</button>
-      <button data-t="setup">🔧 Assetto</button><button data-t="motore">🛠️ Cura motore</button><button data-t="giri">⏱️ Analisi giri</button><button data-t="box">📺 Box</button><button data-t="avvisi">🔔 Avvisi</button><button data-t="report">📄 Report</button></div>
+      <button data-t="setup">🔧 Assetto</button><button data-t="motore">🛠️ Cura motore</button><button data-t="giri">⏱️ Analisi giri</button><button data-t="box">📺 Box</button><button data-t="live">👥 Team live</button><button data-t="avvisi">🔔 Avvisi</button><button data-t="report">📄 Report</button></div>
     <div class="pt-pane" id="pt-strat"></div><div class="pt-pane" id="pt-weekend" hidden></div><div class="pt-pane" id="pt-storico" hidden></div><div class="pt-pane" id="pt-cal" hidden></div>
-    <div class="pt-pane" id="pt-setup" hidden></div><div class="pt-pane" id="pt-motore" hidden></div><div class="pt-pane" id="pt-giri" hidden></div><div class="pt-pane" id="pt-box" hidden></div><div class="pt-pane" id="pt-avvisi" hidden></div><div class="pt-pane" id="pt-report" hidden></div></div>
+    <div class="pt-pane" id="pt-setup" hidden></div><div class="pt-pane" id="pt-motore" hidden></div><div class="pt-pane" id="pt-giri" hidden></div><div class="pt-pane" id="pt-box" hidden></div><div class="pt-pane" id="pt-live" hidden></div><div class="pt-pane" id="pt-avvisi" hidden></div><div class="pt-pane" id="pt-report" hidden></div></div>
   </div>
   <div class="card" id="stcard">
     <h2>La tua stazione in pista <span class="badge off" id="stbadge">non collegata</span></h2>
@@ -893,7 +903,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='25/11/2026 09:30';
+const TC_VER='25/11/2026 10:00';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1189,7 +1199,7 @@ function renderMotore(){const P=$('pt-motore');const eng=engNow(),m=motorState(e
     motorSave(eng,{since:Date.now(),litres:0,extraMin:0,model:m.model,use:m.use,parts:{}});renderMotore();};}
 function ptShow(t){PT.tab=t;document.querySelectorAll('#pt-tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
   document.querySelectorAll('.pt-pane').forEach(p=>p.hidden=p.id!=='pt-'+t);ptRender();}
-function ptRender(){if(!proOK())return;try{({strat:renderStrat,weekend:renderWeekend,storico:renderStorico,cal:renderCal,setup:renderSetupTab,motore:renderMotore,giri:renderGiri,box:renderBoxTab,avvisi:renderAvvisi,report:renderReportTab})[PT.tab]();}catch(e){console.warn(e);}}
+function ptRender(){if(!proOK())return;try{({strat:renderStrat,weekend:renderWeekend,storico:renderStorico,cal:renderCal,setup:renderSetupTab,motore:renderMotore,giri:renderGiri,box:renderBoxTab,live:renderLive,avvisi:renderAvvisi,report:renderReportTab})[PT.tab]();}catch(e){console.warn(e);}}
 const fmtS=x=>(x>=0?'+':'−')+fmt(Math.abs(x),1)+' s';
 const lblTime=lbl=>lbl.slice(11,16),lblDay=lbl=>new Date(lbl.slice(0,10)+'T12:00:00').toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'});
 // rain probability for a 15-min step: radar nowcast in the first hour, model probability afterwards
@@ -1486,7 +1496,7 @@ function drawBox(){if(!SIM||!CUR)return;const S=SIM.S,ni=SIM.ni,n=S[ni],p30=S[Ma
   let ta=0;const tile=(cls,l,body)=>`<div class="bx-t ${cls||''}" style="grid-area:${'abcde'[ta++]}"><div class="l">${l}</div>${body}</div>`;
   const trend=(a,b)=>b-a>0.7?'▲':a-b>0.7?'▼':'▶';
   // avvisi in fondo
-  const msgs=[];if(raining)msgs.push('🌧️ Piove in pista: monta le rain');else if(mins!=null)msgs.push(`🌧️ Pioggia tra ${mins} min (probabilità ${Math.round(first.p*100)}%)`);
+  const msgs=[];try{LIVE.ev.filter(e=>Date.now()-e.ts<20*60e3).slice(0,3).forEach(e=>msgs.push(`👥 ${e.driver?e.driver+': ':''}${lvText(e).replace(/<[^>]+>/g,'')} (${e.author||'team'})`));}catch(e){}if(raining)msgs.push('🌧️ Piove in pista: monta le rain');else if(mins!=null)msgs.push(`🌧️ Pioggia tra ${mins} min (probabilità ${Math.round(first.p*100)}%)`);
   if(CL.res&&CL.res.leads&&CL.res.leads[0]&&CL.res.leads[0].ps>=0.5)msgs.push('⛈️ Nubi temporalesche vicine');
   if(Math.abs(p30.asph-n.asph)>=3)msgs.push(`🌡️ Asfalto ${p30.asph>n.asph?'in salita':'in calo'}: ${fmt(n.asph,0)} → ${fmt(p30.asph,0)} °C in 30 min`);
   if((n.wg||n.ws)>=40)msgs.push(`💨 Raffiche fino a ${Math.round(n.wg||n.ws)} km/h`);
@@ -1530,6 +1540,90 @@ $('bx-ltp').onchange=e=>{if(e.target.value)ltOpen(e.target.value);};
 $('bx-ltr').onclick=()=>{const f=$('bx-ltif');if(f.src){const u=f.src;f.src='about:blank';setTimeout(()=>f.src=u,60);}};
 $('bx-lto').onclick=()=>{const u=ltNorm($('bx-ltu').value);if(u)window.open(u,'_blank','noopener');};
 $('bx-ltw').onclick=()=>{LT.w=LT.w%3+1;$('boxscr').dataset.ltw=LT.w;$('bx-ltw').textContent=['◧','◨','⬛'][LT.w-1];$('bx-ltw').title=['Altezza normale','Più alta','Tutto lo schermo'][LT.w-1];setTimeout(()=>{try{drawBox();}catch(e){}},50);};
+// ---------- Team live: dati condivisi in tempo reale nel team ----------
+// Sito vero: tabella team_live su Supabase + Realtime (file 8). Prototipo in chat: database dell'artifact. Senza account: solo su questo dispositivo (e tra le schede aperte).
+const LIVE={ev:[],src:'',tid:null,ch:null,unsub:null,bc:null,peers:0,seen:new Set(),mine:new Set(),kind:'press',flash:{},started:false};
+const LV_KINDS={press:['🎈','Pressioni'],jet:['🔧','Getto'],tyre:['🛞','Gomme'],note:['📝','Nota']};
+const lvId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const lvMe=()=>store.get('tc_live_me','')||(ACCT.session&&ACCT.session.user&&String(ACCT.session.user.email||'').split('@')[0])||'Box';
+function lvAgo(ts){const m=Math.round((Date.now()-ts)/60e3);return m<1?'adesso':m<60?m+' min fa':Math.round(m/60)+' h fa';}
+function lvText(e){const d=e.data||{};if(e.kind==='press'){const w=['fl','fr','rl','rr'].map(k=>d[k]!=null&&d[k]!==''?fmt(+d[k],2):'—');return`${d.hot?'a caldo':'a freddo'}: ant. ${w[0]} / ${w[1]} · post. ${w[2]} / ${w[3]} bar`;}
+  if(e.kind==='jet')return`getto ${esc(d.jet||'—')}${d.needle?' · spillo '+esc(d.needle):''}${d.screw?' · vite H '+esc(d.screw):''}`;
+  if(e.kind==='tyre')return`${d.type==='rain'?'RAIN':'SLICK'}${d.set?' · treno '+esc(d.set):''}`;return esc(d.text||'');}
+function lvIngest(list,fromLocal){const before=LIVE.seen.size&&LIVE.started;let fresh=[];
+  const m=new Map(LIVE.ev.map(e=>[e.id,e]));for(const e of list){if(!e||!e.id)continue;if(e._del){m.delete(e.id);continue;}if(!LIVE.seen.has(e.id)){LIVE.seen.add(e.id);if(before&&!LIVE.mine.has(e.id))fresh.push(e);}m.set(e.id,e);}
+  LIVE.ev=[...m.values()].sort((a,b)=>b.ts-a.ts).slice(0,300);LIVE.started=true;
+  if(LIVE.src==='local')store.set('tc_live_local',LIVE.ev.slice(0,150));
+  fresh.forEach(e=>{LIVE.flash[e.driver||'—']=Date.now();});if(fresh.length)lvToast(fresh[0]);
+  if(PT.tab==='live'&&!$('pt-live').hidden)renderLive();try{if($('boxscr').style.display==='block')drawBox();}catch(e){}}
+function lvToast(e){let t=$('lv-toast');if(!t){t=document.createElement('div');t.id='lv-toast';document.body.appendChild(t);}
+  t.innerHTML=`<b>👥 ${esc(e.author||'Team')}</b> · ${esc(e.driver||'')}<br>${LV_KINDS[e.kind]?LV_KINDS[e.kind][0]:''} ${lvText(e)}`;t.style.display='block';clearTimeout(LIVE.tt);LIVE.tt=setTimeout(()=>t.style.display='none',6000);
+  try{navigator.vibrate&&navigator.vibrate(120);}catch(_){}}
+function liveStop(){try{LIVE.unsub&&LIVE.unsub();}catch(e){}try{LIVE.ch&&ACCT.sb.removeChannel(LIVE.ch);}catch(e){}LIVE.unsub=LIVE.ch=null;LIVE.peers=0;}
+async function liveStart(){
+  if(cloudOK()){const t=cloudTeam();if(LIVE.src==='cloud'&&LIVE.tid===t.id)return;liveStop();LIVE.src='cloud';LIVE.tid=t.id;LIVE.ev=[];LIVE.seen=new Set();LIVE.started=false;
+    try{const{data,error}=await ACCT.sb.from('team_live').select('*').eq('team_id',t.id).gt('ts',new Date(Date.now()-3*864e5).toISOString()).order('ts',{ascending:false}).limit(300);
+      if(error)throw error;lvIngest((data||[]).map(r=>({id:r.id,ts:+new Date(r.ts),author:r.author_name,driver:r.driver,kind:r.kind,data:r.data})));}catch(e){LIVE.err='Team live non disponibile: '+(e.message||e)+' (serve il file 8 su Supabase)';}
+    try{if(ACCT.sb.channel){const ch=ACCT.sb.channel('live:'+t.id,{config:{presence:{key:lvId()}}});
+      ch.on('postgres_changes',{event:'INSERT',schema:'public',table:'team_live',filter:'team_id=eq.'+t.id},p=>{const r=p.new;lvIngest([{id:r.id,ts:+new Date(r.ts),author:r.author_name,driver:r.driver,kind:r.kind,data:r.data}]);})
+        .on('postgres_changes',{event:'DELETE',schema:'public',table:'team_live'},p=>{if(p.old&&p.old.id)lvIngest([{id:p.old.id,_del:1}]);})
+        .on('presence',{event:'sync'},()=>{LIVE.peers=Object.keys(ch.presenceState()).length;if(PT.tab==='live')renderLive();})
+        .subscribe(st=>{if(st==='SUBSCRIBED')try{ch.track({who:lvMe()});}catch(e){}});LIVE.ch=ch;}}catch(e){}
+    return;}
+  if(window.__demoLive&&LIVE.src!=='demo'){const d=await window.__demoLive();if(d){liveStop();LIVE.src='demo';LIVE.api=d;LIVE.ev=[];LIVE.seen=new Set();LIVE.started=false;
+      LIVE.unsub=d.subscribe(list=>{const ids=new Set(list.map(e=>e.id));const gone=LIVE.ev.filter(e=>!ids.has(e.id)).map(e=>({id:e.id,_del:1}));lvIngest(list.concat(gone));});return;}}
+  if(LIVE.src)return;LIVE.src='local';lvIngest(store.get('tc_live_local',[]));
+  try{LIVE.bc=new BroadcastChannel('tc_live');LIVE.bc.onmessage=m=>lvIngest([m.data]);}catch(e){}}
+async function livePost(kind,driver,data){const e={id:lvId(),ts:Date.now(),author:lvMe(),driver:driver||'',kind,data};LIVE.mine.add(e.id);
+  if(LIVE.src==='cloud'){const{error}=await ACCT.sb.from('team_live').insert({id:e.id,team_id:LIVE.tid,author:ACCT.session.user.id,author_name:e.author,driver:e.driver,kind,data,ts:new Date(e.ts).toISOString()});if(error)throw error;lvIngest([e]);}
+  else if(LIVE.src==='demo'){await LIVE.api.post(e);}
+  else{lvIngest([e]);try{LIVE.bc&&LIVE.bc.postMessage(e);}catch(_){}}}
+async function liveDel(id){const e=LIVE.ev.find(x=>x.id===id);if(!e)return;
+  if(LIVE.src==='cloud'){await ACCT.sb.from('team_live').delete().eq('id',id);}else if(LIVE.src==='demo'){await LIVE.api.del(id);}else{try{LIVE.bc&&LIVE.bc.postMessage({id,_del:1});}catch(_){}}
+  lvIngest([{id,_del:1}]);}
+function lvBoard(){const by={};for(const e of [...LIVE.ev].reverse()){const k=e.driver||'—';const b=by[k]||(by[k]={});b[e.kind]=e;b.last=e;}return by;}
+function renderLive(){const P=$('pt-live');if(!P)return;liveStart();
+  const src=LIVE.src,ds=drivers(),board=lvBoard(),names=[...new Set(ds.concat(Object.keys(board).filter(k=>k!=='—')))];
+  const pill=src==='cloud'?`<span class="lv-pill on"><i></i>Live con il team ${esc(cloudTeam()?cloudTeam().name:'')}${LIVE.peers>1?` · ${LIVE.peers} dispositivi collegati`:''}</span>`
+    :src==='demo'?`<span class="lv-pill on"><i></i>Live · sincronizzato con il tuo account (prova su iPad e telefono insieme)</span>`
+    :`<span class="lv-pill"><i></i>Solo su questo dispositivo</span><span class="sub" style="margin:0">Per condividere: entra con l'account e crea o unisciti a un team (👤).</span>`;
+  const kd=LIVE.kind,drvSel=`<select id="lv-drv">${(names.length?names:['']).map(n=>`<option${n===store.get('tc_live_drv','')?' selected':''}>${esc(n)}</option>`).join('')}</select>`;
+  const fields=kd==='press'?`<div class="lv-w">${[['fl','Ant. sx'],['fr','Ant. dx'],['rl','Post. sx'],['rr','Post. dx']].map(([k,l])=>`<label>${l}<input id="lv-${k}" type="number" step="0.01" inputmode="decimal" placeholder="bar"></label>`).join('')}</div>
+      <div class="lv-k"><button class="chipb ${store.get('tc_live_hot',true)?'on':''}" id="lv-hot">🔥 A caldo</button><button class="chipb ${store.get('tc_live_hot',true)?'':'on'}" id="lv-cold">❄️ A freddo</button><span class="sub" style="margin:0">Scrivi solo la prima: le altre si copiano.</span></div>`
+    :kd==='jet'?`<div class="lv-w" style="grid-template-columns:repeat(3,1fr)"><label>Getto<input id="lv-jet" placeholder="es. 124"></label><label>Spillo / clip<input id="lv-needle" placeholder="opzionale"></label><label>Vite H (membrana)<input id="lv-screw" placeholder="es. 1 giro 15'"></label></div>`
+    :kd==='tyre'?`<div class="lv-k"><button class="chipb ${store.get('tc_live_ty','slick')==='slick'?'on':''}" data-ty="slick">☀️ Slick</button><button class="chipb ${store.get('tc_live_ty','slick')==='rain'?'on':''}" data-ty="rain">🌧️ Rain</button><input id="lv-set" placeholder="treno n° (es. 3)" style="width:140px"></div>`
+    :`<textarea id="lv-text" rows="2" style="width:100%" placeholder="es. sottosterza in uscita dalla 3, alzo il posteriore di 5 mm"></textarea>`;
+  const cards=names.length?names.map(n=>{const b=board[n]||{},pr=b.press&&b.press.data||{},fl=LIVE.flash[n]&&Date.now()-LIVE.flash[n]<4000;
+    return`<div class="lv-c${fl?' flash':''}"><h4>🏁 ${esc(n)}</h4>
+      <div class="lv-r"><span>Gomme</span><b>${b.tyre?lvText(b.tyre):'—'}</b></div>
+      <div class="lv-r" style="display:block"><span>Pressioni ${b.press?(pr.hot?'a caldo':'a freddo'):''}</span>${b.press?`<div class="lv-tyre" style="margin-top:4px">${['fl','fr','rl','rr'].map(k=>`<b>${pr[k]!=null&&pr[k]!==''?fmt(+pr[k],2):'—'}</b>`).join('')}</div>`:' —'}</div>
+      <div class="lv-r"><span>Carburazione</span><b>${b.jet?lvText(b.jet):'—'}</b></div>
+      ${b.note?`<div class="lv-r" style="display:block"><span>Ultima nota</span><div>${lvText(b.note)}</div></div>`:''}
+      <div class="m sub" style="margin:6px 0 0;font-size:11.5px">${b.last?`aggiornato ${lvAgo(b.last.ts)} da ${esc(b.last.author||'')}`:'nessun dato ancora'}</div></div>`;}).join('')
+    :'<div class="sub">Aggiungi i piloti del team in <b>Assetto</b> (elenco piloti) oppure scrivi il nome qui sotto.</div>';
+  P.innerHTML=`<div class="lv-top">${pill}<span style="margin-left:auto" class="sub">Tu sei <input id="lv-me" value="${esc(store.get('tc_live_me',''))}" placeholder="${esc(lvMe())}" style="width:120px;background:#0f1622;border:1px solid var(--line2);color:var(--ink);border-radius:8px;padding:5px 8px"></span></div>
+   ${LIVE.err?`<div class="sub err">${esc(LIVE.err)}</div>`:''}
+   <div class="lv-drv">${cards}</div>
+   <div class="lv-f"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>Invia al team</b> · pilota ${drvSel}<input id="lv-newdrv" placeholder="o nuovo pilota" style="width:130px"></div>
+     <div class="lv-k" id="lv-kinds">${Object.entries(LV_KINDS).map(([k,[i,l]])=>`<button class="chipb ${k===kd?'on':''}" data-k="${k}">${i} ${l}</button>`).join('')}</div>
+     ${fields}<div class="row" style="margin-top:8px"><button class="btn primary" id="lv-send">📡 Invia a tutti</button><span class="sub" id="lv-msg" style="margin:0"></span></div></div>
+   <h4 style="margin:0 0 6px">Cronologia del team</h4><div class="lv-feed">${LIVE.ev.slice(0,60).map(e=>`<div class="lv-e${Date.now()-e.ts<5000&&!LIVE.mine.has(e.id)?' new':''}"><span class="ic">${LV_KINDS[e.kind]?LV_KINDS[e.kind][0]:'•'}</span><div><b>${esc(e.driver||'Team')}</b> · ${lvText(e)}<div class="m">${new Date(e.ts).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})} · ${esc(e.author||'')}</div></div><button class="x" data-del="${esc(e.id)}" title="Cancella">✕</button></div>`).join('')||'<div class="sub">Ancora niente: il primo dato che invii compare qui e su tutti i dispositivi del team.</div>'}</div>`;
+  $('lv-me').onchange=e=>{store.set('tc_live_me',e.target.value.trim());};
+  $('lv-drv').onchange=e=>store.set('tc_live_drv',e.target.value);
+  $('lv-kinds').onclick=e=>{const b=e.target.closest('button');if(b){LIVE.kind=b.dataset.k;renderLive();}};
+  if(kd==='press'){$('lv-hot').onclick=()=>{store.set('tc_live_hot',true);renderLive();};$('lv-cold').onclick=()=>{store.set('tc_live_hot',false);renderLive();};
+    $('lv-fl').oninput=e=>['fr','rl','rr'].forEach(k=>{const i=$('lv-'+k);if(!i.dataset.touched)i.value=e.target.value;});['fr','rl','rr'].forEach(k=>$('lv-'+k).oninput=e=>e.target.dataset.touched=1);}
+  if(kd==='tyre')P.querySelectorAll('[data-ty]').forEach(b=>b.onclick=()=>{store.set('tc_live_ty',b.dataset.ty);renderLive();});
+  P.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>liveDel(b.dataset.del));
+  $('lv-send').onclick=async()=>{const m=$('lv-msg'),nd=$('lv-newdrv').value.trim(),drv=nd||$('lv-drv').value;let data;
+    if(kd==='press'){data={hot:store.get('tc_live_hot',true)};let ok=0;['fl','fr','rl','rr'].forEach(k=>{const v=parseFloat(String($('lv-'+k).value).replace(',','.'));if(isFinite(v)&&v>0&&v<4){data[k]=v;ok++;}});if(!ok){m.textContent='Scrivi almeno una pressione (es. 0,72).';return;}}
+    else if(kd==='jet'){data={jet:$('lv-jet').value.trim(),needle:$('lv-needle').value.trim(),screw:$('lv-screw').value.trim()};if(!data.jet&&!data.screw){m.textContent='Scrivi il getto o la vite.';return;}}
+    else if(kd==='tyre')data={type:store.get('tc_live_ty','slick'),set:$('lv-set').value.trim()};
+    else{data={text:$('lv-text').value.trim().slice(0,400)};if(!data.text){m.textContent='Scrivi la nota.';return;}}
+    if(nd&&!drivers().includes(nd)){store.set('tc_drivers',drivers().concat(nd).join(', '));}store.set('tc_live_drv',drv);
+    m.textContent='Invio…';try{await livePost(kd,drv,data);m.textContent='✅ Inviato';LIVE.flash[drv]=Date.now();renderLive();}catch(e){m.innerHTML='<span class="err">'+esc(e.message||e)+'</span>';}};}
+setInterval(()=>{if(PT.tab==='live'&&!$('pt-live').hidden&&!document.activeElement?.closest?.('#pt-live'))renderLive();},30e3);
+setTimeout(()=>{try{liveStart();}catch(e){}},2500);
 // ---------- Due dashboard: Amatore / Team Pro ----------
 const DASH=[
  ['Meteo e radar',[
@@ -1543,7 +1637,7 @@ const DASH=[
  ['Strumenti',[
   ['t_strat','tab:strat','Slick o rain · strategia','',1,1],['t_weekend','tab:weekend','Dossier del weekend','',0,1],['t_storico','tab:storico','Storico meteo','',1,1],
   ['t_cal','tab:cal','Calendario gare','',1,1],['t_setup','tab:setup','Assetto','',1,1],['t_motore','tab:motore','Cura del motore','ore, revisioni, consigli di manutenzione',1,0],
-  ['t_giri','tab:giri','Analisi giri','',1,1],['t_box','tab:box','Schermo box + live timing','',0,1],['t_avvisi','tab:avvisi','Avvisi al team','',0,1],['t_report','tab:report','Report','',0,1]]],
+  ['t_giri','tab:giri','Analisi giri','',1,1],['t_box','tab:box','Schermo box + live timing','',0,1],['t_live','tab:live','Team live','pressioni, getti e note condivisi in tempo reale',0,1],['t_avvisi','tab:avvisi','Avvisi al team','',0,1],['t_report','tab:report','Report','',0,1]]],
  ['In pista',[
   ['carb','#carbbox','Carburazione','getto consigliato, vite del carburatore a membrana',1,0],
   ['gps','#kartcard','GPS sul kart','conta i giri con il telefono',1,0],
@@ -1694,7 +1788,7 @@ const _storeSet=store.set.bind(store);store.set=(k,v)=>{_storeSet(k,v);if(k==='t
 setInterval(()=>{if(document.visibilityState==='visible')cloudSyncDiary();},30000);
 // ===== dati personali salvati nell'account (tutti gli utenti, anche gratis) =====
 const UD={busy:false,soon:null,at:0,err:'',n:0};
-const UD_KEYS=/^tc_(plog|calendar|alerts|drivers|engine|jet|cmp|pdrv|psess|pt_dur|reports|team|shmode|staddr|sessions_.+|calib_.+|pbase_.+|dry_.+|sens_.+|tcol_.+|phot_.+|pos_.+|motor_.+|jet_.+|mode|dash_am|dash_pro)$/;
+const UD_KEYS=/^tc_(plog|calendar|alerts|drivers|engine|jet|cmp|pdrv|psess|pt_dur|reports|team|shmode|staddr|sessions_.+|calib_.+|pbase_.+|dry_.+|sens_.+|tcol_.+|phot_.+|pos_.+|motor_.+|jet_.+|mode|dash_am|dash_pro|live_me)$/;
 const udMod=()=>store.get('tc_mod',{});
 const udLastK=()=>'tc_usync_'+(ACCT.session?ACCT.session.user.id:'x');
 function udLocalKeys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(UD_KEYS.test(k))o.push(k);}return o;}

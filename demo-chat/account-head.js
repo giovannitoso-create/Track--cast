@@ -7,6 +7,13 @@ window.__TC_CFG={supabaseUrl:'demo',supabaseKey:'demo',stripe:{singolo_mese:'dem
  const ready=(async()=>{try{if(!await waitClaude())return null;const[db,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!user)return null;
    const me=await user.me();if(!me||!me.id)return null;ctx={db,uid:me.id,email:me.email||'',name:me.name||'',owner:true};return ctx;}catch(e){console.warn('demo account',e);return null;}})();
  window.__demoAcct=ready;
+ // Team live nel prototipo: collezione condivisa dell'artifact, aggiornata in tempo reale su tutti i tuoi dispositivi
+ window.__demoLive=async()=>{await ready;if(!ctx||!ctx.db)return null;try{const c=ctx.db.collection('teamlive');
+   return{subscribe(cb){let u=null,tm=null;const emit=q=>{try{cb(q.docs.map(d=>d.data()).filter(x=>x&&x.id));}catch(e){}};const qy=()=>{try{return c.orderBy('ts','desc').limit(200);}catch(e){return c;}};
+       const poll=()=>{const go=()=>qy().get().then(emit).catch(()=>{});go();tm=setInterval(go,3000);};
+       try{const q=qy();if(typeof q.onSnapshot==='function')u=q.onSnapshot(emit,e=>{console.warn('live',e);if(!tm)poll();});else poll();}catch(e){console.warn('live',e);poll();}
+       return()=>{try{u&&u();}catch(e){}clearInterval(tm);};},
+     post:async e=>{await c.doc(e.id).set(e);},del:async id=>{await c.doc(id).delete();}};}catch(e){return null;}};
  const col=()=>ctx.db.collection('data/users/'+ctx.uid);
  const enc=k=>k.replace(/[^A-Za-z0-9_.~:@+-]/g,c=>'~'+c.charCodeAt(0).toString(16));
  const label=()=>ctx.email||ctx.name||'il tuo account Claude';
