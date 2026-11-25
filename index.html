@@ -154,6 +154,15 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
  #sheet.pdfmode .top{grid-template-columns:1fr 1.25fr}#sheet.pdfmode .trk{background:#fff!important}#sheet.pdfmode #sh-track text{fill:#222}#sheet.pdfmode #sh-track svg{max-height:190px}#sheet.pdfmode .kpis{grid-template-columns:1fr 1fr}#sheet.pdfmode .row2{grid-template-columns:1.7fr 1fr;break-inside:avoid}#sh-chart svg{max-height:135px}#sheet.pdfmode .card .cs,#sheet.pdfmode .lg{font-size:9px}#sheet.pdfmode .facts div{font-size:10px;padding-bottom:3px}#sheet.pdfmode .facts{gap:4px}#sheet.pdfmode .k{padding:6px 8px}#sheet.pdfmode .k .v{font-size:14px}#sheet.pdfmode .k.next .v{font-size:18px}#sheet.pdfmode h2{font-size:20px}#sheet.pdfmode .rise i{display:none}
 #sheet.pdfmode .pg{width:1123px;padding:0 24px 18px;box-sizing:border-box}#sheet.pdfmode [data-k=note]{width:90px!important}#sheet.pdfmode [data-k=trackName]{width:100px!important}#sheet.pdfmode select[data-k=cmp]{width:105px!important}#sheet.pdfmode #sh-track svg{max-height:230px}#sheet.pdfmode .noprint{display:none!important}
 #nowc.locked>*:not(#pro-lock){display:none!important}#nowc.locked #pro-lock{display:block!important}
+.modesw{display:flex;background:var(--surface2);border:1px solid var(--line2);border-radius:999px;padding:3px;gap:2px;flex:none}.modesw button{border:0;background:none;color:var(--ink3);font:600 12.5px Inter;padding:6px 11px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.modesw button.on{background:var(--ink);color:var(--bg)}body.mode-pro .modesw button.on{background:linear-gradient(135deg,#ffd23f,#ff9f1a);color:#1a1200}
+.mp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:620px){.mp-grid{grid-template-columns:1fr}}
+.mp-card{text-align:left;display:flex;flex-direction:column;gap:6px;background:var(--surface2);border:1px solid var(--line2);border-radius:14px;padding:16px;color:var(--ink);cursor:pointer;font:inherit}.mp-card:hover{border-color:var(--rain)}
+.mp-card .mp-ic{font-size:30px}.mp-card b{font-size:17px}.mp-card span{color:var(--ink2);font-size:13px}.mp-card ul{margin:6px 0 0;padding-left:18px;color:var(--ink2);font-size:13px;line-height:1.6}
+.dc-g{margin:12px 0 4px;font:700 11px Inter;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.mdl .dc-i{display:flex!important;flex-direction:row!important;text-align:left;justify-content:flex-start;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;margin-top:6px;cursor:pointer}.mdl .dc-i input{padding:0;margin:0;width:18px;height:18px;accent-color:var(--rain);flex:none}.dc-i>div{flex:1;min-width:0}.dc-i b{font-size:14px}.dc-i small{display:block;color:var(--ink3);font-size:12px}
+.dc-i .dc-def{margin-left:auto;font-size:10.5px;color:var(--ink3);white-space:nowrap}
+.dash-off{display:none!important}.row2.dash-one,.row3.dash-one{grid-template-columns:1fr!important}
 .mdl{position:fixed;inset:0;background:rgba(3,6,12,.78);display:none;align-items:flex-start;justify-content:center;z-index:5500;padding:14px;overflow:auto}
 .mdl .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;padding:18px;margin:20px 0}
 .mdl input,.mdl select{background:#0f1622;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 10px;font:inherit}.mdl input:focus,.mdl select:focus{outline:none;border-color:#ffb547}.mdl h3{margin:0 0 4px}.mdl label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink2);margin:8px 0}.mdl input{width:100%;box-sizing:border-box}
@@ -343,7 +352,7 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
     <button class="btn" id="area" title="Cerca le piste di kart nella zona inquadrata dalla mappa">Cerca nella mappa</button>
   </div>
   <span id="tcver" class="sub" style="margin:0 0 0 auto;font-size:11px;white-space:nowrap"></span>
-  <button class="btn" id="acctbtn">👤 Accedi</button>
+  <div class="modesw" id="modesw" title="Cambia dashboard"><button data-m="am">🏁 Amatore</button><button data-m="pro">⭐ Team Pro</button></div><button class="btn" id="dashbtn" title="Scegli cosa vedere nella tua dashboard">⚙️</button><button class="btn" id="acctbtn">👤 Accedi</button>
   <div class="status" id="status">Caricamento della banca dati delle piste…</div>
 </header>
 <div class="near" id="near"></div>
@@ -454,7 +463,7 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
 <div class="strip" id="strip"></div>
 
 <div class="row2">
-  <div class="card">
+  <div class="card" id="asphcard">
     <h2>Asfalto e aria · prossime 12 ore</h2>
     <div class="sub">Temperatura dell'asfalto calcolata ogni 15 minuti dal bilancio energetico (sole, nuvole, vento, irraggiamento, pioggia, evaporazione, terreno) con i dati reali previsti per la pista.</div>
     <div class="chartlegend"><span class="chip"><i style="border-color:var(--asph)"></i>Asfalto</span><span class="chip"><i style="border-color:#6f9fd8;border-top-style:dashed"></i>Aria</span></div>
@@ -462,7 +471,7 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
     <div class="sub" style="margin-top:10px">Pioggia ogni 15 minuti (mm) e velo d'acqua stimato sull'asfalto. La linea tratteggiata è la soglia oltre cui la rain è più veloce della slick.</div>
     <div class="chart"><canvas id="rchart" height="150"></canvas><div class="tip" id="rtip"></div></div>
   </div>
-  <div class="card">
+  <div class="card" id="modcard">
     <h2>Modelli a confronto</h2>
     <div class="sub">Più i modelli concordano, più la previsione è affidabile.</div>
     <div id="models" style="overflow-x:auto"></div>
@@ -565,6 +574,12 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
     <div class="foot"><span id="sh-foot"></span><span>Generata da TrackCast Kart</span></div>
   </div></div></div>
 <div class="mdl" id="acct"><div class="box"><div style="display:flex;align-items:center;gap:8px"><h3>👤 Il tuo account</h3><button class="chipb" id="acct-x" style="margin-left:auto">Chiudi</button></div><div id="acct-body"></div></div></div>
+<div class="mdl" id="modepick"><div class="box" style="max-width:760px"><h3 style="margin:0 0 4px">Come usi TrackCast?</h3><div class="sub" style="margin:0 0 14px">Scegli la dashboard adatta a te. Puoi cambiarla quando vuoi dal pulsante in alto.</div>
+<div class="mp-grid"><button class="mp-card" data-m="am"><span class="mp-ic">🏁</span><b>Amatore / domenicale</b><span>Vai in pista per divertirti o per le gare del club e il motore lo curi tu.</span><ul><li>Meteo, pioggia e slick o rain</li><li>Pressioni e carburazione semplici</li><li>Cura del motore: ore, revisioni, consigli</li><li>Giri con il GPS del telefono</li></ul></button>
+<button class="mp-card" data-m="pro"><span class="mp-ic">⭐</span><b>Team / pilota Pro</b><span>Corri nei campionati, hai un team e un meccanico.</span><ul><li>Radar avanzato, matrice, modelli a confronto</li><li>Strategia, dossier weekend, report</li><li>Schermo box con live timing, avvisi al team</li><li>Stazione meteo in pista</li></ul></button></div></div></div>
+<div class="mdl" id="dashcfg"><div class="box" style="max-width:620px"><div style="display:flex;align-items:center;gap:8px"><h3 style="margin:0">⚙️ La tua dashboard · <span id="dc-mode"></span></h3><button class="chipb" id="dc-x" style="margin-left:auto">Fatto</button></div>
+<div class="sub" style="margin:6px 0 10px">Accendi o spegni i riquadri. Ogni dashboard (Amatore e Team Pro) ricorda le sue scelte.</div><div id="dc-list"></div>
+<div class="row"><button class="chipb" id="dc-reset">↺ Ripristina i predefiniti</button></div></div></div>
 <div class="mdl" id="plans"><div class="box" style="max-width:720px"><div style="display:flex;align-items:center;gap:8px"><h3>⭐ TrackCast Pro</h3><button class="chipb" id="plans-x" style="margin-left:auto">Chiudi</button></div>
   <div class="sub" style="margin:0">Radar avanzato con matrice sensori, nowcast con probabilità, nubi dal satellite e avvisi temporali in anticipo. In arrivo: avvisi “pioggia in pista” sul telefono.</div><div id="plans-body"></div></div></div>
 <div id="pdfstage" aria-hidden="true"></div>
@@ -869,7 +884,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='22/11/2026 23:55';
+const TC_VER='25/11/2026 09:00';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1506,6 +1521,43 @@ $('bx-ltp').onchange=e=>{if(e.target.value)ltOpen(e.target.value);};
 $('bx-ltr').onclick=()=>{const f=$('bx-ltif');if(f.src){const u=f.src;f.src='about:blank';setTimeout(()=>f.src=u,60);}};
 $('bx-lto').onclick=()=>{const u=ltNorm($('bx-ltu').value);if(u)window.open(u,'_blank','noopener');};
 $('bx-ltw').onclick=()=>{LT.w=LT.w%3+1;$('boxscr').dataset.ltw=LT.w;$('bx-ltw').textContent=['◧','◨','⬛'][LT.w-1];$('bx-ltw').title=['Altezza normale','Più alta','Tutto lo schermo'][LT.w-1];setTimeout(()=>{try{drawBox();}catch(e){}},50);};
+// ---------- Due dashboard: Amatore / Team Pro ----------
+const DASH=[
+ ['Meteo e radar',[
+  ['nowc','#nowc','Nowcast radar · prossimi 60 minuti','pioggia minuto per minuto in pista',1,1],
+  ['nubi','#cl-box','Nubi dal satellite','copertura del cielo prossime 2 ore',0,1],
+  ['mtx','#mtx','Matrice sensori 2048','il cerchio radar intorno alla pista',1,1],
+  ['tbar','#tbar','Linea del tempo animata','le prossime ore con il pulsante Play',1,1],
+  ['strip','#strip','Striscia ora per ora','meteo delle prossime ore a colpo d\'occhio',1,1],
+  ['asph','#asphcard','Asfalto e aria · 12 ore','grafico delle temperature',1,1],
+  ['mod','#modcard','Modelli a confronto','quanto sono d\'accordo i modelli meteo',0,1]]],
+ ['Strumenti',[
+  ['t_strat','tab:strat','Slick o rain · strategia','',1,1],['t_weekend','tab:weekend','Dossier del weekend','',0,1],['t_storico','tab:storico','Storico meteo','',1,1],
+  ['t_cal','tab:cal','Calendario gare','',1,1],['t_setup','tab:setup','Assetto','',1,1],['t_motore','tab:motore','Cura del motore','ore, revisioni, consigli di manutenzione',1,0],
+  ['t_giri','tab:giri','Analisi giri','',1,1],['t_box','tab:box','Schermo box + live timing','',0,1],['t_avvisi','tab:avvisi','Avvisi al team','',0,1],['t_report','tab:report','Report','',0,1]]],
+ ['In pista',[
+  ['gps','#kartcard','GPS sul kart','conta i giri con il telefono',1,0],
+  ['st','#stcard','Stazione meteo in pista','i tuoi sensori collegati',0,1]]]];
+const DMODE=()=>store.get('tc_mode','')||'pro';
+function dashState(m){const def={};DASH.forEach(([,it])=>it.forEach(x=>def[x[0]]=!!x[m==='am'?4:5]));return Object.assign(def,store.get('tc_dash_'+m,{}));}
+function applyDash(){const m=DMODE(),st=dashState(m);document.body.classList.toggle('mode-am',m==='am');document.body.classList.toggle('mode-pro',m!=='am');
+  document.querySelectorAll('#modesw button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  let firstTab=null;DASH.forEach(([,it])=>it.forEach(([k,sel])=>{const on=st[k];
+    if(sel.startsWith('tab:')){const t=sel.slice(4),b=document.querySelector(`#pt-tabs [data-t="${t}"]`);if(b)b.classList.toggle('dash-off',!on);if(on&&!firstTab)firstTab=t;if(!on&&typeof PT!=='undefined'&&PT.tab===t)PT._hide=1;}
+    else{const e=document.querySelector(sel);if(e)e.classList.toggle('dash-off',!on);}}));
+  const anyTab=!!firstTab;$('procard').classList.toggle('dash-off',!anyTab);
+  if(typeof PT!=='undefined'&&PT._hide){PT._hide=0;if(firstTab)try{ptShow(firstTab);}catch(e){}}
+  ['row2','row3'].forEach(c=>{const r=document.querySelector('.'+c);if(r){const vis=[...r.children].filter(e=>!e.classList.contains('dash-off')&&e.style.display!=='none').length;r.classList.toggle('dash-one',vis===1);}});}
+function setMode(m){store.set('tc_mode',m);$('modepick').style.display='none';applyDash();try{if(typeof udSync==='function')udSync();}catch(e){}}
+function openDash(){const m=DMODE(),st=dashState(m),def=dashState.call(null,'__');$('dc-mode').textContent=m==='am'?'🏁 Amatore':'⭐ Team Pro';
+  $('dc-list').innerHTML=DASH.map(([g,it])=>`<div class="dc-g">${g}</div>`+it.map(([k,,n,d,a,p])=>`<label class="dc-i"><input type="checkbox" data-k="${k}" ${st[k]?'checked':''}><div><b>${n}</b>${d?`<small>${d}</small>`:''}</div><span class="dc-def">${a&&p?'in tutte e due':a?'tipico Amatore':'tipico Pro'}</span></label>`).join('')).join('');
+  $('dashcfg').style.display='flex';}
+$('dc-list').addEventListener('change',e=>{const k=e.target.dataset.k;if(!k)return;const m=DMODE(),o=store.get('tc_dash_'+m,{});o[k]=e.target.checked;store.set('tc_dash_'+m,o);applyDash();});
+$('dc-reset').onclick=()=>{store.set('tc_dash_'+DMODE(),{});applyDash();openDash();};
+$('dc-x').onclick=()=>$('dashcfg').style.display='none';$('dashbtn').onclick=openDash;
+$('modesw').onclick=e=>{const b=e.target.closest('button');if(b)setMode(b.dataset.m);};
+document.querySelectorAll('#modepick .mp-card').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+applyDash();if(!store.get('tc_mode','')&&!window.__TC_DEMO_NOPICK)$('modepick').style.display='flex';
 // ---------- 7) Avvisi al team ----------
 const ALR={last:{}};
 const alrCfg=()=>Object.assign({on:false,min:20,prob:50,storm:true,sun:false,tgChat:''},store.get('tc_alerts',{}));
@@ -1632,7 +1684,7 @@ const _storeSet=store.set.bind(store);store.set=(k,v)=>{_storeSet(k,v);if(k==='t
 setInterval(()=>{if(document.visibilityState==='visible')cloudSyncDiary();},30000);
 // ===== dati personali salvati nell'account (tutti gli utenti, anche gratis) =====
 const UD={busy:false,soon:null,at:0,err:'',n:0};
-const UD_KEYS=/^tc_(plog|calendar|alerts|drivers|engine|jet|cmp|pdrv|psess|pt_dur|reports|team|shmode|staddr|sessions_.+|calib_.+|pbase_.+|dry_.+|sens_.+|tcol_.+|phot_.+|pos_.+|motor_.+|jet_.+)$/;
+const UD_KEYS=/^tc_(plog|calendar|alerts|drivers|engine|jet|cmp|pdrv|psess|pt_dur|reports|team|shmode|staddr|sessions_.+|calib_.+|pbase_.+|dry_.+|sens_.+|tcol_.+|phot_.+|pos_.+|motor_.+|jet_.+|mode|dash_am|dash_pro)$/;
 const udMod=()=>store.get('tc_mod',{});
 const udLastK=()=>'tc_usync_'+(ACCT.session?ACCT.session.user.id:'x');
 function udLocalKeys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(UD_KEYS.test(k))o.push(k);}return o;}
