@@ -2,10 +2,10 @@
 window.__TC_CFG={supabaseUrl:'demo',supabaseKey:'demo',stripe:{singolo_mese:'demo-pay:singolo_mese',singolo_anno:'demo-pay:singolo_anno',team_mese:'demo-pay:team_mese',team_anno:'demo-pay:team_anno'},portal:'demo-portal'};
 (function(){
  const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
- const OUT='tc_demo_out';let ctx=null;
+ const OUT='tc_demo_out';let ctx=null;ls.del(OUT);/* prototipo privato: si entra sempre come creatore */
  const waitClaude=()=>new Promise(r=>{const t0=Date.now();(function p(){if(window.claude&&window.claude.use)return r(true);if(Date.now()-t0>5000)return r(false);setTimeout(p,100);})();});
  const ready=(async()=>{try{if(!await waitClaude())return null;const[db,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!user)return null;
-   const me=await user.me();if(!me||!me.id)return null;ctx={db,uid:me.id,email:me.email||'',name:me.name||'',owner:!!me.isOwner};return ctx;}catch(e){console.warn('demo account',e);return null;}})();
+   const me=await user.me();if(!me||!me.id)return null;ctx={db,uid:me.id,email:me.email||'',name:me.name||'',owner:true};return ctx;}catch(e){console.warn('demo account',e);return null;}})();
  window.__demoAcct=ready;
  const col=()=>ctx.db.collection('data/users/'+ctx.uid);
  const enc=k=>k.replace(/[^A-Za-z0-9_.~:@+-]/g,c=>'~'+c.charCodeAt(0).toString(16));
