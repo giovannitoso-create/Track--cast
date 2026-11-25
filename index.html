@@ -903,7 +903,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='25/11/2026 10:10';
+const TC_VER='25/11/2026 10:20';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1598,7 +1598,7 @@ function renderLive(){const P=$('pt-live');if(!P)return;liveStart();
       <div class="lv-r" style="display:block"><span>Pressioni ${b.press?(pr.hot?'a caldo':'a freddo'):''}</span>${b.press?`<div class="lv-tyre" style="margin-top:4px">${['fl','fr','rl','rr'].map(k=>`<b>${pr[k]!=null&&pr[k]!==''?fmt(+pr[k],2):'—'}</b>`).join('')}</div>`:' —'}</div>
       ${b.note?`<div class="lv-r" style="display:block"><span>Ultima nota</span><div>${lvText(b.note)}</div></div>`:''}
       <div class="m sub" style="margin:6px 0 0;font-size:11.5px">${b.last?`aggiornato ${lvAgo(b.last.ts)} da ${esc(b.last.author||'')}`:'nessun dato ancora'}</div></div>`;}).join('')
-    :'<div class="sub">Aggiungi i piloti del team in <b>Assetto</b> (elenco piloti) oppure scrivi il nome qui sotto.</div>';
+    :'<div class="sub">Scrivi il nome del primo pilota qui sotto in «nuovo pilota»: da quel momento ha la sua scheda.</div>';
   P.innerHTML=`<div class="lv-top">${pill}<span style="margin-left:auto" class="sub">Tu sei <input id="lv-me" value="${esc(store.get('tc_live_me',''))}" placeholder="${esc(lvMe())}" style="width:120px;background:#0f1622;border:1px solid var(--line2);color:var(--ink);border-radius:8px;padding:5px 8px"></span></div>
    ${LIVE.err?`<div class="sub err">${esc(LIVE.err)}</div>`:''}
    <div class="lv-drv">${cards}</div>
@@ -1633,7 +1633,7 @@ const DASH=[
   ['mod','#modcard','Modelli a confronto','quanto sono d\'accordo i modelli meteo',0,1]]],
  ['Strumenti',[
   ['t_strat','tab:strat','Slick o rain · strategia','',1,1],['t_weekend','tab:weekend','Dossier del weekend','',0,1],['t_storico','tab:storico','Storico meteo','',1,1],
-  ['t_cal','tab:cal','Calendario gare','',1,1],['t_setup','tab:setup','Assetto','',1,1],['t_motore','tab:motore','Cura del motore','ore, revisioni, consigli di manutenzione',1,0],
+  ['t_cal','tab:cal','Calendario gare','',1,1],['t_setup','tab:setup','Assetto','',1,0],['t_motore','tab:motore','Cura del motore','ore, revisioni, consigli di manutenzione',1,0],
   ['t_giri','tab:giri','Analisi giri','',1,1],['t_box','tab:box','Schermo box + live timing','',0,1],['t_live','tab:live','Team live','pressioni, gomme e note condivise in tempo reale',0,1],['t_avvisi','tab:avvisi','Avvisi al team','',0,1],['t_report','tab:report','Report','',0,1]]],
  ['In pista',[
   ['carb','#carbbox','Carburazione','getto consigliato, vite del carburatore a membrana',1,0],
