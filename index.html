@@ -18,8 +18,8 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 .logo{display:flex;align-items:center;gap:10px}
 .logo .mark{width:30px;height:30px;border-radius:6px;background:linear-gradient(135deg,var(--accent),#7a0300);display:grid;place-items:center;font:700 16px "Barlow Condensed"}
 .logo h1{margin:0;font-size:26px;text-transform:uppercase}.logo h1 span{color:var(--ink3);font-weight:500}
-.search{flex:1;min-width:260px;display:flex;gap:8px;position:relative}
-.search input{flex:1;background:var(--surface2);border:1px solid var(--line2);color:var(--ink);border-radius:8px;padding:9px 12px;font:500 14px Inter}
+.search{flex:1;min-width:min(260px,100%);display:flex;gap:8px;position:relative;flex-wrap:wrap}
+.search input{flex:1 1 180px;min-width:0;background:var(--surface2);border:1px solid var(--line2);color:var(--ink);border-radius:8px;padding:9px 12px;font:500 14px Inter}
 .search input:focus{outline:none;border-color:var(--ink3)}
 .sugg{position:absolute;top:42px;left:0;right:0;background:#06090d;border:1px solid var(--line2);border-radius:8px;z-index:1000;max-height:320px;overflow:auto;display:none}
 .sugg div{padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:10px}
@@ -33,7 +33,7 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 .chipb{background:var(--surface);border:1px solid var(--line);color:var(--ink2);border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer}
 .chipb:hover{border-color:var(--ink3);color:var(--ink)}
 .grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;margin-top:14px}
-@media(max-width:1000px){.grid{grid-template-columns:1fr}}
+@media(max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
 .card h2{margin:0 0 2px;font-size:19px;font-weight:600;text-transform:uppercase}
 .sub{color:var(--ink3);font-size:12px;margin-bottom:8px}
@@ -183,7 +183,7 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 .dl-brands{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.dl-brands span{padding:3px 9px;border-radius:999px;background:#1c2b40;font:600 12px Inter;color:#cfe3ff}
 .dl-drop{display:block;border:2px dashed var(--line2);border-radius:12px;padding:16px;text-align:center;color:var(--ink2);cursor:pointer;margin:8px 0}.dl-drop.over{border-color:var(--rain);background:rgba(61,139,255,.08)}
 .dl-tab td,.dl-tab th{padding:5px 8px;font-size:13px}.dl-tab .best{color:#c58cff;font-weight:800}.dl-tab .out{opacity:.45}.dl-kpi{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}.dl-kpi div{background:#0d1626;border:1px solid #24395a;border-radius:10px;padding:8px 12px}.dl-kpi b{display:block;font:800 20px "JetBrains Mono"}.dl-kpi span{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
-.mtxs{cursor:zoom-in}.mtxb{max-width:1180px!important}.mtxb-g{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;margin-top:10px;align-items:start}@media(max-width:860px){.mtxb-g{grid-template-columns:1fr}}
+.mtxs{cursor:zoom-in}#mtxb-x{position:relative;z-index:5}.mtxb h3{font-size:16px}.mtxb{max-width:1180px!important}.mtxb-g{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;margin-top:10px;align-items:start}@media(max-width:860px){.mtxb-g{grid-template-columns:minmax(0,1fr)}}.mtxb-side,.mtxb-card{min-width:0;overflow-wrap:anywhere}
 .mtxb-cw{position:relative;width:min(100%,78vh);margin:0 auto;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#0e1a2c 0%,#08101c 70%,#050a12 100%);box-shadow:0 0 0 1px #1d2f48,0 0 0 8px #0a1422,0 0 0 9px #23395a}
 .mtxb-cw canvas{width:100%;height:100%;display:block;border-radius:50%;cursor:crosshair;touch-action:manipulation}
 .mtxb-tip{position:absolute;z-index:3;pointer-events:none;min-width:170px;max-width:240px;background:rgba(6,12,22,.94);border:1px solid #2a4468;border-radius:10px;padding:8px 10px;font-size:12.5px;color:#e3f0ff;box-shadow:0 6px 20px rgba(0,0,0,.5)}
@@ -289,7 +289,7 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 .kpi.asph .v{color:var(--asph)}
 .setup{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
 @media(max-width:600px){.setup{grid-template-columns:1fr}}
-.sbox{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+.sbox{min-width:0;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
 .sbox.wide{grid-column:1/-1;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
 .sbox .t1{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
 .sbox .sv{font:700 28px/1.1 "Barlow Condensed";margin-top:2px}
@@ -432,7 +432,7 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
         <div id="cl-main" style="font-weight:700;font-size:16px">In attesa del satellite…</div><div id="cl-sub" class="sub" style="margin:2px 0 6px"></div>
         <div id="cl-strip" style="display:flex;gap:3px"></div><div id="cl-lbl" style="display:flex;gap:3px;font-size:10px;color:#7f91aa"></div>
         <div style="display:flex;gap:8px;align-items:center;margin-top:6px"><label style="font-size:12px;color:#9fb0c6;cursor:pointer"><input type="checkbox" id="cl-show"> Mostra le nubi sulla mappa</label><span class="st" id="cl-status" style="margin:0"></span></div></div>
-      <div class="mtx" id="mtx"><h3>Matrice sensori · <span class="mtx-n">2048</span> occhi virtuali intorno alla pista</h3><div class="sub" id="mtx-ver" style="margin:-4px 0 6px"></div>
+      <div class="mtx" id="mtx"><h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">Matrice sensori · <span class="mtx-n">2048</span> occhi virtuali intorno alla pista <button class="chipb" id="mtx-open" style="margin-left:auto">🔍 Apri in grande</button></h3><div class="sub" id="mtx-ver" style="margin:-4px 0 6px"></div>
         <div class="mtxw"><div class="mtxs"><canvas id="mtx-c" width="720" height="720"></canvas></div><div class="mtxl" id="mtx-l">In attesa del radar…</div></div>
         <div class="mtxk"><span><i style="background:#1a2230"></i>asciutto</span><span><i style="background:#28c76e"></i>pioggia (colore = mm/h)</span><span><i style="border:2px solid #fff;width:7px;height:7px"></i>in rotta verso la pista</span><span><i style="background:rgba(170,182,200,.55)"></i>nubi (satellite)</span><span>▲ rinforza · ▼ cala</span></div></div>
     </div>
@@ -930,7 +930,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='25/11/2026 12:30';
+const TC_VER='25/11/2026 12:50';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1022,10 +1022,14 @@ function mtxBigDraw(src){const cv=$('mtxb-c'),ctx=cv.getContext('2d'),W=cv.width
 function mtxTop(){const sens=(NC.res&&NC.res.sens||[]).filter(s=>!s.off&&s.v>=0.2).sort((a,b)=>(b.hit-a.hit)||(b.v-a.v)).slice(0,8);
   $('mtxb-top').innerHTML=sens.length?sens.map((s,i)=>{const c=tcColor(s.v)||[120,200,255,200];return`<button class="mtxb-top" data-i="${i}"><i style="background:rgb(${c[0]|0},${c[1]|0},${c[2]|0})"></i><span style="flex:1">${dir8(s.brg)} · ${fmt(s.km,0)} km · ${fmt(s.v,1)} mm/h</span>${s.hit?`<b style="color:#5ad1ff">🎯 ${Math.max(1,Math.round(s.eta))}'</b>`:''}</button>`;}).join(''):'<div class="sub" style="margin:4px 0 0">Nessuna pioggia nei 50 km.</div>';
   $('mtxb-top').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{MTXB.sel=sens[+b.dataset.i];$('mtxb-info').innerHTML=mtxCellHtml(MTXB.sel);});}
-function openMtxBig(){if(!NC.res||!NC.res.sens){return;}const m=$('mtxbig');m.style.display='flex';$('mtxb-trk').textContent=CUR?CUR.name:'';$('mtxb-sum').innerHTML=$('mtx-l').innerHTML;mtxTop();
+function openMtxBig(){const m=$('mtxbig');m.style.display='flex';$('mtxb-trk').textContent=CUR?CUR.name:'';$('mtxb-sum').innerHTML=$('mtx-l').innerHTML||'—';
+  if(!NC.res||!NC.res.sens){$('mtxb-top').innerHTML='';$('mtxb-info').innerHTML=`<b>Radar non ancora pronto</b><div class="sub" style="margin:4px 0 0">${CUR?'Sto aspettando i dati del radar per questa pista (servono pochi secondi; nel prototipo in chat il radar può non essere disponibile). Appena arrivano, le celle si accendono qui.':'Scegli prima una pista: la matrice si accende intorno alla pista scelta.'}</div>`;
+    const cv=$('mtxb-c'),ctx=cv.getContext('2d'),W=cv.width,c=W/2;ctx.clearRect(0,0,W,W);ctx.strokeStyle='rgba(120,200,255,.25)';ctx.lineWidth=1.5;[0.12,0.3,0.5,0.7,0.9].forEach(f=>{ctx.beginPath();ctx.arc(c,c,c*f,0,7);ctx.stroke();});
+    ctx.fillStyle='#ffd23f';ctx.beginPath();ctx.arc(c,c,c*0.06,0,7);ctx.fill();clearTimeout(MTXB.wait);MTXB.wait=setTimeout(()=>{if(m.style.display==='flex'&&NC.res&&NC.res.sens)openMtxBig();},3000);return;}
+  mtxTop();
   const cv=$('mtxb-c'),dpr=Math.min(2,window.devicePixelRatio||1),w=Math.round(Math.min(900,cv.getBoundingClientRect().width*dpr))||720;if(cv.width!==w){cv.width=w;cv.height=w;}
   if(!MTXA.raf)MTXA.raf=requestAnimationFrame(mtxFrame);}
-$('mtx-c').addEventListener('click',openMtxBig);$('mtx-c').title='Tocca per ingrandire';
+$('mtx-c').addEventListener('click',openMtxBig);$('mtx-open').addEventListener('click',openMtxBig);$('mtx-c').title='Tocca per ingrandire';
 $('mtxb-x').onclick=()=>{$('mtxbig').style.display='none';MTXB.hov=null;};$('mtxbig').addEventListener('click',e=>{if(e.target.id==='mtxbig')$('mtxb-x').onclick();});
 $('mtxb-pause').onclick=e=>{MTXA.paused=!MTXA.paused;e.target.classList.toggle('on',MTXA.paused);e.target.textContent=MTXA.paused?'▶ Riavvia il fascio':'⏸ Ferma il fascio';};
 $('mtxb-hit').onclick=e=>{MTXB.hit=!MTXB.hit;if(MTXB.hit)MTXB.wet=false;$('mtxb-wet').classList.remove('on');e.target.classList.toggle('on',MTXB.hit);};
