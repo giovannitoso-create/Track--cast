@@ -162,7 +162,7 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 .dc-g{margin:12px 0 4px;font:700 11px Inter;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
 .mdl .dc-i{display:flex!important;flex-direction:row!important;text-align:left;justify-content:flex-start;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;margin-top:6px;cursor:pointer}.mdl .dc-i input{padding:0;margin:0;width:18px;height:18px;accent-color:var(--rain);flex:none}.dc-i>div{flex:1;min-width:0}.dc-i b{font-size:14px}.dc-i small{display:block;color:var(--ink3);font-size:12px}
 .dc-i .dc-def{margin-left:auto;font-size:10.5px;color:var(--ink3);white-space:nowrap}
-.dash-off{display:none!important}.row2.dash-one,.row3.dash-one{grid-template-columns:1fr!important}
+.dash-off{display:none!important}#carbbox.dash-off~.sbox:has(#tyrecmp){grid-column:1/-1}.row2.dash-one,.row3.dash-one{grid-template-columns:1fr!important}
 .mdl{position:fixed;inset:0;background:rgba(3,6,12,.78);display:none;align-items:flex-start;justify-content:center;z-index:5500;padding:14px;overflow:auto}
 .mdl .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;padding:18px;margin:20px 0}
 .mdl input,.mdl select{background:#0f1622;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 10px;font:inherit}.mdl input:focus,.mdl select:focus{outline:none;border-color:#ffb547}.mdl h3{margin:0 0 4px}.mdl label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink2);margin:8px 0}.mdl input{width:100%;box-sizing:border-box}
@@ -434,7 +434,7 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
           <div style="flex:1;min-width:200px"><div class="t1">Gomme per la sessione</div><div class="sv" id="tyre">—</div><div class="t3" id="tyrenote"></div>
             <div class="inl">Partenza <select id="sstart"></select> giro asciutto <input type="number" id="dryref" step="0.1" style="width:64px" placeholder="s"> s · durata <select id="sdur"><option value="10">10' prove</option><option value="8">8' qualifica</option><option value="12" selected>12' manche</option><option value="15">15' prefinale</option><option value="20">20' finale</option></select></div></div>
         </div>
-        <div class="sbox"><div class="t1">Carburazione</div>
+        <div class="sbox" id="carbbox"><div class="t1">Carburazione</div>
           <div class="inl"><select id="jeteng" style="max-width:100%"></select></div>
           <div class="sv" id="jet">—</div>
           <div class="inl" id="jetrefrow"></div><div class="t3" id="jetnote"></div>
@@ -884,7 +884,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='25/11/2026 09:00';
+const TC_VER='25/11/2026 09:10';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1490,7 +1490,7 @@ function drawBox(){if(!SIM||!CUR)return;const S=SIM.S,ni=SIM.ni,n=S[ni],p30=S[Ma
    ${tile('','Asfalto',`<div class="v">${fmt(n.asph,0)}<small>°C</small> <span class="bx-tr">${trend(n.asph,p30.asph)}</span></div><div class="s">tra 30 min ${fmt(p30.asph,0)} °C · aria ${fmt(n.ta,0)} °C</div>`)}
    ${tile(best==='RAIN'?'rain':'slick','Gomma',`<div class="bx-tyre">${c?tyreIcon(tyreCol(c),64):''}<div><div class="v">${best}</div><div class="s">${c?esc(c.brand+' '+c.slick):''}</div></div></div><div class="s">slick ${fmtS(L.slick)} · rain ${fmtS(L.rain)} al giro</div>`)}
    ${tile('','Pressioni',pressHtml)}
-   ${tile('','Carburazione',`<div class="v bx-v2">${esc(jet)||'—'}</div><div class="s">${esc(engNow().name.split(' · ')[0])}</div>`)}
+   ${dashState(DMODE()).carb?tile('','Carburazione',`<div class="v bx-v2">${esc(jet)||'—'}</div><div class="s">${esc(engNow().name.split(' · ')[0])}</div>`):tile('','Aria',`<div class="v">${fmt(n.ta,0)}<small>°C</small></div><div class="s">umidità ${n.rh!=null?Math.round(n.rh):'—'}%${n.ps!=null?' · '+Math.round(n.ps)+' hPa':''}</div>`)}
    ${tile('','Vento',`<div class="bx-wind">${compass}<div><div class="v">${Math.round(n.ws)}<small>km/h</small></div><div class="s">raffiche ${Math.round(n.wg||n.ws)}${wd!=null?' · da '+dir8(wd):''}</div></div></div>`)}
    <div class="bx-tick"><div class="bx-tickin">${msgs.concat(msgs).map(m=>`<span>${esc(m)}</span>`).join('')}</div></div>`;
   {const g=$('bx-grid'),g2=$('bx-grid2');g2.innerHTML='';[...g.children].slice(3).forEach(e=>g2.appendChild(e));}
@@ -1536,6 +1536,7 @@ const DASH=[
   ['t_cal','tab:cal','Calendario gare','',1,1],['t_setup','tab:setup','Assetto','',1,1],['t_motore','tab:motore','Cura del motore','ore, revisioni, consigli di manutenzione',1,0],
   ['t_giri','tab:giri','Analisi giri','',1,1],['t_box','tab:box','Schermo box + live timing','',0,1],['t_avvisi','tab:avvisi','Avvisi al team','',0,1],['t_report','tab:report','Report','',0,1]]],
  ['In pista',[
+  ['carb','#carbbox','Carburazione','getto consigliato, vite del carburatore a membrana',1,0],
   ['gps','#kartcard','GPS sul kart','conta i giri con il telefono',1,0],
   ['st','#stcard','Stazione meteo in pista','i tuoi sensori collegati',0,1]]]];
 const DMODE=()=>store.get('tc_mode','')||'pro';
