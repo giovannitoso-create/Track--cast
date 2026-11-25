@@ -917,7 +917,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='25/11/2026 12:00';
+const TC_VER='25/11/2026 11:15';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1568,7 +1568,6 @@ function dlParse(text,name){const lines=String(text).replace(/\r/g,'').split('\n
   if(/AiM CSV/i.test(lines[0])||row('Segment Times')||row('Beacon Markers')){out.src='AiM / MyChron';
     const seg=row('Segment Times');if(seg)out.laps=dlSplit(seg).slice(1).map(dlTime).filter(v=>v!=null);
     if(!out.laps.length){const bm=row('Beacon Markers');if(bm){const c=dlSplit(bm).slice(1).map(x=>parseFloat(x)).filter(isFinite);out.laps=c.map((v,i)=>v-(i?c[i-1]:0));}}
-    {const bm=row('Beacon Markers');const cum=bm?dlSplit(bm).slice(1).map(x=>parseFloat(x)).filter(isFinite):[];let a=0;const bnd=cum.length?cum:out.laps.map(v=>a+=v);try{out.tel=dlTel(lines,bnd);}catch(e){}}
     const d=row('Date'),t=row('Time');if(d){const ds=dlSplit(d)[1]+' '+(t?dlSplit(t)[1]:'12:00');const ms=Date.parse(ds.replace(/^\w+,\s*/,''));if(isFinite(ms))out.start=ms-new Date(ms).getTimezoneOffset()*60e3;}
     if(out.laps.length)return out;}
   // tabella con colonna del tempo sul giro (Unipro/Off Camber, Alfano, fogli Excel…)
@@ -1577,41 +1576,20 @@ function dlParse(text,name){const lines=String(text).replace(/\r/g,'').split('\n
     const li=H.findIndex(x=>/^(lap|giro|tour|runde|n|#|nr|n°|lap ?#|lap ?nr)$/.test(x));
     if(ti<0||(li<0&&!/lap|giro|tour/.test(H[ti])))continue;
     const vals=lines.slice(h+1).map(l=>dlSplit(l)[ti]).map(dlTime);const good=vals.filter(dlOk);
-    if(good.length>=2){out.src=/temps|tour/.test(H.join(' '))?'Alfano':'Tabella giri';out.laps=good;try{out.tel=dlTel(lines,null,true);}catch(e){}return out;}
+    if(good.length>=2){out.src=/temps|tour/.test(H.join(' '))?'Alfano':'Tabella giri';out.laps=good;return out;}
     // serie temporale di un solo giro (es. Alfano: un file per giro)
-    const num=vals.filter(v=>v!=null);if(num.length>20&&num[num.length-1]>num[0]){const lap=num[num.length-1]-num[0];if(dlOk(lap)){out.src='Alfano (un file per giro)';out.laps=[lap];out.single=true;try{out.tel=dlTel(lines,null);}catch(e){}return out;}}}
+    const num=vals.filter(v=>v!=null);if(num.length>20&&num[num.length-1]>num[0]){const lap=num[num.length-1]-num[0];if(dlOk(lap)){out.src='Alfano (un file per giro)';out.laps=[lap];out.single=true;return out;}}}
   // testo libero: il primo tempo plausibile di ogni riga ("1  48.123", "Giro 3 0:48.12"…)
   for(const l of lines){const toks=l.match(/\d{1,2}:\d{2}[.,]\d{1,4}|\d{2,3}[.,]\d{2,4}/g)||[];const v=toks.map(dlTime).find(dlOk);if(v!=null)out.laps.push(v);}
   out.src=/unipro/i.test(text)?'Unipro':/alfano/i.test(text)?'Alfano':/mychron|aim/i.test(text)?'AiM / MyChron':'Lista tempi';return out;}
-// telemetria: canali del data logger (giri motore, velocità, temperature, accelerazioni) giro per giro
-const DL_CH=[['rpm',/^(rpm|engine ?rpm|giri ?motore|regime|tr\/?min|n ?mot)/i,'Giri motore','rpm'],['v',/(gps ?speed|speed|velocit|vitesse|km\/?h|geschw)/i,'Velocità','km/h'],
-  ['water',/(water|acqua|eau|h2o|coolant|wt\b|t ?h2o)/i,'Acqua','°C'],['egt',/(exhaust|egt|scarico|t\.? ?gas|gas ?temp|t ?ech|t ?scar)/i,'Scarico','°C'],
-  ['cht',/(cht|head|testa|candela|spark|t ?cyl|cilindro)/i,'Testa','°C'],['latg',/(lat\w* ?acc|acc\w* ?lat|lateral|g ?lat|latg)/i,'G laterale','g'],
-  ['t1',/^t ?1$/i,'Temp. 1','°C'],['t2',/^t ?2$/i,'Temp. 2','°C']];
-function dlTel(lines,bounds,lapCol){let h=-1;for(let i=0;i<lines.length;i++){const c=dlSplit(lines[i]);if(c.length>=3&&/^(time|temps|tempo|zeit|t|time ?\(s\))$/i.test(c[0])){
-    const nx=lines.slice(i+1,i+6).filter(l=>dlSplit(l).every(x=>x===''||isFinite(+x.replace(',','.'))));if(nx.length>=2){h=i;break;}}}
-  if(h<0)return null;const H=dlSplit(lines[h]),chans=[];const used=new Set();
-  H.forEach((n,j)=>{if(!j)return;const d=DL_CH.find(([k,re])=>!used.has(k)&&re.test(n.trim()));if(d){used.add(d[0]);chans.push({k:d[0],j,name:d[2],unit:d[3],raw:n});}});
-  if(!chans.length)return null;const li=lapCol?H.findIndex(n=>/^(lap|giro|tour|runde)$/i.test(n)):-1;
-  const rows=[];for(const l of lines.slice(h+1)){const c=dlSplit(l);const t=parseFloat(String(c[0]).replace(',','.'));if(!isFinite(t))continue;rows.push(c.map(x=>parseFloat(String(x).replace(',','.'))));}
-  if(rows.length<20)return null;let groups=[];
-  if(bounds&&bounds.length){let a=0;bounds.forEach(b=>{groups.push(rows.filter(r=>r[0]>=a&&r[0]<b));a=b;});}
-  else if(li>0){const m=new Map();rows.forEach(r=>{const k=r[li];if(!m.has(k))m.set(k,[]);m.get(k).push(r);});groups=[...m.values()];}
-  else groups=[rows];
-  const laps=groups.map(g=>{const o={};if(!g.length)return o;chans.forEach(ch=>{const v=g.map(r=>r[ch.j]).filter(isFinite);if(!v.length)return;
-      if(ch.k==='rpm'||ch.k==='v'){o[ch.k+'Max']=Math.max(...v);const core=v.slice(Math.floor(v.length*0.05),Math.ceil(v.length*0.95));o[ch.k+'Min']=Math.min(...(core.length?core:v));}
-      else if(ch.k==='latg')o.latgMax=Math.max(...v.map(Math.abs));else o[ch.k+'Max']=Math.max(...v);});
-    const step=Math.max(1,Math.floor(g.length/160)),vc=chans.find(c=>c.k==='v'),rc=chans.find(c=>c.k==='rpm'),t0=g[0][0],T=(g[g.length-1][0]-t0)||1;
-    o.tr=g.filter((_,i)=>i%step===0).map(r=>[+((r[0]-t0)/T).toFixed(3),vc?Math.round(r[vc.j]):null,rc?Math.round(r[rc.j]/10)*10:null]);return o;});
-  return{chans:chans.map(({k,name,unit,raw})=>({k,name,unit,raw})),laps};}
 function dlCond(ts){const pick=S=>{if(!S||!S.length||ts<S[0].ts-3600e3||ts>S[S.length-1].ts+3600e3)return null;let b=S[0];for(const p of S)if(Math.abs(p.ts-ts)<Math.abs(b.ts-ts))b=p;return b;};
-  const p=pick(SIM&&SIM.S)||pick(WKC.W&&WKC.W.S);let rho=null;try{rho=+((p.air||airDensity(p)).pct).toFixed(1);}catch(e){}return p?{asph:+(+p.asph).toFixed(1),ta:+(+p.ta).toFixed(1),film:+(+(p.film||0)).toFixed(2),rh:p.rh!=null?Math.round(p.rh):null,rho}:null;}
+  const p=pick(SIM&&SIM.S)||pick(WKC.W&&WKC.W.S);return p?{asph:+(+p.asph).toFixed(1),ta:+(+p.ta).toFixed(1),film:+(+(p.film||0)).toFixed(2),rh:p.rh!=null?Math.round(p.rh):null}:null;}
 function dlStats(laps){const v=laps.map(l=>l.s),srt=[...v].sort((a,b)=>a-b),med=srt[Math.floor(srt.length/2)]||0;laps.forEach(l=>l.out=l.s>med*1.07);
   const ok=laps.filter(l=>!l.out),best=ok.length?Math.min(...ok.map(l=>l.s)):null,b3=ok.map(l=>l.s).sort((a,b)=>a-b).slice(0,3);
   return{best,avg3:b3.length?b3.reduce((a,b)=>a+b,0)/b3.length:null,avg:ok.length?ok.reduce((a,l)=>a+l.s,0)/ok.length:null,n:laps.length};}
 async function dlReadFiles(files){const res=[];for(const f of files){try{res.push(dlParse(await f.text(),f.name));}catch(e){}}
   const singles=res.filter(r=>r.single).sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{numeric:true}));const multi=res.filter(r=>!r.single);
-  const r=multi.find(x=>x.laps.length)||{src:singles[0]?singles[0].src:'File',laps:[],start:null};if(singles.length){r.laps=r.laps.concat(singles.flatMap(x=>x.laps));const T=singles.filter(x=>x.tel);if(T.length===singles.length&&!multi.length)r.tel={chans:T[0].tel.chans,laps:T.map(x=>x.tel.laps[0])};}return r;}
+  const r=multi.find(x=>x.laps.length)||{src:singles[0]?singles[0].src:'File',laps:[],start:null};if(singles.length)r.laps=r.laps.concat(singles.flatMap(x=>x.laps));return r;}
 function renderDL(){const B=$('dl-box');if(!B)return;if(!CUR){B.innerHTML='<div class="sub">Scegli una pista.</div>';return;}
   const L=dlList(),today=new Date(wkNowP()).toISOString().slice(0,10),wk=wkList().slice().sort((a,b)=>(a.day+a.time).localeCompare(b.day+b.time)),ds=drivers();
   const P=DL.pend;let h=`<div class="dl-imp"><h3 style="margin:0 0 4px">📥 Tempi dal data logger</h3><div class="sub" style="margin:0">Carica il file esportato dal tuo cronometro: ogni giro viene legato all'asfalto, all'aria e alla pioggia di quel momento, così vedi quanto è il pilota e quanto le condizioni.</div>
@@ -1619,7 +1597,7 @@ function renderDL(){const B=$('dl-box');if(!B)return;if(!CUR){B.innerHTML='<div 
    <label class="dl-drop" id="dl-drop">📂 Tocca per scegliere il file (.csv, .txt) — anche più file insieme<br><span class="sub" style="margin:0">oppure trascinalo qui</span><input type="file" id="dl-file" accept=".csv,.txt,.tsv,text/csv,text/plain" multiple hidden></label>
    <details><summary class="sub" style="cursor:pointer;margin:0">…oppure incolla i tempi (uno per riga)</summary><textarea id="dl-txt" rows="4" style="width:100%;margin-top:6px" placeholder="1  48.512\n2  47.903\n3  47.811"></textarea><button class="chipb" id="dl-txtok" style="margin-top:6px">Leggi i tempi</button></details>
    <details style="margin-top:6px"><summary class="sub" style="cursor:pointer;margin:0">Come esporto il file?</summary><div class="sub" style="margin:6px 0 0;line-height:1.55"><b>MyChron (AiM):</b> scarica la sessione in Race Studio 3, apri l'analisi ed esporta in CSV/Excel.<br><b>Alfano:</b> scarica la sessione con l'app Alfano ADA (Bluetooth) o il programma per PC ed esporta i giri.<br><b>Unipro:</b> scarica con il programma per PC (Unipro Analyser / Off Camber) ed esporta in CSV.<br>Se non trovi l'esportazione, copia la lista dei tempi e incollala qui sopra.</div></details>`;
-  if(P){h+=`<div style="margin-top:10px;padding:10px;border-radius:10px;background:#0d1626;border:1px solid #24395a"><b>${P.laps.length} giri letti</b> <span class="sub" style="margin:0">(${esc(P.src)}) · migliore ${fmt(Math.min(...P.laps),3)} s</span>${P.tel?`<div class="sub" style="margin:4px 0 0">📡 Telemetria trovata: ${P.tel.chans.map(c=>esc(c.name)).join(', ')}</div>`:''}
+  if(P){h+=`<div style="margin-top:10px;padding:10px;border-radius:10px;background:#0d1626;border:1px solid #24395a"><b>${P.laps.length} giri letti</b> <span class="sub" style="margin:0">(${esc(P.src)}) · migliore ${fmt(Math.min(...P.laps),3)} s</span>
      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px">Turno <select id="dl-turn"><option value="">— scegli l'orario —</option>${wk.map((x,i)=>`<option value="${i}">${esc(lblDay(x.day+'T00:00'))} ${esc(x.time)} · ${esc(x.type)}</option>`).join('')}</select>
      partenza <input type="date" id="dl-day" value="${P.start?new Date(P.start).toISOString().slice(0,10):today}"><input type="time" id="dl-time" value="${P.start?new Date(P.start).toISOString().slice(11,16):''}">
      pilota <input id="dl-drv" list="dl-drvs" value="${esc(store.get('tc_live_drv','')||ds[0]||'')}" style="width:120px"><datalist id="dl-drvs">${ds.map(d=>`<option>${esc(d)}</option>`).join('')}</datalist>
@@ -1630,7 +1608,6 @@ function renderDL(){const B=$('dl-box');if(!B)return;if(!CUR){B.innerHTML='<div 
      <div class="dl-kpi"><div><span>Miglior giro</span><b style="color:#c58cff">${st.best?fmt(st.best,3):'—'}</b></div><div><span>Media 3 migliori</span><b>${st.avg3?fmt(st.avg3,3):'—'}</b></div><div><span>Media giri buoni</span><b>${st.avg?fmt(st.avg,3):'—'}</b></div>${sel.laps[0]&&sel.laps[0].c?`<div><span>Asfalto</span><b>${fmt(sel.laps[0].c.asph,0)}→${fmt(sel.laps[sel.laps.length-1].c.asph,0)}°</b></div>`:''}</div>
      ${dlChart(sel.laps,st)}
      <table class="dl-tab" style="margin-top:8px"><thead><tr><th>Giro</th><th>Tempo</th><th>Distacco</th><th>Ora</th><th>Asfalto</th><th>Aria</th><th>Pista</th></tr></thead><tbody>${sel.laps.map(l=>`<tr class="${l.s===st.best?'best':''}${l.out?' out':''}"><td>${l.n}</td><td class="mono">${fmt(l.s,3)}</td><td class="mono">${st.best&&!l.out?'+'+fmt(l.s-st.best,3):l.out?'lento / box':''}</td><td>${new Date(l.ts).toISOString().slice(11,16)}</td><td>${l.c?fmt(l.c.asph,1)+' °C':'—'}</td><td>${l.c?fmt(l.c.ta,1)+' °C':'—'}</td><td>${l.c?(l.c.film>0.05?'💧 bagnata':'asciutta'):'—'}</td></tr>`).join('')}</tbody></table>`;
-    h+=dlTelView(sel,st,L);
     const withC=L.filter(x=>x.laps.some(l=>l.c));if(withC.length>=2){const rows=withC.map(x=>{const s=dlStats(x.laps),ok=x.laps.filter(l=>!l.out&&l.c);return{x,best:s.best,asph:ok.length?ok.reduce((a,l)=>a+l.c.asph,0)/ok.length:null};}).filter(r=>r.best&&r.asph!=null);
       if(rows.length>=2){const byD={};rows.forEach(r=>(byD[r.x.driver||'—']=byD[r.x.driver||'—']||[]).push(r));
         h+=`<h4 style="margin:16px 0 6px">Migliori giri e asfalto, sessione per sessione</h4><table class="dl-tab"><thead><tr><th>Sessione</th><th>Pilota</th><th>Asfalto medio</th><th>Miglior giro</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.x.label)}</td><td>${esc(r.x.driver||'')}</td><td>${fmt(r.asph,1)} °C</td><td class="mono">${fmt(r.best,3)}</td></tr>`).join('')}</tbody></table>
@@ -1643,35 +1620,12 @@ function renderDL(){const B=$('dl-box');if(!B)return;if(!CUR){B.innerHTML='<div 
   const alertMsg=()=>$('dl-box').insertAdjacentHTML('beforeend','<div class="sub err">Non trovo tempi: scrivi un tempo per riga (es. 48.512 oppure 0:48.512).</div>');
   if(P){$('dl-turn').onchange=e=>{const x=wk[+e.target.value];if(x){$('dl-day').value=x.day;$('dl-time').value=x.time;}};$('dl-cancel').onclick=()=>{DL.pend=null;renderDL();};
     $('dl-save').onclick=()=>{const day=$('dl-day').value,tm=$('dl-time').value;if(!day||!tm){$('dl-msg').textContent='Scegli il turno o scrivi l\'ora di partenza: serve per legare i giri al meteo.';return;}
-      const t0=Date.parse(`${day}T${tm}:00Z`),drv=$('dl-drv').value.trim();let acc=0;const laps=P.laps.map((s,i)=>{acc+=s;const ts=t0+acc*1000,tl=P.tel&&P.tel.laps[i]?Object.fromEntries(Object.entries(P.tel.laps[i]).map(([k,v])=>[k,k==='tr'?v:+(+v).toFixed(k==='latgMax'?2:0)])):null;return{n:i+1,s:+s.toFixed(3),ts,c:dlCond(ts),tl};});
+      const t0=Date.parse(`${day}T${tm}:00Z`),drv=$('dl-drv').value.trim();let acc=0;const laps=P.laps.map((s,i)=>{acc+=s;const ts=t0+acc*1000;return{n:i+1,s:+s.toFixed(3),ts,c:dlCond(ts)};});
       const tsel=$('dl-turn').value!==''?wk[+$('dl-turn').value]:null,id=Date.now().toString(36);
-      const label=`${lblDay(day+'T00:00')} ${tm}${tsel?' · '+tsel.type:''}${drv?' · '+drv:''}`;const l=dlList();l.unshift({id,src:P.src,label,driver:drv,start:t0,laps,chans:P.tel?P.tel.chans:null});store.set(dlKey(),l.slice(0,60));
+      const label=`${lblDay(day+'T00:00')} ${tm}${tsel?' · '+tsel.type:''}${drv?' · '+drv:''}`;const l=dlList();l.unshift({id,src:P.src,label,driver:drv,start:t0,laps});store.set(dlKey(),l.slice(0,60));
       if(drv&&!drivers().includes(drv))store.set('tc_drivers',drivers().concat(drv).join(', '));DL.pend=null;DL.sel=id;renderDL();};}
-  if($('dl-cmp'))$('dl-cmp').onchange=e=>{DL.cmp=+e.target.value;renderDL();};
   if(L.length){$('dl-ses').onchange=e=>{DL.sel=e.target.value;renderDL();};$('dl-del').onclick=()=>{if(!confirmDel())return;store.set(dlKey(),dlList().filter(x=>x.id!==DL.sel));DL.sel=null;renderDL();};}
   function confirmDel(){const b=$('dl-del');if(b.dataset.sure){return true;}b.dataset.sure=1;b.textContent='Tocca di nuovo per cancellare';setTimeout(()=>{if(b.isConnected){b.textContent='🗑️ Cancella';delete b.dataset.sure;}},3000);return false;}}
-function dlTelView(sel,st,L){const C=sel.chans;if(!C||!sel.laps.some(l=>l.tl))return'';const has=k=>C.some(c=>c.k===k),ok=sel.laps.filter(l=>!l.out&&l.tl),best=sel.laps.find(l=>l.s===st.best);
-  const mx=k=>{const v=ok.map(l=>l.tl[k]).filter(x=>x!=null);return v.length?Math.max(...v):null;},av=k=>{const v=ok.map(l=>l.tl[k]).filter(x=>x!=null);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;};
-  const cols=[['vMax','V max','km/h',0],['vMin','V min curva','km/h',0],['rpmMax','RPM max','',0],['rpmMin','RPM min','',0],['waterMax','Acqua','°C',0],['egtMax','Scarico','°C',0],['chtMax','Testa','°C',0],['t1Max','T1','°C',0],['t2Max','T2','°C',0],['latgMax','G lat','g',2]].filter(([k])=>sel.laps.some(l=>l.tl&&l.tl[k]!=null));
-  let h=`<h4 style="margin:18px 0 4px">📡 Telemetria · ${C.map(c=>esc(c.name)).join(' · ')}</h4><div class="dl-kpi">
-    ${has('v')?`<div><span>Velocità max</span><b>${fmt(mx('vMax'),0)}<small> km/h</small></b></div><div><span>V min media in curva</span><b>${fmt(av('vMin'),1)}<small> km/h</small></b></div>`:''}
-    ${has('rpm')?`<div><span>Giri max</span><b>${Math.round(mx('rpmMax'))}</b></div>`:''}${has('water')?`<div><span>Acqua max</span><b>${fmt(mx('waterMax'),0)}°</b></div>`:''}${has('egt')?`<div><span>Scarico max</span><b>${fmt(mx('egtMax'),0)}°</b></div>`:''}${has('cht')?`<div><span>Testa max</span><b>${fmt(mx('chtMax'),0)}°</b></div>`:''}</div>
-    <table class="dl-tab"><thead><tr><th>Giro</th><th>Tempo</th>${cols.map(c=>`<th>${c[1]}${c[2]?` <span class="sub" style="margin:0">${c[2]}</span>`:''}</th>`).join('')}</tr></thead><tbody>${sel.laps.filter(l=>l.tl).map(l=>`<tr class="${l.s===st.best?'best':''}${l.out?' out':''}"><td>${l.n}</td><td class="mono">${fmt(l.s,3)}</td>${cols.map(([k,,,d])=>`<td class="mono">${l.tl[k]!=null?fmt(l.tl[k],d):'—'}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
-  if(best&&best.tl&&best.tl.tr&&best.tl.tr.some(p=>p[1]!=null)){const cmp=sel.laps.find(l=>l.n===DL.cmp&&l.tl&&l.tl.tr)||ok.filter(l=>l!==best).sort((a,b)=>a.s-b.s)[0];
-    h+=`<div style="display:flex;gap:8px;align-items:center;margin:12px 0 4px;flex-wrap:wrap"><b>Velocità lungo il giro</b> · migliore (giro ${best.n}) contro <select id="dl-cmp">${ok.filter(l=>l!==best).map(l=>`<option value="${l.n}"${cmp&&l.n===cmp.n?' selected':''}>giro ${l.n} (${fmt(l.s,3)})</option>`).join('')}</select></div>${dlTrace(best,cmp)}
-    <div class="sub" style="margin:4px 0 0">Dove la linea viola sta sopra la grigia, nel giro migliore si andava più forte in quel punto: di solito si guadagna nelle velocità minime in curva.</div>`;}
-  const rows=L.filter(x=>x.chans&&x.laps.some(l=>l.tl&&l.c&&l.c.rho!=null)).map(x=>{const o=x.laps.filter(l=>!l.out&&l.tl&&l.c);const a=k=>{const v=o.map(l=>l.tl[k]).filter(v=>v!=null);return v.length?Math.max(...v):null;};
-    return{x,rho:o.reduce((s,l)=>s+(l.c.rho||0),0)/o.length,ta:o.reduce((s,l)=>s+l.c.ta,0)/o.length,egt:a('egtMax'),water:a('waterMax'),rpm:a('rpmMax'),v:a('vMax')};}).filter(r=>r.rho);
-  if(rows.length>=2&&rows.some(r=>r.egt!=null||r.rpm!=null)){h+=`<h4 style="margin:16px 0 4px">Motore e aria, sessione per sessione</h4><table class="dl-tab"><thead><tr><th>Sessione</th><th>Aria</th><th>Densità aria</th>${rows.some(r=>r.rpm)?'<th>Giri max</th>':''}${rows.some(r=>r.egt)?'<th>Scarico max</th>':''}${rows.some(r=>r.water)?'<th>Acqua max</th>':''}${rows.some(r=>r.v)?'<th>V max</th>':''}</tr></thead><tbody>
-    ${rows.map(r=>`<tr${r.x.id===sel.id?' class="best"':''}><td>${esc(r.x.label)}</td><td>${fmt(r.ta,0)} °C</td><td>${fmt(r.rho,1)}%</td>${rows.some(q=>q.rpm)?`<td>${r.rpm?Math.round(r.rpm):'—'}</td>`:''}${rows.some(q=>q.egt)?`<td>${r.egt?fmt(r.egt,0)+'°':'—'}</td>`:''}${rows.some(q=>q.water)?`<td>${r.water?fmt(r.water,0)+'°':'—'}</td>`:''}${rows.some(q=>q.v)?`<td>${r.v?fmt(r.v,0):'—'}</td>`:''}</tr>`).join('')}</tbody></table>
-    <div class="sub" style="margin:6px 0 0">Come leggerla: a parità di getto, con l'aria più densa il motore riceve più aria e la carburazione si smagrisce, e la temperatura allo scarico di solito sale; con l'aria più leggera succede il contrario. Se lo scarico cambia molto senza che cambi la densità dell'aria, controlla carburazione, candela e accensione.</div>`;}
-  return h;}
-function dlTrace(a,b){const W=640,H=170,pad=8,all=[...a.tl.tr,...(b&&b.tl&&b.tl.tr||[])].map(p=>p[1]).filter(v=>v!=null);if(!all.length)return'';const mn=Math.min(...all),mx=Math.max(...all),rg=Math.max(5,mx-mn);
-  const pl=(l,col,w)=>`<polyline fill="none" stroke="${col}" stroke-width="${w}" points="${l.tl.tr.filter(p=>p[1]!=null).map(p=>`${pad+p[0]*(W-2*pad)},${10+(H-30)*(1-(p[1]-mn)/rg)}`).join(' ')}"/>`;
-  return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto;background:#0b1220;border:1px solid #1f2a3a;border-radius:10px">
-   <text x="10" y="18" fill="#7f91aa" font-size="10">${Math.round(mx)} km/h</text><text x="10" y="${H-24}" fill="#7f91aa" font-size="10">${Math.round(mn)} km/h</text>
-   ${b&&b.tl&&b.tl.tr?pl(b,'#8a97ab',1.5):''}${pl(a,'#c58cff',2.2)}
-   <text x="${W/2}" y="${H-6}" fill="#5f7390" font-size="10" text-anchor="middle">partenza → arrivo del giro</text></svg>`;}
 function dlChart(laps,st){const ok=laps.filter(l=>!l.out);if(ok.length<2)return'';const W=640,H=150,pad=34,mn=Math.min(...ok.map(l=>l.s)),mx=Math.max(...ok.map(l=>l.s)),rg=Math.max(0.3,mx-mn);
   const x=i=>pad+i*(W-pad-8)/Math.max(1,laps.length-1),y=v=>12+(H-34)*(v-mn)/rg;const as=laps.filter(l=>l.c).map(l=>l.c.asph),amn=Math.min(...as),amx=Math.max(...as),ar=Math.max(1,amx-amn),ya=v=>12+(H-34)*(1-(v-amn)/ar);
   return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto;background:#0b1220;border:1px solid #1f2a3a;border-radius:10px">
