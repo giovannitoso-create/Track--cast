@@ -173,6 +173,12 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 .lv-feed{display:flex;flex-direction:column;gap:6px}.lv-e{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);font-size:13px}.lv-e.new{animation:lvn 2.5s}@keyframes lvn{from{background:rgba(51,209,122,.25)}}
 .lv-e .ic{font-size:18px}.lv-e .m{color:var(--ink3);font-size:11.5px}.lv-e .x{margin-left:auto;background:none;border:0;color:var(--ink3);cursor:pointer}
 #lv-toast{position:fixed;right:14px;bottom:14px;z-index:7000;max-width:330px;background:#0f2a1c;border:1px solid #2e7d50;color:#d9ffe8;border-radius:12px;padding:10px 12px;font-size:13.5px;box-shadow:0 8px 30px rgba(0,0,0,.5);display:none}
+.wkc{border-color:#3a3220;background:linear-gradient(180deg,#17140c,var(--surface) 60%)}.wkc-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.wkc-act{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}.wkc-act .on{background:#33d17a;color:#04140a;border-color:#33d17a}
+.wkc-nx{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:12px 0 10px;padding:12px 14px;border-radius:12px;background:#0d1626;border:1px solid #24395a}.wkc-nx .cd{font:800 30px "JetBrains Mono";color:#ffd23f;line-height:1}.wkc-nx .cd small{display:block;font:600 11px Inter;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.wkc-nx .tt{font-size:18px;font-weight:800}.wkc-nx .ad{display:flex;gap:8px;flex-wrap:wrap;margin-top:5px}.wkc-tag{padding:3px 9px;border-radius:999px;font:700 12px Inter;background:#1c2b40;color:#cfe3ff}.wkc-tag.rain{background:#16305e;color:#9fc6ff}.wkc-tag.slick{background:#3a2c0a;color:#ffd27a}.wkc-tag.warn{background:#3a1a14;color:#ffb199}
+.wkc-list{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}.wkc-s{flex:none;min-width:148px;padding:9px 11px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);font-size:12.5px;position:relative}.wkc-s b{display:block;font-size:13.5px}.wkc-s .t{font:700 15px "JetBrains Mono"}
+.wkc-s.past{opacity:.45}.wkc-s.now{border-color:#33d17a;box-shadow:0 0 0 2px rgba(51,209,122,.25)}.wkc-s.next{border-color:#ffd23f}.wkc-s .x{position:absolute;top:4px;right:6px;background:none;border:0;color:var(--ink3);cursor:pointer}
+.wkc-form{margin-top:10px;padding:10px;border-radius:10px;background:var(--surface2);border:1px solid var(--line)}.wkc-form input,.wkc-form select,.wkc-form textarea{background:#0f1622;border:1px solid var(--line2);color:var(--ink);border-radius:8px;padding:7px 8px;font:inherit}
 .mdl{position:fixed;inset:0;background:rgba(3,6,12,.78);display:none;align-items:flex-start;justify-content:center;z-index:5500;padding:14px;overflow:auto}
 .mdl .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;padding:18px;margin:20px 0}
 .mdl input,.mdl select{background:#0f1622;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 10px;font:inherit}.mdl input:focus,.mdl select:focus{outline:none;border-color:#ffb547}.mdl h3{margin:0 0 4px}.mdl label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink2);margin:8px 0}.mdl input{width:100%;box-sizing:border-box}
@@ -367,6 +373,10 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
 </header>
 <div class="near" id="near"></div>
 
+<div class="card wkc" id="wkcard" style="display:none"><div class="wkc-h"><h2 style="margin:0">📋 Programma del weekend</h2><span class="sub" id="wkc-trk" style="margin:0"></span>
+  <div class="wkc-act"><button class="chipb" id="wkc-bell" title="Avviso 20 minuti prima di ogni turno">🔔 Avvisi</button><button class="chipb" id="wkc-paste">📋 Incolla programma</button><button class="chipb" id="wkc-add">＋ Turno</button><button class="chipb" id="wkc-full">Dossier ↗</button></div></div>
+  <div id="wkc-next"></div><div class="wkc-list" id="wkc-list"></div>
+  <div class="wkc-form" id="wkc-form" hidden></div></div>
 <div class="card tbar" id="tbar" style="display:none">
   <div class="tbtop">
     <button class="btn primary" id="tb-play" title="Scorri le prossime ore">▶ Play</button>
@@ -903,7 +913,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='25/11/2026 10:20';
+const TC_VER='25/11/2026 10:40';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1496,7 +1506,7 @@ function drawBox(){if(!SIM||!CUR)return;const S=SIM.S,ni=SIM.ni,n=S[ni],p30=S[Ma
   let ta=0;const tile=(cls,l,body)=>`<div class="bx-t ${cls||''}" style="grid-area:${'abcde'[ta++]}"><div class="l">${l}</div>${body}</div>`;
   const trend=(a,b)=>b-a>0.7?'▲':a-b>0.7?'▼':'▶';
   // avvisi in fondo
-  const msgs=[];try{LIVE.ev.filter(e=>Date.now()-e.ts<20*60e3).slice(0,3).forEach(e=>msgs.push(`👥 ${e.driver?e.driver+': ':''}${lvText(e).replace(/<[^>]+>/g,'')} (${e.author||'team'})`));}catch(e){}if(raining)msgs.push('🌧️ Piove in pista: monta le rain');else if(mins!=null)msgs.push(`🌧️ Pioggia tra ${mins} min (probabilità ${Math.round(first.p*100)}%)`);
+  const msgs=[];try{const now=wkNowP(),nx=wkList().map(x=>({x,t:wkTs(x)})).filter(o=>o.t>now).sort((a,b)=>a.t-b.t)[0];if(nx)msgs.push(`📋 Prossimo turno: ${nx.x.type} alle ${nx.x.time} (tra ${wkDur((nx.t-now)/60e3)})`);}catch(e){}try{LIVE.ev.filter(e=>Date.now()-e.ts<20*60e3).slice(0,3).forEach(e=>msgs.push(`👥 ${e.driver?e.driver+': ':''}${lvText(e).replace(/<[^>]+>/g,'')} (${e.author||'team'})`));}catch(e){}if(raining)msgs.push('🌧️ Piove in pista: monta le rain');else if(mins!=null)msgs.push(`🌧️ Pioggia tra ${mins} min (probabilità ${Math.round(first.p*100)}%)`);
   if(CL.res&&CL.res.leads&&CL.res.leads[0]&&CL.res.leads[0].ps>=0.5)msgs.push('⛈️ Nubi temporalesche vicine');
   if(Math.abs(p30.asph-n.asph)>=3)msgs.push(`🌡️ Asfalto ${p30.asph>n.asph?'in salita':'in calo'}: ${fmt(n.asph,0)} → ${fmt(p30.asph,0)} °C in 30 min`);
   if((n.wg||n.ws)>=40)msgs.push(`💨 Raffiche fino a ${Math.round(n.wg||n.ws)} km/h`);
@@ -1540,6 +1550,51 @@ $('bx-ltp').onchange=e=>{if(e.target.value)ltOpen(e.target.value);};
 $('bx-ltr').onclick=()=>{const f=$('bx-ltif');if(f.src){const u=f.src;f.src='about:blank';setTimeout(()=>f.src=u,60);}};
 $('bx-lto').onclick=()=>{const u=ltNorm($('bx-ltu').value);if(u)window.open(u,'_blank','noopener');};
 $('bx-ltw').onclick=()=>{LT.w=LT.w%3+1;$('boxscr').dataset.ltw=LT.w;$('bx-ltw').textContent=['◧','◨','⬛'][LT.w-1];$('bx-ltw').title=['Altezza normale','Più alta','Tutto lo schermo'][LT.w-1];setTimeout(()=>{try{drawBox();}catch(e){}},50);};
+// ---------- Programma del weekend in cima alla pagina: turni, conto alla rovescia, avvisi 20' prima ----------
+const WKC={W:null,wAt:0,wTrk:'',loading:false,form:''};
+const wkNowP=()=>Date.now()-new Date().getTimezoneOffset()*60e3; // ora locale nella stessa convenzione dei turni
+const wkTs=x=>Date.parse(`${x.day}T${x.time}:00Z`);
+const wkDur=m=>{m=Math.round(m);if(m<60)return m+' min';const h=Math.floor(m/60);return h<24?`${h} h ${String(m%60).padStart(2,'0')}'`:`${Math.floor(h/24)} g ${h%24} h`;};
+function wkAdv(x){const ts=wkTs(x);let S=SIM&&SIM.S,st=S?sessStats(S,ts,x.dur||10):null;
+  if(!st&&WKC.W&&WKC.wTrk===(CUR&&CUR.id))st=sessStats(WKC.W.S,ts,x.dur||10);if(!st)return null;st.kind=/qualif/i.test(x.type)?'quali':/(gara|final|prefinal)/i.test(x.type)?'gara':'prove';
+  try{return{st,adv:sessAdvice(st,dryRef())};}catch(e){return{st};}}
+async function wkcFar(){if(!CUR||WKC.loading)return;if(WKC.W&&WKC.wTrk===CUR.id&&Date.now()-WKC.wAt<30*60e3)return;WKC.loading=true;
+  try{const W=simulate(await wkForecast(CUR));if(W){WKC.W=W;WKC.wAt=Date.now();WKC.wTrk=CUR.id;}}catch(e){}finally{WKC.loading=false;}renderWkCard();}
+function wkParse(txt,day){const out=[];String(txt).split(/\n+/).forEach(l=>{const m=l.match(/(\d{1,2})[:.](\d{2})/);if(!m)return;const h=+m[1],mi=+m[2];if(h>23||mi>59)return;
+  const low=l.toLowerCase(),dm=l.match(/(\d{1,2})\s*'|(\d{1,2})\s*(?:min|giri)/);let type=WK_TYPES.find(t=>low.includes(t.toLowerCase()))||(/qual|crono/.test(low)?'Qualifica':/pre.?final/.test(low)?'Prefinale':/final/.test(low)?'Finale':/warm/.test(low)?'Warm up':/(gara|race|manche|heat)/.test(low)?'Gara 1':/(prov|libere|practice|free)/.test(low)?'Prove libere':'Prove libere');
+  const cat=(l.replace(m[0],'').replace(/\d{1,2}\s*('|min|giri)/i,'').match(/\b(KZ2?|OK-?J(?:unior)?|OK-?N|OK|X30\s*\w*|Rotax\s*\w*|Mini\s*\w*|60\s*Mini|KZ2\s*Master|Senior|Junior)\b/i)||[])[0];
+  out.push({day,time:String(h).padStart(2,'0')+':'+String(mi).padStart(2,'0'),type:cat?`${type} · ${cat.trim()}`:type,dur:dm?+(dm[1]||dm[2]):(type==='Finale'||type.startsWith('Gara')?20:10)});});return out;}
+function renderWkCard(){const C=$('wkcard');if(!C)return;if(!CUR){C.style.display='none';return;}C.style.display='';
+  const L=wkList().slice().sort((a,b)=>(a.day+a.time).localeCompare(b.day+b.time)),now=wkNowP();$('wkc-trk').textContent=CUR.name;
+  $('wkc-bell').classList.toggle('on',!!store.get('tc_wk_bell',false));
+  const nxt=L.find(x=>wkTs(x)+(x.dur||10)*60e3>now),cur=nxt&&wkTs(nxt)<=now;
+  if(L.some(x=>{const t=wkTs(x);return t>now&&!(SIM&&SIM.S&&SIM.S.length&&t<=SIM.S[SIM.S.length-1].ts);}))wkcFar();
+  if(!L.length){$('wkc-next').innerHTML=`<div class="sub" style="margin:10px 0 4px">Inserisci i turni del weekend (o incolla il programma ufficiale): qui vedrai il conto alla rovescia al prossimo turno con gomma, pressioni e pioggia già pronte, e il sito ti avvisa 20 minuti prima.</div>`;$('wkc-list').innerHTML='';}
+  else{if(nxt){const a=wkAdv(nxt),t=wkTs(nxt),mins=(t-now)/60e3,best=a&&a.adv?a.adv.best:'';
+      $('wkc-next').innerHTML=`<div class="wkc-nx"><div class="cd">${cur?'IN PISTA':wkDur(mins)}<small>${cur?`finisce tra ${wkDur((t+(nxt.dur||10)*60e3-now)/60e3)}`:'al prossimo turno'}</small></div>
+        <div style="flex:1;min-width:200px"><div class="tt">${esc(nxt.type)} · ${lblDay(nxt.day+'T00:00')} ${esc(nxt.time)} <span class="sub" style="margin:0">(${nxt.dur||10}')</span></div>
+        <div class="ad">${a?`<span class="wkc-tag ${best.startsWith('rain')?'rain':'slick'}">${best==='rain?'?'SLICK · rain pronte':best.toUpperCase()}</span><span class="wkc-tag${a.st.pp>=40?' warn':''}">🌧️ pioggia ${a.st.pp}%</span><span class="wkc-tag">🛣️ asfalto ${fmt(a.st.asph,0)} °C</span><span class="wkc-tag">🌡️ aria ${fmt(a.st.ta,0)} °C</span>${a.adv&&a.adv.press?`<span class="wkc-tag">🎈 ${a.adv.press}</span>`:''}`:`<span class="sub" style="margin:0">${WKC.loading?'Calcolo la previsione…':'Previsione non ancora disponibile per questo turno (arriva fino a 16 giorni prima).'}</span>`}</div></div></div>`;}
+    else $('wkc-next').innerHTML='<div class="sub" style="margin:10px 0 4px">Tutti i turni sono finiti. Aggiungi quelli del prossimo weekend.</div>';
+    $('wkc-list').innerHTML=L.map(x=>{const t=wkTs(x),past=t+(x.dur||10)*60e3<=now,isNow=t<=now&&!past,a=past?null:wkAdv(x),i=wkList().findIndex(y=>y.day===x.day&&y.time===x.time&&y.type===x.type);
+      return`<div class="wkc-s${past?' past':isNow?' now':x===nxt?' next':''}"><button class="x" data-wdel="${i}" title="Togli">✕</button><span class="sub" style="margin:0">${lblDay(x.day+'T00:00')}</span><div class="t">${esc(x.time)}</div><b>${esc(x.type)}</b>${a&&a.adv?`<span class="sub" style="margin:2px 0 0">${a.adv.best==='rain?'?'slick (rain pronte)':a.adv.best} · ${a.st.pp}% · ${fmt(a.st.asph,0)}°</span>`:''}</div>`;}).join('');}
+  C.querySelectorAll('[data-wdel]').forEach(b=>b.onclick=()=>{const l=wkList();l.splice(+b.dataset.wdel,1);store.set(wkKey(),l);renderWkCard();});
+  const F=$('wkc-form'),today=new Date(wkNowP()).toISOString().slice(0,10);F.hidden=!WKC.form;
+  if(WKC.form==='add')F.innerHTML=`<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input type="date" id="wf-day" value="${store.get('tc_wk_lastday',today)}"><input type="time" id="wf-time" value="09:00"><select id="wf-type">${WK_TYPES.map(t=>`<option>${t}</option>`).join('')}</select><input id="wf-cat" placeholder="categoria (es. KZ2)" style="width:130px"><input type="number" id="wf-dur" value="10" style="width:64px"> min <button class="btn primary" id="wf-ok">Aggiungi</button></div>`;
+  if(WKC.form==='paste')F.innerHTML=`<div class="sub" style="margin:0 0 6px">Incolla il programma ufficiale (una riga per turno con l'orario, es. «09:20 Prove libere KZ2 10'»). Giorno: <input type="date" id="wf-day" value="${store.get('tc_wk_lastday',today)}"></div><textarea id="wf-txt" rows="5" style="width:100%" placeholder="09:00 Prove libere OK 10'\n09:40 Qualifica KZ2 8'\n14:10 Prefinale KZ2\n16:30 Finale KZ2"></textarea><div class="row"><button class="btn primary" id="wf-ok">Aggiungi i turni</button><span class="sub" id="wf-msg" style="margin:0"></span></div>`;
+  if(WKC.form){$('wf-ok').onclick=()=>{const day=$('wf-day').value||today;store.set('tc_wk_lastday',day);const l=wkList();
+    if(WKC.form==='add'){const c=$('wf-cat').value.trim();l.push({day,time:$('wf-time').value||'09:00',type:$('wf-type').value+(c?' · '+c:''),dur:+$('wf-dur').value||10});}
+    else{const add=wkParse($('wf-txt').value,day);if(!add.length){$('wf-msg').textContent='Non trovo orari: scrivi una riga per turno con l\'ora (es. 09:20).';return;}l.push(...add);}
+    store.set(wkKey(),l);WKC.form='';renderWkCard();};}}
+$('wkc-add').onclick=()=>{WKC.form=WKC.form==='add'?'':'add';renderWkCard();};$('wkc-paste').onclick=()=>{WKC.form=WKC.form==='paste'?'':'paste';renderWkCard();};
+$('wkc-full').onclick=()=>{try{ptShow('weekend');$('procard').scrollIntoView({behavior:'smooth'});}catch(e){}};
+$('wkc-bell').onclick=async()=>{const on=!store.get('tc_wk_bell',false);store.set('tc_wk_bell',on);if(on&&'Notification' in window&&Notification.permission==='default'){try{await Notification.requestPermission();}catch(e){}}renderWkCard();};
+function wkAlertTick(){if(!CUR)return;const now=wkNowP(),done=store.get('tc_wk_done',{});let ch=false;
+  for(const x of wkList()){const t=wkTs(x),m=(t-now)/60e3,id=CUR.id+'|'+x.day+'|'+x.time+'|'+x.type;
+    if(m<=20&&m>0&&!done[id]){done[id]=1;ch=true;if(!store.get('tc_wk_bell',false))continue;const a=wkAdv(x),msg=`${x.type} tra ${Math.round(m)} min`+(a&&a.adv?` · ${a.adv.best==='rain?'?'SLICK, rain pronte':a.adv.best.toUpperCase()} · pioggia ${a.st.pp}% · asfalto ${fmt(a.st.asph,0)} °C`:'');
+      try{lvToast({author:'Programma',driver:CUR.name,kind:'note',data:{text:msg}});}catch(e){}
+      try{if('Notification' in window&&Notification.permission==='granted')new Notification('TrackCast · '+x.type,{body:msg,tag:id});}catch(e){}}}
+  if(ch)store.set('tc_wk_done',done);renderWkCard();}
+setInterval(wkAlertTick,30e3);
 // ---------- Team live: dati condivisi in tempo reale nel team ----------
 // Sito vero: tabella team_live su Supabase + Realtime (file 8). Prototipo in chat: database dell'artifact. Senza account: solo su questo dispositivo (e tra le schede aperte).
 const LIVE={ev:[],src:'',tid:null,ch:null,unsub:null,bc:null,peers:0,seen:new Set(),mine:new Set(),kind:'press',flash:{},started:false};
@@ -1624,6 +1679,7 @@ setTimeout(()=>{try{liveStart();}catch(e){}},2500);
 // ---------- Due dashboard: Amatore / Team Pro ----------
 const DASH=[
  ['Meteo e radar',[
+  ['wkprog','#wkcard','Programma del weekend','turni in cima alla pagina, conto alla rovescia e avvisi 20\' prima',0,1],
   ['nowc','#nowc','Nowcast radar · prossimi 60 minuti','pioggia minuto per minuto in pista',1,1],
   ['nubi','#cl-box','Nubi dal satellite','copertura del cielo prossime 2 ore',0,1],
   ['mtx','#mtx','Matrice sensori','Amatore 128 occhi · Team Pro 2048 occhi',1,1],
@@ -1785,7 +1841,7 @@ const _storeSet=store.set.bind(store);store.set=(k,v)=>{_storeSet(k,v);if(k==='t
 setInterval(()=>{if(document.visibilityState==='visible')cloudSyncDiary();},30000);
 // ===== dati personali salvati nell'account (tutti gli utenti, anche gratis) =====
 const UD={busy:false,soon:null,at:0,err:'',n:0};
-const UD_KEYS=/^tc_(plog|calendar|alerts|drivers|engine|jet|cmp|pdrv|psess|pt_dur|reports|team|shmode|staddr|sessions_.+|calib_.+|pbase_.+|dry_.+|sens_.+|tcol_.+|phot_.+|pos_.+|motor_.+|jet_.+|mode|dash_am|dash_pro|live_me)$/;
+const UD_KEYS=/^tc_(plog|calendar|alerts|drivers|engine|jet|cmp|pdrv|psess|pt_dur|reports|team|shmode|staddr|sessions_.+|calib_.+|pbase_.+|dry_.+|sens_.+|tcol_.+|phot_.+|pos_.+|motor_.+|jet_.+|mode|dash_am|dash_pro|live_me|wknd_.+|wk_bell)$/;
 const udMod=()=>store.get('tc_mod',{});
 const udLastK=()=>'tc_usync_'+(ACCT.session?ACCT.session.user.id:'x');
 function udLocalKeys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(UD_KEYS.test(k))o.push(k);}return o;}
@@ -2408,7 +2464,7 @@ function renderNow(){
   applyStationToUI();
 }
 let TSEL=null,tbTimer=null;
-function renderWeather(){
+function renderWeather(){setTimeout(()=>{try{renderWkCard();}catch(e){}},0);
   if(!WX||!SIM)return;const S=SIM.S,ni=SIM.ni;
   // session options
   const sel=$('sstart');const prev=sel.value;sel.innerHTML='';
