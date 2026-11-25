@@ -903,7 +903,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='25/11/2026 10:00';
+const TC_VER='25/11/2026 10:10';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1543,7 +1543,7 @@ $('bx-ltw').onclick=()=>{LT.w=LT.w%3+1;$('boxscr').dataset.ltw=LT.w;$('bx-ltw').
 // ---------- Team live: dati condivisi in tempo reale nel team ----------
 // Sito vero: tabella team_live su Supabase + Realtime (file 8). Prototipo in chat: database dell'artifact. Senza account: solo su questo dispositivo (e tra le schede aperte).
 const LIVE={ev:[],src:'',tid:null,ch:null,unsub:null,bc:null,peers:0,seen:new Set(),mine:new Set(),kind:'press',flash:{},started:false};
-const LV_KINDS={press:['🎈','Pressioni'],jet:['🔧','Getto'],tyre:['🛞','Gomme'],note:['📝','Nota']};
+const LV_KINDS={press:['🎈','Pressioni'],tyre:['🛞','Gomme'],note:['📝','Nota']};
 const lvId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const lvMe=()=>store.get('tc_live_me','')||(ACCT.session&&ACCT.session.user&&String(ACCT.session.user.email||'').split('@')[0])||'Box';
 function lvAgo(ts){const m=Math.round((Date.now()-ts)/60e3);return m<1?'adesso':m<60?m+' min fa':Math.round(m/60)+' h fa';}
@@ -1552,7 +1552,7 @@ function lvText(e){const d=e.data||{};if(e.kind==='press'){const w=['fl','fr','r
   if(e.kind==='tyre')return`${d.type==='rain'?'RAIN':'SLICK'}${d.set?' · treno '+esc(d.set):''}`;return esc(d.text||'');}
 function lvIngest(list,fromLocal){const before=LIVE.seen.size&&LIVE.started;let fresh=[];
   const m=new Map(LIVE.ev.map(e=>[e.id,e]));for(const e of list){if(!e||!e.id)continue;if(e._del){m.delete(e.id);continue;}if(!LIVE.seen.has(e.id)){LIVE.seen.add(e.id);if(before&&!LIVE.mine.has(e.id))fresh.push(e);}m.set(e.id,e);}
-  LIVE.ev=[...m.values()].sort((a,b)=>b.ts-a.ts).slice(0,300);LIVE.started=true;
+  LIVE.ev=[...m.values()].filter(e=>e.kind!=='jet').sort((a,b)=>b.ts-a.ts).slice(0,300);LIVE.started=true;
   if(LIVE.src==='local')store.set('tc_live_local',LIVE.ev.slice(0,150));
   fresh.forEach(e=>{LIVE.flash[e.driver||'—']=Date.now();});if(fresh.length)lvToast(fresh[0]);
   if(PT.tab==='live'&&!$('pt-live').hidden)renderLive();try{if($('boxscr').style.display==='block')drawBox();}catch(e){}}
@@ -1590,14 +1590,12 @@ function renderLive(){const P=$('pt-live');if(!P)return;liveStart();
   const kd=LIVE.kind,drvSel=`<select id="lv-drv">${(names.length?names:['']).map(n=>`<option${n===store.get('tc_live_drv','')?' selected':''}>${esc(n)}</option>`).join('')}</select>`;
   const fields=kd==='press'?`<div class="lv-w">${[['fl','Ant. sx'],['fr','Ant. dx'],['rl','Post. sx'],['rr','Post. dx']].map(([k,l])=>`<label>${l}<input id="lv-${k}" type="number" step="0.01" inputmode="decimal" placeholder="bar"></label>`).join('')}</div>
       <div class="lv-k"><button class="chipb ${store.get('tc_live_hot',true)?'on':''}" id="lv-hot">🔥 A caldo</button><button class="chipb ${store.get('tc_live_hot',true)?'':'on'}" id="lv-cold">❄️ A freddo</button><span class="sub" style="margin:0">Scrivi solo la prima: le altre si copiano.</span></div>`
-    :kd==='jet'?`<div class="lv-w" style="grid-template-columns:repeat(3,1fr)"><label>Getto<input id="lv-jet" placeholder="es. 124"></label><label>Spillo / clip<input id="lv-needle" placeholder="opzionale"></label><label>Vite H (membrana)<input id="lv-screw" placeholder="es. 1 giro 15'"></label></div>`
     :kd==='tyre'?`<div class="lv-k"><button class="chipb ${store.get('tc_live_ty','slick')==='slick'?'on':''}" data-ty="slick">☀️ Slick</button><button class="chipb ${store.get('tc_live_ty','slick')==='rain'?'on':''}" data-ty="rain">🌧️ Rain</button><input id="lv-set" placeholder="treno n° (es. 3)" style="width:140px"></div>`
     :`<textarea id="lv-text" rows="2" style="width:100%" placeholder="es. sottosterza in uscita dalla 3, alzo il posteriore di 5 mm"></textarea>`;
   const cards=names.length?names.map(n=>{const b=board[n]||{},pr=b.press&&b.press.data||{},fl=LIVE.flash[n]&&Date.now()-LIVE.flash[n]<4000;
     return`<div class="lv-c${fl?' flash':''}"><h4>🏁 ${esc(n)}</h4>
       <div class="lv-r"><span>Gomme</span><b>${b.tyre?lvText(b.tyre):'—'}</b></div>
       <div class="lv-r" style="display:block"><span>Pressioni ${b.press?(pr.hot?'a caldo':'a freddo'):''}</span>${b.press?`<div class="lv-tyre" style="margin-top:4px">${['fl','fr','rl','rr'].map(k=>`<b>${pr[k]!=null&&pr[k]!==''?fmt(+pr[k],2):'—'}</b>`).join('')}</div>`:' —'}</div>
-      <div class="lv-r"><span>Carburazione</span><b>${b.jet?lvText(b.jet):'—'}</b></div>
       ${b.note?`<div class="lv-r" style="display:block"><span>Ultima nota</span><div>${lvText(b.note)}</div></div>`:''}
       <div class="m sub" style="margin:6px 0 0;font-size:11.5px">${b.last?`aggiornato ${lvAgo(b.last.ts)} da ${esc(b.last.author||'')}`:'nessun dato ancora'}</div></div>`;}).join('')
     :'<div class="sub">Aggiungi i piloti del team in <b>Assetto</b> (elenco piloti) oppure scrivi il nome qui sotto.</div>';
@@ -1617,7 +1615,6 @@ function renderLive(){const P=$('pt-live');if(!P)return;liveStart();
   P.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>liveDel(b.dataset.del));
   $('lv-send').onclick=async()=>{const m=$('lv-msg'),nd=$('lv-newdrv').value.trim(),drv=nd||$('lv-drv').value;let data;
     if(kd==='press'){data={hot:store.get('tc_live_hot',true)};let ok=0;['fl','fr','rl','rr'].forEach(k=>{const v=parseFloat(String($('lv-'+k).value).replace(',','.'));if(isFinite(v)&&v>0&&v<4){data[k]=v;ok++;}});if(!ok){m.textContent='Scrivi almeno una pressione (es. 0,72).';return;}}
-    else if(kd==='jet'){data={jet:$('lv-jet').value.trim(),needle:$('lv-needle').value.trim(),screw:$('lv-screw').value.trim()};if(!data.jet&&!data.screw){m.textContent='Scrivi il getto o la vite.';return;}}
     else if(kd==='tyre')data={type:store.get('tc_live_ty','slick'),set:$('lv-set').value.trim()};
     else{data={text:$('lv-text').value.trim().slice(0,400)};if(!data.text){m.textContent='Scrivi la nota.';return;}}
     if(nd&&!drivers().includes(nd)){store.set('tc_drivers',drivers().concat(nd).join(', '));}store.set('tc_live_drv',drv);
@@ -1637,7 +1634,7 @@ const DASH=[
  ['Strumenti',[
   ['t_strat','tab:strat','Slick o rain · strategia','',1,1],['t_weekend','tab:weekend','Dossier del weekend','',0,1],['t_storico','tab:storico','Storico meteo','',1,1],
   ['t_cal','tab:cal','Calendario gare','',1,1],['t_setup','tab:setup','Assetto','',1,1],['t_motore','tab:motore','Cura del motore','ore, revisioni, consigli di manutenzione',1,0],
-  ['t_giri','tab:giri','Analisi giri','',1,1],['t_box','tab:box','Schermo box + live timing','',0,1],['t_live','tab:live','Team live','pressioni, getti e note condivisi in tempo reale',0,1],['t_avvisi','tab:avvisi','Avvisi al team','',0,1],['t_report','tab:report','Report','',0,1]]],
+  ['t_giri','tab:giri','Analisi giri','',1,1],['t_box','tab:box','Schermo box + live timing','',0,1],['t_live','tab:live','Team live','pressioni, gomme e note condivise in tempo reale',0,1],['t_avvisi','tab:avvisi','Avvisi al team','',0,1],['t_report','tab:report','Report','',0,1]]],
  ['In pista',[
   ['carb','#carbbox','Carburazione','getto consigliato, vite del carburatore a membrana',1,0],
   ['gps','#kartcard','GPS sul kart','conta i giri con il telefono',1,0],
