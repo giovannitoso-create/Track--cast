@@ -401,7 +401,7 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
         <div id="cl-main" style="font-weight:700;font-size:16px">In attesa del satellite…</div><div id="cl-sub" class="sub" style="margin:2px 0 6px"></div>
         <div id="cl-strip" style="display:flex;gap:3px"></div><div id="cl-lbl" style="display:flex;gap:3px;font-size:10px;color:#7f91aa"></div>
         <div style="display:flex;gap:8px;align-items:center;margin-top:6px"><label style="font-size:12px;color:#9fb0c6;cursor:pointer"><input type="checkbox" id="cl-show"> Mostra le nubi sulla mappa</label><span class="st" id="cl-status" style="margin:0"></span></div></div>
-      <div class="mtx" id="mtx"><h3>Matrice sensori · 2048 occhi virtuali intorno alla pista</h3><div class="sub" id="mtx-ver" style="margin:-4px 0 6px"></div>
+      <div class="mtx" id="mtx"><h3>Matrice sensori · <span class="mtx-n">2048</span> occhi virtuali intorno alla pista</h3><div class="sub" id="mtx-ver" style="margin:-4px 0 6px"></div>
         <div class="mtxw"><div class="mtxs"><canvas id="mtx-c" width="720" height="720"></canvas></div><div class="mtxl" id="mtx-l">In attesa del radar…</div></div>
         <div class="mtxk"><span><i style="background:#1a2230"></i>asciutto</span><span><i style="background:#28c76e"></i>pioggia (colore = mm/h)</span><span><i style="border:2px solid #fff;width:7px;height:7px"></i>in rotta verso la pista</span><span><i style="background:rgba(170,182,200,.55)"></i>nubi (satellite)</span><span>▲ rinforza · ▼ cala</span></div></div>
     </div>
@@ -575,8 +575,8 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
   </div></div></div>
 <div class="mdl" id="acct"><div class="box"><div style="display:flex;align-items:center;gap:8px"><h3>👤 Il tuo account</h3><button class="chipb" id="acct-x" style="margin-left:auto">Chiudi</button></div><div id="acct-body"></div></div></div>
 <div class="mdl" id="modepick"><div class="box" style="max-width:760px"><h3 style="margin:0 0 4px">Come usi TrackCast?</h3><div class="sub" style="margin:0 0 14px">Scegli la dashboard adatta a te. Puoi cambiarla quando vuoi dal pulsante in alto.</div>
-<div class="mp-grid"><button class="mp-card" data-m="am"><span class="mp-ic">🏁</span><b>Amatore / domenicale</b><span>Vai in pista per divertirti o per le gare del club e il motore lo curi tu.</span><ul><li>Meteo, pioggia e slick o rain</li><li>Pressioni e carburazione semplici</li><li>Cura del motore: ore, revisioni, consigli</li><li>Giri con il GPS del telefono</li></ul></button>
-<button class="mp-card" data-m="pro"><span class="mp-ic">⭐</span><b>Team / pilota Pro</b><span>Corri nei campionati, hai un team e un meccanico.</span><ul><li>Radar avanzato, matrice, modelli a confronto</li><li>Strategia, dossier weekend, report</li><li>Schermo box con live timing, avvisi al team</li><li>Stazione meteo in pista</li></ul></button></div></div></div>
+<div class="mp-grid"><button class="mp-card" data-m="am"><span class="mp-ic">🏁</span><b>Amatore / domenicale</b><span>Vai in pista per divertirti o per le gare del club e il motore lo curi tu.</span><ul><li>Meteo, pioggia e slick o rain, matrice radar a 128 occhi</li><li>Pressioni e carburazione semplici</li><li>Cura del motore: ore, revisioni, consigli</li><li>Giri con il GPS del telefono</li></ul></button>
+<button class="mp-card" data-m="pro"><span class="mp-ic">⭐</span><b>Team / pilota Pro</b><span>Corri nei campionati, hai un team e un meccanico.</span><ul><li>Radar avanzato, matrice a 2048 occhi, modelli a confronto</li><li>Strategia, dossier weekend, report</li><li>Schermo box con live timing, avvisi al team</li><li>Stazione meteo in pista</li></ul></button></div></div></div>
 <div class="mdl" id="dashcfg"><div class="box" style="max-width:620px"><div style="display:flex;align-items:center;gap:8px"><h3 style="margin:0">⚙️ La tua dashboard · <span id="dc-mode"></span></h3><button class="chipb" id="dc-x" style="margin-left:auto">Fatto</button></div>
 <div class="sub" style="margin:6px 0 10px">Accendi o spegni i riquadri. Ogni dashboard (Amatore e Team Pro) ricorda le sue scelte.</div><div id="dc-list"></div>
 <div class="row"><button class="chipb" id="dc-reset">↺ Ripristina i predefiniti</button></div></div></div>
@@ -870,7 +870,14 @@ function nowcastFrom(frames){ // frames: newest first, 10 min apart
 // ================= Matrice sensori (idea: fari a matrice, tanti segmenti piccoli e indipendenti) =================
 // 64 direzioni × 32 anelli (1…50 km, più fitti vicino alla pista) = 2048 sensori virtuali. Ognuno legge il suo pezzetto di radar, misura se la cella
 // si rinforza o cala (confronto lagrangiano con 10 min prima) e calcola se e quando quella pioggia passerà sulla pista.
-const MTX_DIRS=64,MTX_RINGS=Array.from({length:32},(_,i)=>Math.round((1+49*Math.pow(i/31,1.5))*10)/10);
+let MTX_DIRS=64,MTX_RINGS=[];
+const MTX_HI=Array.from({length:32},(_,i)=>Math.round((1+49*Math.pow(i/31,1.5))*10)/10),MTX_LO=[2,5,10,15,20,30,40,50];
+// Amatore: matrice classica 16 direzioni × 8 anelli = 128 occhi · Team Pro: 64 × 32 = 2048 occhi
+function mtxRes(){const am=document.body.classList.contains('mode-am'),d=am?16:64,R=am?MTX_LO:MTX_HI;if(d===MTX_DIRS&&R===MTX_RINGS)return false;MTX_DIRS=d;MTX_RINGS=R;
+  const n=d*R.length;document.querySelectorAll('.mtx-n').forEach(e=>e.textContent=n);
+  if(typeof NC!=='undefined'&&NC.frames&&NC.res){try{const ms=NC.res.ms,nn=NC.res.n;const r=nowcastFrom(NC.frames.slice(0,3));r.ms=ms;r.n=nn;NC.res=r;renderNowcast();}catch(e){}}
+  return true;}
+MTX_RINGS=MTX_HI;
 function sensorMatrix(frames,mf){
   const f0=frames[0],f1=frames[1],ny=f0.flipY?1:-1,out=[];
   for(let ri=0;ri<MTX_RINGS.length;ri++){const km=MTX_RINGS[ri],w=ri?(km-MTX_RINGS[ri-1]):1.2;
@@ -884,7 +891,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='25/11/2026 09:10';
+const TC_VER='25/11/2026 09:20';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -899,7 +906,7 @@ function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)retur
   const cell=s=>{const a0=(s.brg-90-360/MTX_DIRS/2)*Math.PI/180+gap,a1=(s.brg-90+360/MTX_DIRS/2)*Math.PI/180-gap,ri0=R0+s.ri*RS+0.5*k,ri1=R0+(s.ri+1)*RS-0.5*k;
     ctx.beginPath();ctx.arc(C,C,ri1,a0,a1);ctx.arc(C,C,ri0,a1,a0,true);ctx.closePath();return[a0,a1,ri0,ri1];};
   const wetC=[],hits=[];
-  for(const s of r.sens){const cc=CL.res&&CL.res.sens?CL.res.sens[s.ri*MTX_DIRS+s.di]:null;
+  for(const s of r.sens){const cc=CL.res&&CL.res.sens&&CL.res.dirs===MTX_DIRS?CL.res.sens[s.ri*MTX_DIRS+s.di]:null;
     if(!s.off&&tcColor(s.v)){wetC.push(s);continue;}
     cell(s);ctx.fillStyle=s.off?'rgba(5,9,15,.9)':cc!=null&&cc>0.15?`rgba(150,170,200,${(0.10+0.38*cc).toFixed(2)})`:`rgba(40,70,110,${s.ri%2?0.20:0.28})`;ctx.fill();}
   ctx.save();ctx.globalCompositeOperation='lighter';
@@ -1485,7 +1492,7 @@ function drawBox(){if(!SIM||!CUR)return;const S=SIM.S,ni=SIM.ni,n=S[ni],p30=S[Ma
   $('bx-grid').innerHTML=`
    <div class="bx-hero" style="--lv:${LV[0]}"><div class="bx-ringw">${ring}</div><div class="bx-status"><div class="bx-st">${LV[1]}</div><div class="bx-ss">${LV[2]}</div>
       <div class="bx-chips"><span>${r?(r.near&&r.near.d<60?`cella più vicina ${Math.round(r.near.d)} km ${dir8(r.near.brg)}`:'nessuna cella entro 60 km'):'radar non disponibile'}</span><span>${CL.res?(CL.res.leads[0].p>=0.5?'☁️ cielo coperto':'☀️ cielo sereno'):'satellite non disponibile'}</span></div></div></div>
-   <div class="bx-radar">${pro&&$('mtx-c')?'<canvas id="bx-mtx"></canvas><div class="bx-cap">Matrice 2048 sensori</div>':'<div class="bx-lock">🔒 Matrice radar · Pro</div>'}</div>
+   <div class="bx-radar">${pro&&$('mtx-c')?'<canvas id="bx-mtx"></canvas><div class="bx-cap">Matrice ${MTX_DIRS*MTX_RINGS.length} sensori</div>':'<div class="bx-lock">🔒 Matrice radar · Pro</div>'}</div>
    <div class="bx-tlw"><div class="l">Prossime 3 ore · <span style="color:#7fb2ff">■ pioggia</span> <span style="color:#ff9f43">● asfalto</span> · banda: <span style="color:#f5a623">slick</span> / <span style="color:#3d8bff">rain</span></div>${timeline}</div>
    ${tile('','Asfalto',`<div class="v">${fmt(n.asph,0)}<small>°C</small> <span class="bx-tr">${trend(n.asph,p30.asph)}</span></div><div class="s">tra 30 min ${fmt(p30.asph,0)} °C · aria ${fmt(n.ta,0)} °C</div>`)}
    ${tile(best==='RAIN'?'rain':'slick','Gomma',`<div class="bx-tyre">${c?tyreIcon(tyreCol(c),64):''}<div><div class="v">${best}</div><div class="s">${c?esc(c.brand+' '+c.slick):''}</div></div></div><div class="s">slick ${fmtS(L.slick)} · rain ${fmtS(L.rain)} al giro</div>`)}
@@ -1526,7 +1533,7 @@ const DASH=[
  ['Meteo e radar',[
   ['nowc','#nowc','Nowcast radar · prossimi 60 minuti','pioggia minuto per minuto in pista',1,1],
   ['nubi','#cl-box','Nubi dal satellite','copertura del cielo prossime 2 ore',0,1],
-  ['mtx','#mtx','Matrice sensori 2048','il cerchio radar intorno alla pista',1,1],
+  ['mtx','#mtx','Matrice sensori','Amatore 128 occhi · Team Pro 2048 occhi',1,1],
   ['tbar','#tbar','Linea del tempo animata','le prossime ore con il pulsante Play',1,1],
   ['strip','#strip','Striscia ora per ora','meteo delle prossime ore a colpo d\'occhio',1,1],
   ['asph','#asphcard','Asfalto e aria · 12 ore','grafico delle temperature',1,1],
@@ -1541,7 +1548,7 @@ const DASH=[
   ['st','#stcard','Stazione meteo in pista','i tuoi sensori collegati',0,1]]]];
 const DMODE=()=>store.get('tc_mode','')||'pro';
 function dashState(m){const def={};DASH.forEach(([,it])=>it.forEach(x=>def[x[0]]=!!x[m==='am'?4:5]));return Object.assign(def,store.get('tc_dash_'+m,{}));}
-function applyDash(){const m=DMODE(),st=dashState(m);document.body.classList.toggle('mode-am',m==='am');document.body.classList.toggle('mode-pro',m!=='am');
+function applyDash(){const m=DMODE(),st=dashState(m);document.body.classList.toggle('mode-am',m==='am');document.body.classList.toggle('mode-pro',m!=='am');mtxRes();
   document.querySelectorAll('#modesw button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
   let firstTab=null;DASH.forEach(([,it])=>it.forEach(([k,sel])=>{const on=st[k];
     if(sel.startsWith('tab:')){const t=sel.slice(4),b=document.querySelector(`#pt-tabs [data-t="${t}"]`);if(b)b.classList.toggle('dash-off',!on);if(on&&!firstTab)firstTab=t;if(!on&&typeof PT!=='undefined'&&PT.tab===t)PT._hide=1;}
@@ -1794,7 +1801,7 @@ async function runCloudcast(){const my=++CL.seq,t=CUR;const st=$('cl-status');if
     // clouds seen by each sensor of the matrix
     const sens={};MTX_RINGS.forEach((km,ri)=>{for(let di=0;di<MTX_DIRS;di++){const b=di*360/MTX_DIRS*Math.PI/180,x=f0.tx+Math.sin(b)*km/f0.kmx,y=f0.ty+ny*Math.cos(b)*km/f0.kmy;sens[ri*MTX_DIRS+di]=at(x,y,Math.max(1,km*0.15/f0.kmx));}});
     const pStorm=Math.max(...leads.map(l=>l.ps));if(storm)storm.p=pStorm;
-    if(my!==CL.seq)return;CL.res={ms:frames[0].ms,leads,storm,ens:ens.length,speed:sp*6,from:(Math.atan2(-vkx,-vky)*180/Math.PI+360)%360,ta,sens,n:frames.length,step};CL.frames=frames;CL.f0=f0;
+    if(my!==CL.seq)return;CL.res={dirs:MTX_DIRS,ms:frames[0].ms,leads,storm,ens:ens.length,speed:sp*6,from:(Math.atan2(-vkx,-vky)*180/Math.PI+360)%360,ta,sens,n:frames.length,step};CL.frames=frames;CL.f0=f0;
     renderClouds();if($('cl-show').checked)drawCloudLayer();renderMatrix();try{checkAlerts();}catch(e){}
     if(WX){SIM=simulate(WX);const c=store.get('tc_calib_'+t.id,null);if(c&&Date.now()-c.ts<4*3600e3)applyCalib(c);renderWeather();}
   }catch(e){if(my!==CL.seq)return;CL.res=null;$('cl-main').textContent='Nubi da satellite non disponibili ora';$('cl-sub').textContent='Il calcolo del sole usa i modelli meteo.';st.textContent='Motivo: '+e.message;}}
