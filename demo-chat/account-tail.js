@@ -6,3 +6,10 @@
    $('ac-demo-in').onclick=async()=>{const m=$('ac-msg');m.textContent='Accesso…';const{error}=await ACCT.sb.auth.signInWithPassword({});if(error)m.innerHTML='<span class="err">'+esc(error.message)+'</span>';};}
   B.querySelectorAll('a[href^="demo-portal"]').forEach(a=>{a.textContent='Disdici il Pro di prova';a.removeAttribute('target');a.onclick=ev=>{ev.preventDefault();window.open('demo-portal');};});};
  window.__demoHooks={refreshPlan:()=>refreshPlan(),renderAcct:()=>renderAcct()};}
+// Prototipo in chat: se il radar vero non è raggiungibile, la matrice mostra un temporale d'esempio (così si può provare l'interazione)
+setInterval(()=>{try{if(!CUR||(NC.res&&!NC.res.demo&&NC.res.sens))return;if(NC.res&&NC.res.demo&&NC.res.dirs===MTX_DIRS)return;
+  const sens=[],ad=(a,b)=>Math.abs(((a-b+540)%360)-180);MTX_RINGS.forEach((km,ri)=>{for(let di=0;di<MTX_DIRS;di++){const brg=di*360/MTX_DIRS,a=ad(brg,270);
+    let v=6*Math.exp(-Math.pow((km-18)/6,2))*Math.exp(-Math.pow(a/38,2))+2.5*Math.exp(-Math.pow((km-38)/5,2))*Math.exp(-Math.pow(ad(brg,215)/22,2));v=Math.round(v*10)/10;
+    const hit=v>=0.2&&a<16&&km>3;sens.push({ri,di,brg,km,v,p:Math.min(1,v/4+0.3),tr:((di*7+ri*3)%10-4.5)/5,hit,eta:hit?km/19*60:null});}});
+  NC.res={demo:true,dirs:MTX_DIRS,sens,ms:Date.now(),moving:true,speed:19,from:270,n:1};renderMatrix();
+  const l=document.getElementById('mtx-l');if(l)l.innerHTML+='<br><span class="sub" style="margin:0">🧪 Temporale d\'esempio: nel prototipo in chat il radar vero non è raggiungibile.</span>';}catch(e){}},6000);

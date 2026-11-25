@@ -930,7 +930,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='25/11/2026 12:50';
+const TC_VER='25/11/2026 13:00';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1004,6 +1004,7 @@ function mtxCellPath(ctx,s,f){const{C,k,R0,RS}=MTXA,[a0,a1]=mtxCellAng(s),ri0=(R
 function mtxCellAt(ev){const cv=$('mtxb-c'),r=cv.getBoundingClientRect(),f=$('mtx-c').width/r.width,X=(ev.clientX-r.left)*f,Y=(ev.clientY-r.top)*f,{C,R0,RS,Rout}=MTXA;
   const dx=X-C,dy=Y-C,d=Math.hypot(dx,dy);if(d<R0)return'center';if(d>Rout)return null;const ri=Math.floor((d-R0)/RS);let brg=(Math.atan2(dy,dx)*180/Math.PI+90+360)%360;const di=Math.round(brg/(360/MTX_DIRS))%MTX_DIRS;
   return(NC.res&&NC.res.sens||[]).find(s=>s.ri===ri&&s.di===di)||null;}
+const mtxEta=s=>Math.max(1,Math.round(s.eta-(NC.res&&NC.res.ms?(Date.now()-NC.res.ms)/60e3:0)));
 const mtxCat=v=>v>=32?'nubifragio':v>=16?'molto forte':v>=4?'forte':v>=1?'moderata':'debole';
 function mtxCellHtml(s){if(s==='center')return`<b>🏁 ${esc(CUR?CUR.name:'Pista')}</b><div class="sub" style="margin:4px 0 0">Il centro della matrice è la pista.</div>`;
   const km0=s.ri?MTX_RINGS[s.ri-1]:0,cl=CL.res&&CL.res.sens&&CL.res.dirs===MTX_DIRS?CL.res.sens[s.ri*MTX_DIRS+s.di]:null;
@@ -1012,7 +1013,7 @@ function mtxCellHtml(s){if(s==='center')return`<b>🏁 ${esc(CUR?CUR.name:'Pista
   const wet=s.v>=0.2;h+=`<div class="r"><span>Pioggia</span><b>${wet?`${fmt(s.v,1)} mm/h · ${mtxCat(s.v)}`:'asciutto'}</b></div>`;
   if(wet&&s.p!=null)h+=`<div class="r"><span>Copertura della cella</span><b>${Math.round(Math.min(1,s.p)*100)}%</b></div>`;
   if(wet&&Math.abs(s.tr)>0.4)h+=`<div class="r"><span>Tendenza</span><b>${s.tr>0?'▲ si rinforza':'▼ si indebolisce'}</b></div>`;
-  if(s.hit&&s.eta!=null)h+=`<div class="r"><span>🎯 In rotta verso la pista</span><b>arriva tra ~${Math.max(1,Math.round(s.eta))} min</b></div>`;else if(wet)h+=`<div class="r"><span>Verso la pista</span><b>no, passa di lato o si allontana</b></div>`;
+  if(s.hit&&s.eta!=null)h+=`<div class="r"><span>🎯 In rotta verso la pista</span><b>arriva tra ~${mtxEta(s)} min</b></div>`;else if(wet)h+=`<div class="r"><span>Verso la pista</span><b>no, passa di lato o si allontana</b></div>`;
   if(cl!=null)h+=`<div class="r"><span>☁️ Nubi (satellite)</span><b>${Math.round(cl*100)}%</b></div>`;return h;}
 function mtxBigDraw(src){const cv=$('mtxb-c'),ctx=cv.getContext('2d'),W=cv.width,f=W/src.width,{C,Rout}=MTXA,sens=NC.res&&NC.res.sens||[];ctx.clearRect(0,0,W,W);ctx.drawImage(src,0,0,W,W);
   if(MTXB.hit||MTXB.wet){ctx.save();ctx.fillStyle='rgba(4,8,14,.72)';ctx.beginPath();ctx.arc(C*f,C*f,Rout*f,0,7);ctx.fill();ctx.restore();
@@ -1020,7 +1021,7 @@ function mtxBigDraw(src){const cv=$('mtxb-c'),ctx=cv.getContext('2d'),W=cv.width
   const ring=(s,col,w)=>{if(!s||s==='center')return;mtxCellPath(ctx,s,f);ctx.strokeStyle=col;ctx.lineWidth=w;ctx.stroke();};
   ring(MTXB.hov,'rgba(255,255,255,.85)',2);ring(MTXB.sel,'#5ad1ff',3.5);}
 function mtxTop(){const sens=(NC.res&&NC.res.sens||[]).filter(s=>!s.off&&s.v>=0.2).sort((a,b)=>(b.hit-a.hit)||(b.v-a.v)).slice(0,8);
-  $('mtxb-top').innerHTML=sens.length?sens.map((s,i)=>{const c=tcColor(s.v)||[120,200,255,200];return`<button class="mtxb-top" data-i="${i}"><i style="background:rgb(${c[0]|0},${c[1]|0},${c[2]|0})"></i><span style="flex:1">${dir8(s.brg)} · ${fmt(s.km,0)} km · ${fmt(s.v,1)} mm/h</span>${s.hit?`<b style="color:#5ad1ff">🎯 ${Math.max(1,Math.round(s.eta))}'</b>`:''}</button>`;}).join(''):'<div class="sub" style="margin:4px 0 0">Nessuna pioggia nei 50 km.</div>';
+  $('mtxb-top').innerHTML=sens.length?sens.map((s,i)=>{const c=tcColor(s.v)||[120,200,255,200];return`<button class="mtxb-top" data-i="${i}"><i style="background:rgb(${c[0]|0},${c[1]|0},${c[2]|0})"></i><span style="flex:1">${dir8(s.brg)} · ${fmt(s.km,0)} km · ${fmt(s.v,1)} mm/h</span>${s.hit?`<b style="color:#5ad1ff">🎯 ${mtxEta(s)}'</b>`:''}</button>`;}).join(''):'<div class="sub" style="margin:4px 0 0">Nessuna pioggia nei 50 km.</div>';
   $('mtxb-top').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{MTXB.sel=sens[+b.dataset.i];$('mtxb-info').innerHTML=mtxCellHtml(MTXB.sel);});}
 function openMtxBig(){const m=$('mtxbig');m.style.display='flex';$('mtxb-trk').textContent=CUR?CUR.name:'';$('mtxb-sum').innerHTML=$('mtx-l').innerHTML||'—';
   if(!NC.res||!NC.res.sens){$('mtxb-top').innerHTML='';$('mtxb-info').innerHTML=`<b>Radar non ancora pronto</b><div class="sub" style="margin:4px 0 0">${CUR?'Sto aspettando i dati del radar per questa pista (servono pochi secondi; nel prototipo in chat il radar può non essere disponibile). Appena arrivano, le celle si accendono qui.':'Scegli prima una pista: la matrice si accende intorno alla pista scelta.'}</div>`;
