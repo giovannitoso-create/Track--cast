@@ -190,6 +190,10 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 .mtxb-side{display:flex;flex-direction:column;gap:10px}.mtxb-ctl{display:flex;gap:6px;flex-wrap:wrap}.mtxb-ctl .on{background:var(--rain);color:#fff;border-color:var(--rain)}
 .mtxb-card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px}.mtxb-tip .r,.mtxb-card .r{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-top:1px dashed var(--line)}.mtxb-card .r span,.mtxb-tip .r span{color:var(--ink3)}
 .mtxb-top{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;border-top:1px dashed var(--line);color:var(--ink);padding:6px 0;cursor:pointer;font:inherit}.mtxb-top i{width:12px;height:12px;border-radius:3px;flex:none}
+.seg{display:flex;gap:3px;background:var(--surface2);border:1px solid var(--line2);border-radius:999px;padding:3px;flex-wrap:wrap}.seg button{border:0;background:none;color:var(--ink2);font:600 12.5px Inter,system-ui,-apple-system,sans-serif;padding:6px 11px;border-radius:999px;cursor:pointer}.seg button.on{background:var(--ink);color:var(--bg)}
+.acw{position:relative}.acw svg{width:100%;height:auto;display:block;touch-action:pan-y}.actip{position:absolute;top:6px;z-index:3;pointer-events:none;background:rgba(6,12,22,.94);border:1px solid #2a4468;border-radius:10px;padding:7px 10px;font-size:12.5px;color:#e3f0ff;min-width:150px;box-shadow:0 6px 20px rgba(0,0,0,.45)}
+.actip b{color:#fff}.actip .r{display:flex;justify-content:space-between;gap:12px}.actip .r span{color:var(--ink3)}
+.ac-leg{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:var(--ink2)}.ac-leg i{display:inline-block;width:18px;height:0;border-top:3px solid;vertical-align:middle;margin-right:6px}.ac-leg i.box{height:10px;border:0;border-radius:3px}
 .mdl{position:fixed;inset:0;background:rgba(3,6,12,.78);display:none;align-items:flex-start;justify-content:center;z-index:5500;padding:14px;overflow:auto}
 .mdl .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;padding:18px;margin:20px 0}
 .mdl input,.mdl select{background:#0f1622;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 10px;font:inherit}.mdl input:focus,.mdl select:focus{outline:none;border-color:#ffb547}.mdl h3{margin:0 0 4px}.mdl label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink2);margin:8px 0}.mdl input{width:100%;box-sizing:border-box}
@@ -533,6 +537,9 @@ input,select,textarea{font-size:15px}
   </div>
 </div>
 
+<div class="card" id="aircard"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">📈 Asfalto e aria · grafici</h2>
+  <div class="seg" id="ac-tabs"><button data-g="h48" class="on">48 ore</button><button data-g="sun">Sole sull'asfalto</button><button data-g="dew">Umidità e condensa</button><button data-g="rho">Densità aria</button><button data-g="week">Giorni</button></div></div>
+  <div class="sub" id="ac-sub" style="margin:8px 0 6px"></div><div class="acw" id="ac-w"><div id="ac-svg"></div><div class="actip" id="ac-tip" hidden></div></div><div class="ac-leg" id="ac-leg"></div></div>
 <div class="row3">
   <div class="card" id="procard"><div id="pt-lock" style="display:none"><h3 style="margin:0 0 6px">🔒 Strumenti Pro</h3><div class="sub" style="margin:0 0 10px">Strategia slick/rain, dossier del weekend, storico e calendario, assetto e carburazione, analisi giri, schermo box, avvisi al team e report di gara.</div><button class="btn primary" id="pt-gopro">⭐ Passa a Pro</button></div>
     <div id="pt-body"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">⭐ Strumenti Pro</h3></div>
@@ -952,7 +959,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='26/11/2026 10:40';
+const TC_VER='26/11/2026 11:20';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1026,6 +1033,60 @@ function mtxPaintFrame(ctx,S,t,ang){const{C,k,R0,Rout,W}=S;ctx.clearRect(0,0,W,W
   ctx.font=`${13*k}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🏁',C,C+1*k);}
 (()=>{const cv=document.getElementById('mtx-c');if(cv&&'IntersectionObserver' in window)new IntersectionObserver(e=>{MTXA.vis=e[0].isIntersecting;}).observe(cv);})();
 const dir8=d=>['N','NE','E','SE','S','SO','O','NO'][Math.round(d/45)%8];
+// ---------- Grafici in più su asfalto e aria ----------
+const AC={g:'h48'};
+const dewPt=(t,rh)=>{const a=17.62,b=243.12,g=Math.log(Math.max(1,rh)/100)+a*t/(b+t);return b*g/(a-g);};
+function acHourly(from,hours){const S=SIM&&SIM.S;if(!S)return[];const out=[];const t0=S[Math.max(0,from)].ts;for(let i=Math.max(0,from);i<S.length;i++){const p=S[i];if((p.ts-t0)%3600e3===0)out.push(p);if(p.ts-t0>hours*3600e3)break;}return out;}
+function acSVG(P,o){// P: punti orari; o:{series:[{k,col,dash,w}],bars:{k,col},band:[lo,hi,col],yfmt,ref,tip}
+  const W=900,H=260,L=58,R=18,T=14,B=30,x0=L,x1=W-R,y0=T,y1=H-B,n=P.length;if(n<2)return'<div class="sub">Dati non ancora disponibili.</div>';
+  const vals=[];(o.series||[]).forEach(se=>P.forEach(p=>{const v=se.f(p);if(isFinite(v))vals.push(v);}));if(o.bars)P.forEach(p=>{const v=o.bars.f(p);if(isFinite(v))vals.push(v,0);});if(o.ref!=null)vals.push(o.ref);
+  let lo=Math.min(...vals),hi=Math.max(...vals);const st=o.step||((hi-lo)>30?10:(hi-lo)>12?5:(hi-lo)>5?2:1);lo=Math.floor(lo/st)*st;hi=Math.ceil(hi/st)*st;if(hi===lo)hi+=st;
+  const X=i=>x0+(x1-x0)*i/(n-1),Y=v=>y1-(y1-y0)*(v-lo)/(hi-lo);let g='';
+  // notte (sole sotto l'orizzonte) in grigio
+  P.forEach((p,i)=>{if(i<n-1&&!(p.sw>5)){g+=`<rect x="${X(i)}" y="${y0}" width="${X(i+1)-X(i)+0.5}" height="${y1-y0}" fill="rgba(120,140,180,.07)"/>`;}});
+  for(let v=lo;v<=hi+1e-9;v+=st){g+=`<line x1="${x0}" x2="${x1}" y1="${Y(v)}" y2="${Y(v)}" stroke="rgba(255,255,255,.07)"/><text x="${x0-6}" y="${Y(v)+4}" fill="#9aa8ba" font-size="12" text-anchor="end">${o.yfmt?o.yfmt(v):v}</text>`;}
+  P.forEach((p,i)=>{const h=p.label.slice(11,13);if(h==='00'||(n<=30&&+h%3===0)||(n>30&&+h%6===0)){g+=`<text x="${X(i)}" y="${H-10}" fill="${h==='00'?'#e8edf3':'#7f91aa'}" font-size="12" font-weight="${h==='00'?700:400}" text-anchor="middle">${h==='00'?lblDay(p.label).split(' ')[0]:h+':00'}</text>`;}});
+  if(o.band){const[a,b,c,lab]=o.band;g+=`<rect x="${x0}" y="${Y(Math.min(b,hi))}" width="${x1-x0}" height="${Math.max(0,Y(Math.max(a,lo))-Y(Math.min(b,hi)))}" fill="${c}"/>${lab?`<text x="${x1-6}" y="${Y(Math.min(b,hi))+14}" fill="#9aa8ba" font-size="11" text-anchor="end">${lab}</text>`:''}`;}
+  if(o.ref!=null)g+=`<line x1="${x0}" x2="${x1}" y1="${Y(o.ref)}" y2="${Y(o.ref)}" stroke="rgba(255,255,255,.35)" stroke-dasharray="4 4"/>`;
+  if(o.fill)g+=o.fill(P,X,Y);
+  if(o.bars){const bw=Math.max(2,(x1-x0)/n*0.7);P.forEach((p,i)=>{const v=o.bars.f(p);if(!isFinite(v))return;g+=`<rect x="${X(i)-bw/2}" y="${Math.min(Y(v),Y(0))}" width="${bw}" height="${Math.abs(Y(v)-Y(0))}" rx="2" fill="${o.bars.col(v,p)}"/>`;});}
+  (o.series||[]).forEach(se=>{const pts=P.map((p,i)=>{const v=se.f(p);return isFinite(v)?`${X(i).toFixed(1)},${Y(v).toFixed(1)}`:null;}).filter(Boolean).join(' ');g+=`<polyline fill="none" stroke="${se.col}" stroke-width="${se.w||2.6}" stroke-linejoin="round" ${se.dash?`stroke-dasharray="${se.dash}"`:''} points="${pts}"/>`;
+    if(se.ext){let mi=0,ma=0;P.forEach((p,i)=>{if(se.f(p)<se.f(P[mi]))mi=i;if(se.f(p)>se.f(P[ma]))ma=i;});[[ma,'max',-10],[mi,'min',se.dash?-12:20]].forEach(([i,t,dy])=>{g+=`<circle cx="${X(i)}" cy="${Y(se.f(P[i]))}" r="4.5" fill="${se.col}" stroke="#0b1220" stroke-width="2"/><text x="${X(i)}" y="${Y(se.f(P[i]))+dy}" fill="${se.col}" font-size="12.5" font-weight="800" text-anchor="middle">${fmt(se.f(P[i]),0)}°</text>`;});}});
+  g+=`<line id="ac-cur" x1="0" x2="0" y1="${y0}" y2="${y1}" stroke="rgba(255,255,255,.5)" stroke-dasharray="3 3" visibility="hidden"/><rect id="ac-hit" x="${x0}" y="${y0}" width="${x1-x0}" height="${y1-y0}" fill="transparent"/>`;
+  AC.geo={x0,x1,n,W,P,tip:o.tip};return`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${g}</svg>`;}
+function renderAirCharts(){const host=$('ac-svg');if(!host)return;if(!SIM||!SIM.S){host.innerHTML='<div class="sub">Scegli una pista.</div>';return;}
+  const ni=SIM.ni,sub=$('ac-sub'),leg=$('ac-leg'),A='#ec8a2e',Ar='#6f9fd8';let html='';
+  if(AC.g==='h48'){const P=acHourly(ni,48);sub.textContent='Asfalto e aria nelle prossime 48 ore. Le zone ombreggiate sono la notte; i pallini segnano massima e minima.';
+    html=acSVG(P,{series:[{f:p=>p.ta,col:Ar,dash:'7 5',ext:1},{f:p=>p.asph,col:A,w:3,ext:1}],yfmt:v=>v+'°',tip:p=>`<div class="r"><span>Asfalto</span><b>${fmt(p.asph,1)} °C</b></div><div class="r"><span>Aria</span><b>${fmt(p.ta,1)} °C</b></div><div class="r"><span>Nubi</span><b>${Math.round(p.cc||0)}%</b></div>`});
+    leg.innerHTML=`<span><i style="border-color:${A}"></i>Asfalto</span><span><i style="border-color:${Ar};border-top-style:dashed"></i>Aria</span><span><i class="box" style="background:rgba(120,140,180,.25)"></i>Notte</span>`;}
+  else if(AC.g==='sun'){const P=acHourly(ni,24);sub.textContent='Di quanti gradi il sole scalda l\'asfalto rispetto all\'aria, ora per ora. Barre alte = pista molto più calda dell\'aria (più grip, gomme che salgono prima in temperatura); sotto lo zero = asfalto più freddo dell\'aria (notte, sera).';
+    html=acSVG(P,{bars:{f:p=>p.asph-p.ta,col:v=>v>15?'#ff7a1a':v>8?'#ffb547':v>2?'#ffd98a':v>=0?'#8aa4c8':'#5b7fb8'},ref:0,yfmt:v=>(v>0?'+':'')+v+'°',
+      tip:p=>`<div class="r"><span>Asfalto − aria</span><b>${p.asph-p.ta>=0?'+':''}${fmt(p.asph-p.ta,1)} °C</b></div><div class="r"><span>Sole</span><b>${Math.round(p.sw||0)} W/m²</b></div><div class="r"><span>Nubi</span><b>${Math.round(p.cc||0)}%</b></div>`});
+    leg.innerHTML=`<span><i class="box" style="background:#ff7a1a"></i>oltre +15°</span><span><i class="box" style="background:#ffb547"></i>+8…15°</span><span><i class="box" style="background:#ffd98a"></i>+2…8°</span><span><i class="box" style="background:#8aa4c8"></i>0…+2°</span><span><i class="box" style="background:#5b7fb8"></i>asfalto più freddo</span>`;}
+  else if(AC.g==='dew'){const P=acHourly(ni,24);sub.textContent='Se l\'asfalto scende vicino al punto di rugiada si forma umidità sulla pista anche senza pioggia (mattino presto, sera): la pista resta "unta" e il grip cala. La fascia rossa segna quando succede.';
+    html=acSVG(P,{series:[{f:p=>dewPt(p.ta,p.rh),col:'#5ad1ff',dash:'6 4'},{f:p=>p.asph,col:A,w:3}],yfmt:v=>v+'°',
+      fill:(P,X,Y)=>P.map((p,i)=>i<P.length-1&&p.asph-dewPt(p.ta,p.rh)<2?`<rect x="${X(i)}" y="12" width="${X(i+1)-X(i)+0.5}" height="218" fill="rgba(255,80,80,.16)"/>`:'').join(''),
+      tip:p=>{const d=dewPt(p.ta,p.rh),m=p.asph-d;return`<div class="r"><span>Asfalto</span><b>${fmt(p.asph,1)} °C</b></div><div class="r"><span>Punto di rugiada</span><b>${fmt(d,1)} °C</b></div><div class="r"><span>Umidità</span><b>${Math.round(p.rh)}%</b></div><div class="r"><span>Margine</span><b style="color:${m<2?'#ff8a80':'#6fe3a0'}">${fmt(m,1)}°${m<2?' · pista umida':''}</b></div>`;}});
+    leg.innerHTML=`<span><i style="border-color:${A}"></i>Asfalto</span><span><i style="border-color:#5ad1ff;border-top-style:dashed"></i>Punto di rugiada</span><span><i class="box" style="background:rgba(255,80,80,.4)"></i>Rischio pista umida</span>`;}
+  else if(AC.g==='rho'){const P=acHourly(ni,48);sub.textContent='Densità dell\'aria rispetto all\'aria standard (100%). Aria più densa = più ossigeno nel motore: più potenza e carburazione che si smagrisce. Aria più leggera = il contrario.';
+    html=acSVG(P,{series:[{f:p=>(p.air||airDensity(p)).pct,col:'#a78bfa',w:3}],band:[99,101,'rgba(255,255,255,.05)','normale'],yfmt:v=>v+'%',step:1,
+      tip:p=>{const d=p.air||airDensity(p);return`<div class="r"><span>Densità</span><b>${fmt(d.pct,1)}%</b></div><div class="r"><span></span><b>${fmt(d.rho,3)} kg/m³</b></div><div class="r"><span>Aria · pressione</span><b>${fmt(p.ta,0)}° · ${Math.round(p.ps)} hPa</b></div>`;}});
+    leg.innerHTML=`<span><i style="border-color:#a78bfa"></i>Densità aria</span><span><i class="box" style="background:rgba(255,255,255,.15)"></i>fascia normale 99–101%</span>`;}
+  else{const S=SIM.S,days={};S.forEach(p=>{if(p.ts<S[ni].ts-12*3600e3)return;const d=p.label.slice(0,10);const o=days[d]||(days[d]={d,amin:99,amax:-99,tmin:99,tmax:-99,lab:p.label});o.amin=Math.min(o.amin,p.asph);o.amax=Math.max(o.amax,p.asph);o.tmin=Math.min(o.tmin,p.ta);o.tmax=Math.max(o.tmax,p.ta);});
+    const D=Object.values(days).slice(0,10);sub.textContent='Escursione giorno per giorno: la barra arancione va dalla minima alla massima dell\'asfalto, quella blu dell\'aria.';
+    const W=900,H=280,L=44,x0=L,x1=W-14,y0=12,y1=H-34,lo=Math.floor(Math.min(...D.map(d=>Math.min(d.amin,d.tmin)))/5)*5,hi=Math.ceil(Math.max(...D.map(d=>d.amax))/5)*5,Y=v=>y1-(y1-y0)*(v-lo)/((hi-lo)||5),cw=(x1-x0)/D.length;let g='';
+    for(let v=lo;v<=hi;v+=5)g+=`<line x1="${x0}" x2="${x1}" y1="${Y(v)}" y2="${Y(v)}" stroke="rgba(255,255,255,.07)"/><text x="${x0-6}" y="${Y(v)+4}" fill="#9aa8ba" font-size="12" text-anchor="end">${v}°</text>`;
+    D.forEach((d,i)=>{const cx=x0+cw*(i+0.5);g+=`<rect x="${cx-cw*0.22}" y="${Y(d.amax)}" width="${cw*0.2}" height="${Math.max(2,Y(d.amin)-Y(d.amax))}" rx="5" fill="${A}"/><rect x="${cx+cw*0.02}" y="${Y(d.tmax)}" width="${cw*0.2}" height="${Math.max(2,Y(d.tmin)-Y(d.tmax))}" rx="5" fill="${Ar}"/>
+      <text x="${cx-cw*0.12}" y="${Y(d.amax)-6}" fill="${A}" font-size="12" font-weight="800" text-anchor="middle">${Math.round(d.amax)}°</text><text x="${cx+cw*0.12}" y="${Y(d.tmax)-6}" fill="#9fc6ff" font-size="12" font-weight="700" text-anchor="middle">${Math.round(d.tmax)}°</text>
+      <text x="${cx}" y="${H-12}" fill="#e8edf3" font-size="12.5" font-weight="700" text-anchor="middle">${lblDay(d.lab).split(' ').slice(0,2).join(' ')}</text>`;});
+    html=`<svg viewBox="0 0 ${W} ${H}">${g}</svg>`;AC.geo=null;leg.innerHTML=`<span><i class="box" style="background:${A}"></i>Asfalto min–max</span><span><i class="box" style="background:${Ar}"></i>Aria min–max</span>`;}
+  host.innerHTML=html;$('ac-tip').hidden=true;
+  const svg=host.querySelector('svg'),hit=host.querySelector('#ac-hit');if(!svg||!hit||!AC.geo)return;
+  const mv=e=>{const r=svg.getBoundingClientRect(),G=AC.geo,sx=(e.clientX-r.left)*G.W/r.width,i=Math.max(0,Math.min(G.n-1,Math.round((sx-G.x0)/(G.x1-G.x0)*(G.n-1)))),p=G.P[i],x=G.x0+(G.x1-G.x0)*i/(G.n-1);
+    const cur=host.querySelector('#ac-cur');cur.setAttribute('x1',x);cur.setAttribute('x2',x);cur.setAttribute('visibility','visible');
+    const tip=$('ac-tip');tip.innerHTML=`<b>${lblDay(p.label)} ${p.label.slice(11,16)}</b>`+G.tip(p);tip.hidden=false;const px=x*r.width/G.W;tip.style.left=Math.min(r.width-tip.offsetWidth-4,Math.max(4,px+12))+'px';};
+  svg.addEventListener('pointermove',mv);svg.addEventListener('pointerdown',mv);svg.addEventListener('pointerleave',()=>{$('ac-tip').hidden=true;const c=host.querySelector('#ac-cur');c&&c.setAttribute('visibility','hidden');});}
+$('ac-tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;AC.g=b.dataset.g;document.querySelectorAll('#ac-tabs button').forEach(x=>x.classList.toggle('on',x===b));renderAirCharts();};
 // ---------- Matrice ingrandita e interattiva ----------
 const MTXB={sel:null,hov:null,hit:false,wet:false,on:false,W:0,g:{}};
 function mtxCellAng(s){const D=MTX_DIRS,gap=Math.PI/D*0.10;return[(s.brg-90-360/D/2)*Math.PI/180+gap,(s.brg-90+360/D/2)*Math.PI/180-gap];}
@@ -1876,6 +1937,7 @@ const DASH=[
   ['tbar','#tbar','Linea del tempo animata','le prossime ore con il pulsante Play',1,1],
   ['strip','#strip','Striscia ora per ora','meteo delle prossime ore a colpo d\'occhio',1,1],
   ['asph','#asphcard','Asfalto e aria · 12 ore','grafico delle temperature',1,1],
+  ['airg','#aircard','Asfalto e aria · grafici','48 ore, sole, condensa, densità aria, giorni',1,1],
   ['mod','#modcard','Modelli a confronto','quanto sono d\'accordo i modelli meteo',0,1]]],
  ['Strumenti',[
   ['t_strat','tab:strat','Slick o rain · strategia','',1,1],['t_weekend','tab:weekend','Dossier del weekend','',0,1],['t_storico','tab:storico','Storico meteo','',1,1],
@@ -2654,7 +2716,7 @@ function renderNow(){
   applyStationToUI();
 }
 let TSEL=null,tbTimer=null;
-function renderWeather(){setTimeout(()=>{try{renderWkCard();}catch(e){}},0);
+function renderWeather(){setTimeout(()=>{try{renderWkCard();}catch(e){}try{renderAirCharts();}catch(e){}},0);
   if(!WX||!SIM)return;const S=SIM.S,ni=SIM.ni;
   // session options
   const sel=$('sstart');const prev=sel.value;sel.innerHTML='';
