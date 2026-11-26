@@ -188,7 +188,7 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 .mtxb-cw canvas{width:100%;height:100%;display:block;border-radius:50%;cursor:crosshair;touch-action:manipulation}
 .mtxb-tip{position:absolute;z-index:3;pointer-events:none;min-width:170px;max-width:240px;background:rgba(6,12,22,.94);border:1px solid #2a4468;border-radius:10px;padding:8px 10px;font-size:12.5px;color:#e3f0ff;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 .mtxb-side{display:flex;flex-direction:column;gap:10px}.mtxb-ctl{display:flex;gap:6px;flex-wrap:wrap}.mtxb-ctl .on{background:var(--rain);color:#fff;border-color:var(--rain)}
-.mtxb-card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px}.mtxb-card .r{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-top:1px dashed var(--line)}.mtxb-card .r span{color:var(--ink3)}
+.mtxb-card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px}.mtxb-tip .r,.mtxb-card .r{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-top:1px dashed var(--line)}.mtxb-card .r span,.mtxb-tip .r span{color:var(--ink3)}
 .mtxb-top{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;border-top:1px dashed var(--line);color:var(--ink);padding:6px 0;cursor:pointer;font:inherit}.mtxb-top i{width:12px;height:12px;border-radius:3px;flex:none}
 .mdl{position:fixed;inset:0;background:rgba(3,6,12,.78);display:none;align-items:flex-start;justify-content:center;z-index:5500;padding:14px;overflow:auto}
 .mdl .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;padding:18px;margin:20px 0}
@@ -628,7 +628,7 @@ input,select,textarea{font-size:15px}
   </div></div></div>
 <div class="mdl" id="acct"><div class="box"><div style="display:flex;align-items:center;gap:8px"><h3>👤 Il tuo account</h3><button class="chipb" id="acct-x" style="margin-left:auto">Chiudi</button></div><div id="acct-body"></div></div></div>
 <div class="mdl" id="mtxbig"><div class="box mtxb"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">📡 Matrice sensori · <span class="mtx-n">2048</span> occhi</h3><span class="sub" id="mtxb-trk" style="margin:0"></span><button class="chipb" id="mtxb-x" style="margin-left:auto">Chiudi</button></div>
-<div class="mtxb-g"><div class="mtxb-cw"><canvas id="mtxb-c" width="900" height="900"></canvas><div id="mtxb-tip" class="mtxb-tip" hidden></div></div>
+<div class="mtxb-g"><div class="mtxb-cw"><canvas id="mtxb-c" width="1600" height="1600"></canvas><div id="mtxb-tip" class="mtxb-tip" hidden></div></div>
 <div class="mtxb-side"><div class="mtxb-ctl"><button class="chipb" id="mtxb-pause">⏸ Ferma il fascio</button><button class="chipb" id="mtxb-hit">🎯 Solo celle in rotta</button><button class="chipb" id="mtxb-wet">🌧️ Solo pioggia</button></div>
 <div class="mtxb-card" id="mtxb-info"><b>Tocca una cella</b><div class="sub" style="margin:4px 0 0">Ogni spicchio è un sensore: tocca o passa sopra per vedere direzione, distanza, intensità, se si rinforza e se sta arrivando in pista.</div></div>
 <div class="mtxb-card"><b>Riepilogo</b><div id="mtxb-sum" class="sub" style="margin:4px 0 0"></div></div>
@@ -952,15 +952,25 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='26/11/2026 10:10';
+const TC_VER='26/11/2026 10:40';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
-function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)return;const W=cv.width,C=W/2,k=W/460;
+function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)return;const W=cv.width;
   if(!r||!r.sens){cancelAnimationFrame(MTXA.raf);MTXA.raf=0;cv.getContext('2d').clearRect(0,0,W,W);if(!CUR)mtxMsg('Scegli una pista (cerca il nome o tocca un puntino sulla mappa): la matrice si accende intorno alla pista scelta.');return;}
-  const B=MTXA.base&&MTXA.base.width===W?MTXA.base:Object.assign(document.createElement('canvas'),{width:W,height:W});MTXA.base=B;
+  mtxPaint(W,MTXA);if(MTXB.on&&MTXB.W)mtxPaint(MTXB.W,MTXB.g);
+  if(!MTXA.raf)MTXA.raf=requestAnimationFrame(mtxFrame);
+  const live=r.sens.filter(s=>!s.off),wet=live.filter(s=>s.v>=0.2),hit=wet.filter(s=>s.hit).sort((a,b)=>a.eta-b.eta),up=wet.filter(s=>s.tr>0.4).length,dn=wet.filter(s=>s.tr<-0.4).length;
+  let h=`<b>${wet.length}</b> sensori su ${live.length} vedono pioggia`;
+  if(hit.length){const f=hit[Math.min(hit.length-1,hit.length>=5?2:0)],mx=hit.reduce((a,s)=>s.v>a.v?s:a,hit[0]);h+=`<br><b>${hit.length}</b> in rotta verso la pista: il primo a <b>${fmt(f.km,f.km<10?1:0)} km verso ${dir8(f.brg)}</b>, arriva tra circa <b>${Math.max(0,Math.round(f.eta-(Date.now()-r.ms)/60e3))} min</b><br>Il più intenso: ${fmt(mx.v,1)} mm/h a ${fmt(mx.km,mx.km<10?1:0)} km`;
+    if(r.start!=null){const d=Math.abs(f.eta-r.start);h+=`<br>${d<=10?'✅ Sensori e scenari concordano':'⚠️ Sensori e scenari non concordano'} sull'orario${d<=10?'':' (affidati di più al più vicino)'}`;}}
+  else if(wet.length)h+=`<br>Nessuna cella in rotta verso la pista`;else h+=`<br>Cielo pulito su tutti i settori fino a 50 km`;
+  if(up||dn)h+=`<br>${up?`▲ ${up} in rinforzo`:''}${up&&dn?' · ':''}${dn?`▼ ${dn} in calo`:''}`;
+  lbl.innerHTML=h;}
+function mtxPaint(W,S){const r=NC.res,C=W/2,k=W/460;
+  const B=S.base&&S.base.width===W?S.base:Object.assign(document.createElement('canvas'),{width:W,height:W});S.base=B;
   const ctx=B.getContext('2d');ctx.clearRect(0,0,W,W);
-  const R0=30*k,RS=(C-34*k-R0)/MTX_RINGS.length,gap=Math.PI/MTX_DIRS*0.10,Rout=R0+MTX_RINGS.length*RS;Object.assign(MTXA,{C,k,R0,RS,Rout});
+  const R0=30*k,RS=(C-34*k-R0)/MTX_RINGS.length,gap=Math.PI/MTX_DIRS*0.10,Rout=R0+MTX_RINGS.length*RS;Object.assign(S,{C,k,R0,RS,Rout,W});
   // fondo: disco con vignettatura
   let g=ctx.createRadialGradient(C,C,R0,C,C,Rout);g.addColorStop(0,'#10203a');g.addColorStop(1,'#091321');ctx.fillStyle=g;ctx.beginPath();ctx.arc(C,C,Rout,0,7);ctx.fill();
   // celle: prima quelle spente (tenui), poi le nuvole, poi la pioggia con bagliore
@@ -975,7 +985,7 @@ function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)retur
   ctx.restore();ctx.shadowBlur=0;
   for(const s of wetC){const[a0,a1,ri0,ri1]=cell(s);if(s.hit){hits.push(s);}
     if(s.v>=0.5&&Math.abs(s.tr)>0.4&&RS>14*k){const am=(a0+a1)/2,rm=(ri0+ri1)/2;ctx.fillStyle='rgba(5,10,18,.85)';ctx.font=`bold ${13*k}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.tr>0?'▲':'▼',C+Math.cos(am)*rm,C+Math.sin(am)*rm);}}
-  MTXA.hits=hits.map(s=>{const a0=(s.brg-90-360/MTX_DIRS/2)*Math.PI/180+gap,a1=(s.brg-90+360/MTX_DIRS/2)*Math.PI/180-gap;return[a0,a1,R0+s.ri*RS+0.5*k,R0+(s.ri+1)*RS-0.5*k];});
+  S.hits=hits.map(s=>{const a0=(s.brg-90-360/MTX_DIRS/2)*Math.PI/180+gap,a1=(s.brg-90+360/MTX_DIRS/2)*Math.PI/180-gap;return[a0,a1,R0+s.ri*RS+0.5*k,R0+(s.ri+1)*RS-0.5*k];});
   // anelli di distanza e raggi
   ctx.lineWidth=1*k;[2,10,25,50].forEach(km=>{const i=MTX_RINGS.reduce((b,v,j)=>Math.abs(v-km)<Math.abs(MTX_RINGS[b]-km)?j:b,0),rr=R0+(i+1)*RS;
     ctx.strokeStyle='rgba(120,200,255,.35)';ctx.setLineDash(km===50?[]:[3*k,4*k]);ctx.beginPath();ctx.arc(C,C,rr,0,7);ctx.stroke();ctx.setLineDash([]);
@@ -993,37 +1003,34 @@ function renderMatrix(){const r=NC.res,cv=$('mtx-c'),lbl=$('mtx-l');if(!cv)retur
     ctx.strokeStyle=lg;ctx.lineWidth=4*k;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();ctx.lineCap='butt';
     const h=Math.atan2(y1-y0,x1-x0);ctx.fillStyle='#cfe3ff';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x1-14*k*Math.cos(h-0.45),y1-14*k*Math.sin(h-0.45));ctx.lineTo(x1-14*k*Math.cos(h+0.45),y1-14*k*Math.sin(h+0.45));ctx.fill();
     const t=`${Math.round(r.speed)} km/h`,mx=C+Math.cos(a)*(Rout*0.62),my=C+Math.sin(a)*(Rout*0.62);ctx.font=`700 ${11*k}px Inter,system-ui`;const tw=ctx.measureText(t).width+12*k;
-    ctx.fillStyle='rgba(6,12,22,.9)';ctx.strokeStyle='rgba(160,205,255,.7)';ctx.beginPath();ctx.roundRect(mx-tw/2,my-9*k,tw,18*k,9*k);ctx.fill();ctx.stroke();ctx.fillStyle='#e3f0ff';ctx.fillText(t,mx,my+0.5*k);}
-  if(!MTXA.raf)MTXA.raf=requestAnimationFrame(mtxFrame);
-  const live=r.sens.filter(s=>!s.off),wet=live.filter(s=>s.v>=0.2),hit=wet.filter(s=>s.hit).sort((a,b)=>a.eta-b.eta),up=wet.filter(s=>s.tr>0.4).length,dn=wet.filter(s=>s.tr<-0.4).length;
-  let h=`<b>${wet.length}</b> sensori su ${live.length} vedono pioggia`;
-  if(hit.length){const f=hit[Math.min(hit.length-1,hit.length>=5?2:0)],mx=hit.reduce((a,s)=>s.v>a.v?s:a,hit[0]);h+=`<br><b>${hit.length}</b> in rotta verso la pista: il primo a <b>${fmt(f.km,f.km<10?1:0)} km verso ${dir8(f.brg)}</b>, arriva tra circa <b>${Math.max(0,Math.round(f.eta-(Date.now()-r.ms)/60e3))} min</b><br>Il più intenso: ${fmt(mx.v,1)} mm/h a ${fmt(mx.km,mx.km<10?1:0)} km`;
-    if(r.start!=null){const d=Math.abs(f.eta-r.start);h+=`<br>${d<=10?'✅ Sensori e scenari concordano':'⚠️ Sensori e scenari non concordano'} sull'orario${d<=10?'':' (affidati di più al più vicino)'}`;}}
-  else if(wet.length)h+=`<br>Nessuna cella in rotta verso la pista`;else h+=`<br>Cielo pulito su tutti i settori fino a 50 km`;
-  if(up||dn)h+=`<br>${up?`▲ ${up} in rinforzo`:''}${up&&dn?' · ':''}${dn?`▼ ${dn} in calo`:''}`;
-  lbl.innerHTML=h;}
+    ctx.fillStyle='rgba(6,12,22,.9)';ctx.strokeStyle='rgba(160,205,255,.7)';ctx.beginPath();ctx.roundRect(mx-tw/2,my-9*k,tw,18*k,9*k);ctx.fill();ctx.stroke();ctx.fillStyle='#e3f0ff';ctx.fillText(t,mx,my+0.5*k);S.lbl={t,mx,my,tw};}else S.lbl=null;
+}
 function mtxFrame(now){const cv=$('mtx-c');if(!cv||!MTXA.base||!NC.res){MTXA.raf=0;return;}MTXA.raf=requestAnimationFrame(mtxFrame);
   const big=$('mtxbig')&&$('mtxbig').style.display==='flex';if(document.hidden||!(MTXA.vis||big))return;if(now-(MTXA.last||0)<33)return;MTXA.last=now;
-  const ctx=cv.getContext('2d'),W=cv.width,{C,k,R0,Rout}=MTXA,t=(now-MTXA.t0)/1000;ctx.clearRect(0,0,W,W);ctx.drawImage(MTXA.base,0,0);
+  const t=(now-MTXA.t0)/1000;
+  if(MTXA.paused){MTXA.pt=(MTXA.pt??t);MTXA.t0+=(t-MTXA.pt)*1000;}else MTXA.pt=null;const ang=((MTXA.paused?MTXA.pt:t)/4%1)*Math.PI*2-Math.PI/2;
+  if(MTXA.vis)mtxPaintFrame(cv.getContext('2d'),MTXA,t,ang);if(big&&MTXB.g.base)try{mtxBigDraw(t,ang);}catch(e){}}
+function mtxPaintFrame(ctx,S,t,ang){const{C,k,R0,Rout,W}=S;ctx.clearRect(0,0,W,W);ctx.drawImage(S.base,0,0);
   // fascio rotante (un giro ogni 4 s)
-  if(MTXA.paused){MTXA.pt=(MTXA.pt??t);MTXA.t0+=(t-MTXA.pt)*1000;}else MTXA.pt=null;const ang=((MTXA.paused?MTXA.pt:t)/4%1)*Math.PI*2-Math.PI/2;ctx.save();ctx.beginPath();ctx.arc(C,C,Rout,0,7);ctx.clip();
+  ctx.save();ctx.beginPath();ctx.arc(C,C,Rout,0,7);ctx.clip();
   if(ctx.createConicGradient){const cg=ctx.createConicGradient(ang-0.9,C,C);cg.addColorStop(0,'rgba(90,200,255,0)');cg.addColorStop(0.143,'rgba(90,200,255,.22)');cg.addColorStop(0.1432,'rgba(90,200,255,0)');cg.addColorStop(1,'rgba(90,200,255,0)');
     ctx.fillStyle=cg;ctx.beginPath();ctx.moveTo(C,C);ctx.arc(C,C,Rout,ang-0.9,ang);ctx.closePath();ctx.fill();}
   ctx.strokeStyle='rgba(140,220,255,.8)';ctx.lineWidth=1.5*k;ctx.beginPath();ctx.moveTo(C+Math.cos(ang)*R0,C+Math.sin(ang)*R0);ctx.lineTo(C+Math.cos(ang)*Rout,C+Math.sin(ang)*Rout);ctx.stroke();ctx.restore();
   // celle in rotta: bordo che pulsa
   const pu=0.5+0.5*Math.sin(t*4);ctx.strokeStyle=`rgba(255,255,255,${(0.45+0.55*pu).toFixed(2)})`;ctx.lineWidth=(1+1.2*pu)*k;
-  for(const[a0,a1,ri0,ri1]of MTXA.hits){ctx.beginPath();ctx.arc(C,C,ri1,a0,a1);ctx.arc(C,C,ri0,a1,a0,true);ctx.closePath();ctx.stroke();}
+  for(const[a0,a1,ri0,ri1]of S.hits||[]){ctx.beginPath();ctx.arc(C,C,ri1,a0,a1);ctx.arc(C,C,ri0,a1,a0,true);ctx.closePath();ctx.stroke();}
+  if(S.lbl){const{t:tx,mx,my,tw}=S.lbl;ctx.font=`700 ${11*k}px Inter,system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='rgba(6,12,22,.95)';ctx.strokeStyle='rgba(160,205,255,.8)';ctx.lineWidth=1*k;ctx.beginPath();ctx.roundRect(mx-tw/2,my-9*k,tw,18*k,9*k);ctx.fill();ctx.stroke();ctx.fillStyle='#e3f0ff';ctx.fillText(tx,mx,my+0.5*k);}
   // pista al centro con onda
   const w=(t%2)/2;ctx.strokeStyle=`rgba(255,210,63,${(0.7*(1-w)).toFixed(2)})`;ctx.lineWidth=2*k;ctx.beginPath();ctx.arc(C,C,R0*0.45+R0*0.9*w,0,7);ctx.stroke();
   const gg=ctx.createRadialGradient(C,C-3*k,1,C,C,R0*0.55);gg.addColorStop(0,'#ffe48a');gg.addColorStop(1,'#f0a800');ctx.fillStyle=gg;ctx.shadowColor='rgba(255,200,60,.8)';ctx.shadowBlur=12*k;ctx.beginPath();ctx.arc(C,C,R0*0.55,0,7);ctx.fill();ctx.shadowBlur=0;
-  ctx.font=`${13*k}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🏁',C,C+1*k);if(big)try{mtxBigDraw(cv);}catch(e){}}
+  ctx.font=`${13*k}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🏁',C,C+1*k);}
 (()=>{const cv=document.getElementById('mtx-c');if(cv&&'IntersectionObserver' in window)new IntersectionObserver(e=>{MTXA.vis=e[0].isIntersecting;}).observe(cv);})();
 const dir8=d=>['N','NE','E','SE','S','SO','O','NO'][Math.round(d/45)%8];
 // ---------- Matrice ingrandita e interattiva ----------
-const MTXB={sel:null,hov:null,hit:false,wet:false};
+const MTXB={sel:null,hov:null,hit:false,wet:false,on:false,W:0,g:{}};
 function mtxCellAng(s){const D=MTX_DIRS,gap=Math.PI/D*0.10;return[(s.brg-90-360/D/2)*Math.PI/180+gap,(s.brg-90+360/D/2)*Math.PI/180-gap];}
-function mtxCellPath(ctx,s,f){const{C,k,R0,RS}=MTXA,[a0,a1]=mtxCellAng(s),ri0=(R0+s.ri*RS+0.5*k)*f,ri1=(R0+(s.ri+1)*RS-0.5*k)*f,c=C*f;ctx.beginPath();ctx.arc(c,c,ri1,a0,a1);ctx.arc(c,c,ri0,a1,a0,true);ctx.closePath();}
-function mtxCellAt(ev){const cv=$('mtxb-c'),r=cv.getBoundingClientRect(),f=$('mtx-c').width/r.width,X=(ev.clientX-r.left)*f,Y=(ev.clientY-r.top)*f,{C,R0,RS,Rout}=MTXA;
+function mtxCellPath(ctx,s,G){const{C,k,R0,RS}=G,[a0,a1]=mtxCellAng(s),ri0=R0+s.ri*RS+0.5*k,ri1=R0+(s.ri+1)*RS-0.5*k,c=C;ctx.beginPath();ctx.arc(c,c,ri1,a0,a1);ctx.arc(c,c,ri0,a1,a0,true);ctx.closePath();}
+function mtxCellAt(ev){const cv=$('mtxb-c'),r=cv.getBoundingClientRect(),G=MTXB.g,f=G.W/r.width,X=(ev.clientX-r.left)*f,Y=(ev.clientY-r.top)*f,{C,R0,RS,Rout}=G;
   const dx=X-C,dy=Y-C,d=Math.hypot(dx,dy);if(d<R0)return'center';if(d>Rout)return null;const ri=Math.floor((d-R0)/RS);let brg=(Math.atan2(dy,dx)*180/Math.PI+90+360)%360;const di=Math.round(brg/(360/MTX_DIRS))%MTX_DIRS;
   return(NC.res&&NC.res.sens||[]).find(s=>s.ri===ri&&s.di===di)||null;}
 const mtxEta=s=>Math.max(1,Math.round(s.eta-(NC.res&&NC.res.ms?(Date.now()-NC.res.ms)/60e3:0)));
@@ -1037,11 +1044,12 @@ function mtxCellHtml(s){if(s==='center')return`<b>🏁 ${esc(CUR?CUR.name:'Pista
   if(wet&&Math.abs(s.tr)>0.4)h+=`<div class="r"><span>Tendenza</span><b>${s.tr>0?'▲ si rinforza':'▼ si indebolisce'}</b></div>`;
   if(s.hit&&s.eta!=null)h+=`<div class="r"><span>🎯 In rotta verso la pista</span><b>arriva tra ~${mtxEta(s)} min</b></div>`;else if(wet)h+=`<div class="r"><span>Verso la pista</span><b>no, passa di lato o si allontana</b></div>`;
   if(cl!=null)h+=`<div class="r"><span>☁️ Nubi (satellite)</span><b>${Math.round(cl*100)}%</b></div>`;return h;}
-function mtxBigDraw(src){const cv=$('mtxb-c'),ctx=cv.getContext('2d'),W=cv.width,f=W/src.width,{C,Rout}=MTXA,sens=NC.res&&NC.res.sens||[];ctx.clearRect(0,0,W,W);ctx.drawImage(src,0,0,W,W);
-  if(MTXB.hit||MTXB.wet){ctx.save();ctx.fillStyle='rgba(4,8,14,.72)';ctx.beginPath();ctx.arc(C*f,C*f,Rout*f,0,7);ctx.fill();ctx.restore();
-    for(const s of sens){if(s.off||!(s.v>=0.2)||(MTXB.hit&&!s.hit))continue;ctx.save();mtxCellPath(ctx,s,f);ctx.clip();ctx.drawImage(src,0,0,W,W);ctx.restore();}}
-  const ring=(s,col,w)=>{if(!s||s==='center')return;mtxCellPath(ctx,s,f);ctx.strokeStyle=col;ctx.lineWidth=w;ctx.stroke();};
-  ring(MTXB.hov,'rgba(255,255,255,.85)',2);ring(MTXB.sel,'#5ad1ff',3.5);}
+function mtxBigDraw(t,ang){const cv=$('mtxb-c'),ctx=cv.getContext('2d'),G=MTXB.g,W=G.W,sens=NC.res&&NC.res.sens||[];if(cv.width!==W){cv.width=W;cv.height=W;}
+  mtxPaintFrame(ctx,G,t,ang);const{C,Rout}=G;
+  if(MTXB.hit||MTXB.wet){ctx.save();ctx.fillStyle='rgba(4,8,14,.72)';ctx.beginPath();ctx.arc(C,C,Rout,0,7);ctx.fill();ctx.restore();
+    for(const s of sens){if(s.off||!(s.v>=0.2)||(MTXB.hit&&!s.hit))continue;ctx.save();mtxCellPath(ctx,s,G);ctx.clip();ctx.drawImage(G.base,0,0);ctx.restore();}}
+  const ring=(s,col,w)=>{if(!s||s==='center')return;mtxCellPath(ctx,s,G);ctx.strokeStyle=col;ctx.lineWidth=w*G.k;ctx.stroke();};
+  ring(MTXB.hov,'rgba(255,255,255,.9)',2);ring(MTXB.sel,'#5ad1ff',3.2);}
 function mtxTop(){const sens=(NC.res&&NC.res.sens||[]).filter(s=>!s.off&&s.v>=0.2).sort((a,b)=>(b.hit-a.hit)||(b.v-a.v)).slice(0,8);
   $('mtxb-top').innerHTML=sens.length?sens.map((s,i)=>{const c=tcColor(s.v)||[120,200,255,200];return`<button class="mtxb-top" data-i="${i}"><i style="background:rgb(${c[0]|0},${c[1]|0},${c[2]|0})"></i><span style="flex:1">${dir8(s.brg)} · ${fmt(s.km,0)} km · ${fmt(s.v,1)} mm/h</span>${s.hit?`<b style="color:#5ad1ff">🎯 ${mtxEta(s)}'</b>`:''}</button>`;}).join(''):'<div class="sub" style="margin:4px 0 0">Nessuna pioggia nei 50 km.</div>';
   $('mtxb-top').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{MTXB.sel=sens[+b.dataset.i];$('mtxb-info').innerHTML=mtxCellHtml(MTXB.sel);});}
@@ -1050,10 +1058,10 @@ function openMtxBig(){const m=$('mtxbig');m.style.display='flex';$('mtxb-trk').t
     const cv=$('mtxb-c'),ctx=cv.getContext('2d'),W=cv.width,c=W/2;ctx.clearRect(0,0,W,W);ctx.strokeStyle='rgba(120,200,255,.25)';ctx.lineWidth=1.5;[0.12,0.3,0.5,0.7,0.9].forEach(f=>{ctx.beginPath();ctx.arc(c,c,c*f,0,7);ctx.stroke();});
     ctx.fillStyle='#ffd23f';ctx.beginPath();ctx.arc(c,c,c*0.06,0,7);ctx.fill();clearTimeout(MTXB.wait);MTXB.wait=setTimeout(()=>{if(m.style.display==='flex'&&NC.res&&NC.res.sens)openMtxBig();},3000);return;}
   mtxTop();
-  const cv=$('mtxb-c'),dpr=Math.min(2,window.devicePixelRatio||1),w=Math.round(Math.min(900,cv.getBoundingClientRect().width*dpr))||720;if(cv.width!==w){cv.width=w;cv.height=w;}
+  const cv=$('mtxb-c'),dpr=window.devicePixelRatio||1,css=cv.getBoundingClientRect().width||600;MTXB.W=2160;MTXB.on=true;mtxPaint(MTXB.W,MTXB.g);if(cv.width!==MTXB.W){cv.width=MTXB.W;cv.height=MTXB.W;}
   if(!MTXA.raf)MTXA.raf=requestAnimationFrame(mtxFrame);}
 $('mtx-c').addEventListener('click',openMtxBig);$('mtx-open').addEventListener('click',openMtxBig);$('mtx-c').title='Tocca per ingrandire';
-$('mtxb-x').onclick=()=>{$('mtxbig').style.display='none';MTXB.hov=null;};$('mtxbig').addEventListener('click',e=>{if(e.target.id==='mtxbig')$('mtxb-x').onclick();});
+$('mtxb-x').onclick=()=>{$('mtxbig').style.display='none';MTXB.hov=null;MTXB.on=false;};$('mtxbig').addEventListener('click',e=>{if(e.target.id==='mtxbig')$('mtxb-x').onclick();});
 $('mtxb-pause').onclick=e=>{MTXA.paused=!MTXA.paused;e.target.classList.toggle('on',MTXA.paused);e.target.textContent=MTXA.paused?'▶ Riavvia il fascio':'⏸ Ferma il fascio';};
 $('mtxb-hit').onclick=e=>{MTXB.hit=!MTXB.hit;if(MTXB.hit)MTXB.wet=false;$('mtxb-wet').classList.remove('on');e.target.classList.toggle('on',MTXB.hit);};
 $('mtxb-wet').onclick=e=>{MTXB.wet=!MTXB.wet;if(MTXB.wet)MTXB.hit=false;$('mtxb-hit').classList.remove('on');e.target.classList.toggle('on',MTXB.wet);};
