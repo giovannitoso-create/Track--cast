@@ -59,13 +59,23 @@ input.q{flex:1;min-width:200px;background:#0b1323;border:1px solid var(--line2);
 .note{margin-top:22px;font-size:12.5px;color:var(--ink3);line-height:1.6}
 .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#14233f;border:1px solid #2d4a7a;border-radius:12px;padding:10px 14px;font-size:13.5px;display:none;z-index:9}
 .demo{background:#2a210b;border:1px solid #6b5313;color:#ffe08a;border-radius:12px;padding:10px 12px;margin-top:12px;font-size:13.5px;display:none}
+
+body.light{--bg:#fff;--s1:#fff;--s2:#f6f8fb;--line:#e3e7ee;--line2:#d3d9e2;--ink:#111418;--ink2:#3d4552;--ink3:#6b7482;font-family:Arial,Inter,system-ui,sans-serif}
+body.light header{background:#fff;border-bottom:1px solid #e3e7ee}body.light .logo{color:#0b2a7a}body.light .logo small{color:#9a7400}
+body.light .card{background:#fff;border-color:#e6e9ef;box-shadow:0 1px 2px rgba(16,24,40,.04)}body.light h1,body.light h2{text-transform:none;font-family:Arial,Inter,sans-serif;font-weight:400;letter-spacing:0}
+body.light h1{font-size:34px}body.light h2{font-size:26px}body.light .kpi,body.light .cc{background:#fff;border-color:#e3e7ee}body.light .tbl th{background:#f6f8fb}
+body.light input.q{background:#fff;color:#111;border-color:#cfd6df}body.light .back{background:#fff;color:#111;border-color:#d3d9e2}body.light .pill{background:#f1f3f6;border-color:#e3e7ee}body.light .pill button{color:#3d4552}
+body.light .chips button{background:#fff;color:#3d4552}body.light .tag.dry{background:#e3f7ec;color:#137a42}body.light .tag.risk{background:#fff1df;color:#9a5b00}body.light .tag.wet{background:#e3efff;color:#1a56c4}
+body.light .rk:hover{background:#f6f8fb}body.light .tw{border-color:#e3e7ee}body.light .tbl tr:hover td{background:#f6f8fb}body.light .kpi .v[style]{filter:brightness(.6) saturate(1.4)}
+body.light #map{background:#0b1220}
+.theme-t{border:1px solid var(--line2);background:var(--s2);color:var(--ink);border-radius:999px;width:36px;height:36px;cursor:pointer;font-size:16px}
 </style>
 </head>
 <body>
 <header>
   <div class="logo"><span class="stars"><svg width="26" height="26" viewBox="0 0 26 26"><g fill="#ffcc33"></g></svg></span><div>TrackCast Europe<small data-i="tag">METEO PER LE PISTE DI KART EUROPEE</small></div></div>
   <div class="hsp"></div>
-  <div class="pill" id="lang"><button data-l="it">🇮🇹 IT</button><button data-l="en">🇬🇧 EN</button></div>
+  <button class="theme-t" id="themebtn">🌙</button><div class="pill" id="lang"><button data-l="it">🇮🇹 IT</button><button data-l="en">🇬🇧 EN</button></div>
   <a class="back" href="index.html" data-i="back">← Piste italiane</a><a class="back acct" id="acct" href="index.html" style="display:none"></a>
 </header>
 <div class="wrap">
@@ -184,6 +194,7 @@ function render(nm=c=>CC[c][LANG==='en'?2:1]){
   drawMap();}
 $('q').oninput=()=>render();
 async function load(){render();try{await locate();await weather();}catch(e){demoData();}render();}
+(()=>{const ap=()=>{const d=store.get('tc_theme','light')==='dark';document.body.classList.toggle('light',!d);$('themebtn').textContent=d?'☀️':'🌙';};$('themebtn').onclick=()=>{store.set('tc_theme',store.get('tc_theme','light')==='dark'?'light':'dark');ap();};ap();})();
 applyLang();initMap();load();
 // account: stesso account della pagina principale (stesso sito)
 (()=>{const a=$('acct');if(store.get('tc_creator',false)||window.__TC_DEMO){a.style.display='';a.textContent='👑 '+(LANG==='en'?'Creator':'Creatore');a.title=LANG==='en'?'Creator account: everything included':'Account del creatore: tutto incluso';}})();setInterval(()=>{weather().then(render).catch(()=>{});},15*60e3);

@@ -397,6 +397,52 @@ details summary{cursor:pointer;color:var(--ink);font-weight:600}
 b,strong{color:#fff}
 .chipb{font-weight:600}
 input,select,textarea{font-size:15px}
+
+/* ===== Tema chiaro "documento": pagina bianca, scritte nere, pulito ===== */
+body.light{--bg:#ffffff;--surface:#ffffff;--surface2:#f6f8fb;--line:#e3e7ee;--line2:#d3d9e2;--ink:#111418;--ink2:#3d4552;--ink3:#6b7482;--slick:#b8610a;--rain:#1a66e0;--warn:#b7860b;--asph:#d9690f;
+  background:#fff;color:#111418;font-family:Arial,Inter,system-ui,-apple-system,sans-serif}
+body.light b,body.light strong{color:#000}
+body.light header{background:#fff;border-bottom:1px solid #e3e7ee;box-shadow:0 1px 0 #f1f3f6}
+body.light .card{background:#fff;border:1px solid #e6e9ef;border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+body.light .card h2{text-transform:none;letter-spacing:0;font:400 28px/1.15 Arial,Inter,system-ui,sans-serif;color:#000}
+body.light .mtx h3,body.light .nowc h3,body.light .cl h3{text-transform:none;letter-spacing:0;font-weight:700;color:#000}
+body.light .sbox,body.light .k{background:#fff;border:1px solid #e6e9ef}
+body.light .sbox .t1,body.light .k .l{color:#5f6876}
+body.light .btn{background:#fff;border:1px solid #d3d9e2;color:#111}body.light .btn:hover{background:#f1f3f6}
+body.light .btn.primary{background:#1a66e0;border-color:#1a66e0;color:#fff}
+body.light .chipb{background:#fff;border:1px solid #d3d9e2;color:#3d4552}body.light .chipb:hover{background:#f1f3f6}
+body.light input,body.light select,body.light textarea{background:#fff!important;color:#111!important;border:1px solid #cfd6df!important}
+body.light .mdl{background:rgba(20,24,32,.35)}body.light .mdl .box{background:#fff;border:1px solid #e3e7ee;box-shadow:0 20px 50px rgba(16,24,40,.18)}
+body.light table th{color:#5f6876}body.light table td{border-color:#eceff3}
+body.light .modesw{background:#f1f3f6;border-color:#e3e7ee}body.light .modesw button{color:#3d4552}body.light .modesw button.on{background:#1a66e0;color:#fff}
+body.light .seg{background:#f1f3f6;border-color:#e3e7ee}body.light .seg button{color:#3d4552}body.light .seg button.on{background:#1a66e0;color:#fff}
+body.light .pt-tabs{background:#f6f8fb;border-color:#e3e7ee}body.light .pt-tabs .tg{background:#fff;box-shadow:0 0 0 1px #eceff3}body.light .pt-tabs button{color:#3d4552}body.light .pt-tabs button.on{color:#000}
+body.light .jt-cmp,body.light .jt-f{background:#f1f3f6;color:#111}
+body.light .lv-c,body.light .lv-f,body.light .lv-e,body.light .dl-imp,body.light .mtxb-card,body.light .wkc-s,body.light .wkc-form,body.light .eu-t,body.light .mp-card,body.light .dc-i{background:#fff;border-color:#e3e7ee;color:#111}
+body.light .wkc{background:#fffdf6;border-color:#f0e3bf}body.light .wkc-nx{background:#f6f8fb;border-color:#e3e7ee}body.light .wkc-nx .cd{color:#b8610a}
+body.light .wkc-tag,body.light .lv-pill,body.light .dl-brands span{background:#eef2f8;color:#1d2a3d}
+body.light .dl-kpi div{background:#f6f8fb;border-color:#e3e7ee}
+body.light [style*="background:#0f1622"],body.light [style*="background:#0d1626"],body.light [style*="background:#131c2b"],body.light [style*="background:#1c2534"],body.light [style*="background:#1a2230"]{background:#f6f8fb!important;color:#111!important;border-color:#e3e7ee!important}
+/* i "monitor" (mappa, radar, matrice, grafici) restano scuri come uno schermo dentro il documento */
+body.light .chart,body.light .acw{background:#0f1724;border-radius:12px;padding:8px}
+body.light .radarbar,body.light .mtxs,body.light .mtxb-cw,body.light #boxscr,body.light .rb-badge{--bg:#0a0d12;--surface:#0f1319;--surface2:#151b24;--line:#222b37;--line2:#2c3746;--ink:#f6f9fd;--ink2:#d2dbe7;--ink3:#a3b0c2}
+body.light #boxscr b,body.light .radarbar b{color:#fff}
+body.light #boxscr input,body.light #boxscr select,body.light .radarbar select{background:#0a121d!important;color:#e8eef7!important;border-color:#24395a!important}
+body.light .mtx{color:#111}
+body.light .theme-t{background:#f1f3f6}
+body.light .nowc{background:#f6f8fb;border-color:#e3e7ee}body.light .nowc h3{text-transform:none;color:#000}
+body.light .sugg{background:#fff;box-shadow:0 10px 30px rgba(16,24,40,.12)}body.light .tip{background:#111827;color:#fff}
+body.light #tyrecard{background:#f6f8fb!important;color:#3d4552!important}
+body.light #sheet{--bg:#0a0d12;--surface:#0f1319;--surface2:#151b24;--line:#222b37;--line2:#2c3746;--ink:#f6f9fd;--ink2:#d2dbe7;--ink3:#a3b0c2;color:#f6f9fd}
+body.light .ic.w{background:#fff4d6}body.light .ic.c{background:#ffe3e3}body.light .ic.i{background:#e3efff}
+body.light .badge.on{background:#e3f7ec;color:#137a42;border-color:#b7e5c9}body.light .badge.off{background:#f1f3f6}
+body.light .mtx{background:transparent}
+body.light .kpi3>div{background:#fff;border-color:#e3e7ee}body.light .kpi3 .l{color:#5f6876}
+body.light #gpsprob{background:#fff7e0!important;border-color:#f0d58a!important;color:#5a4300!important}
+body.light .near .chipb{color:#1d2a3d!important;background:#fff}
+body.light [style*="color:#9fe3ff"]{color:#0b6fa8!important}body.light [style*="color:#ffd08a"],body.light [style*="color:#ffc781"]{color:#9a5b00!important}
+body.light .pill-s.slick{background:#c05f00;color:#fff}body.light .pill-s.rain{background:#1a66e0;color:#fff}
+.theme-t{border:1px solid var(--line2);background:var(--surface2);color:var(--ink);border-radius:999px;width:36px;height:36px;cursor:pointer;font-size:16px;flex:none}
 </style>
 </head>
 <body>
@@ -410,7 +456,7 @@ input,select,textarea{font-size:15px}
     <button class="btn" id="area" title="Cerca le piste di kart nella zona inquadrata dalla mappa">Cerca nella mappa</button>
   </div>
   <span id="tcver" class="sub" style="margin:0 0 0 auto;font-size:11px;white-space:nowrap"></span>
-  <button class="btn eubtn" id="eubtn" title="Piste europee">🇪🇺 Europa</button><div class="modesw" id="modesw" title="Cambia dashboard"><button data-m="am">🏁 Amatore</button><button data-m="pro">⭐ Team Pro</button></div><button class="btn" id="dashbtn" title="Scegli cosa vedere nella tua dashboard">⚙️</button><button class="btn" id="acctbtn">👤 Accedi</button>
+  <button class="theme-t" id="themebtn" title="Tema chiaro / scuro">🌙</button><button class="btn eubtn" id="eubtn" title="Piste europee">🇪🇺 Europa</button><div class="modesw" id="modesw" title="Cambia dashboard"><button data-m="am">🏁 Amatore</button><button data-m="pro">⭐ Team Pro</button></div><button class="btn" id="dashbtn" title="Scegli cosa vedere nella tua dashboard">⚙️</button><button class="btn" id="acctbtn">👤 Accedi</button>
   <div class="status" id="status">Caricamento della banca dati delle piste…</div>
 </header>
 <div class="near" id="near"></div>
@@ -968,7 +1014,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='26/11/2026 13:20';
+const TC_VER='26/11/2026 14:00';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1936,6 +1982,9 @@ setTimeout(()=>{try{liveStart();}catch(e){}},2500);
  G.forEach(([n,ids])=>{const g=document.createElement('div');g.className='tg';g.innerHTML=`<div class="tgh">${n}</div><div class="tgb"></div>`;ids.forEach(id=>{const b=T.querySelector(`button[data-t="${id}"]`);if(b)g.lastChild.appendChild(b);});T.appendChild(g);});
  const fixG=()=>T.querySelectorAll('.tg').forEach(g=>g.style.display=[...g.querySelectorAll('button')].some(b=>!b.classList.contains('dash-off'))?'':'none');
  new MutationObserver(fixG).observe(T,{subtree:true,attributes:true,attributeFilter:['class']});fixG();})();
+// tema: chiaro "documento" (predefinito) o scuro
+(()=>{const ap=()=>{const d=store.get('tc_theme','light')==='dark';document.body.classList.toggle('light',!d);$('themebtn').textContent=d?'☀️':'🌙';$('themebtn').title=d?'Passa al tema chiaro':'Passa al tema scuro';try{if(SIM)renderWeather();}catch(e){}};
+ $('themebtn').onclick=()=>{store.set('tc_theme',store.get('tc_theme','light')==='dark'?'light':'dark');ap();};ap();})();
 // ---------- Due dashboard: Amatore / Team Pro ----------
 const DASH=[
  ['Meteo e radar',[
