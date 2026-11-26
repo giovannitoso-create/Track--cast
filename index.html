@@ -194,6 +194,11 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:12
 .acw{position:relative}.acw svg{width:100%;height:auto;display:block;touch-action:pan-y}.actip{position:absolute;top:6px;z-index:3;pointer-events:none;background:rgba(6,12,22,.94);border:1px solid #2a4468;border-radius:10px;padding:7px 10px;font-size:12.5px;color:#e3f0ff;min-width:150px;box-shadow:0 6px 20px rgba(0,0,0,.45)}
 .actip b{color:#fff}.actip .r{display:flex;justify-content:space-between;gap:12px}.actip .r span{color:var(--ink3)}
 .ac-leg{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:var(--ink2)}.ac-leg i{display:inline-block;width:18px;height:0;border-top:3px solid;vertical-align:middle;margin-right:6px}.ac-leg i.box{height:10px;border:0;border-radius:3px}
+.eubtn{background:linear-gradient(135deg,#0d2a6b,#1a3f9c)!important;border-color:#3157b8!important;color:#ffd84d!important;font-weight:700}
+.eu-cc{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.eu-cc button{background:var(--surface2);border:1px solid var(--line2);color:var(--ink2);border-radius:999px;padding:6px 11px;font:600 13px Inter,system-ui,-apple-system,sans-serif;cursor:pointer}.eu-cc button.on{background:#1a3f9c;border-color:#3157b8;color:#fff}
+.eu-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;max-height:60vh;overflow:auto;padding-right:4px}
+.eu-t{display:flex;gap:10px;align-items:center;text-align:left;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:var(--ink);cursor:pointer;font:inherit}.eu-t:hover{border-color:#3157b8}
+.eu-t .fl{font-size:26px;line-height:1}.eu-t b{display:block;font-size:14.5px}.eu-t span{font-size:12.5px;color:var(--ink3)}
 .mdl{position:fixed;inset:0;background:rgba(3,6,12,.78);display:none;align-items:flex-start;justify-content:center;z-index:5500;padding:14px;overflow:auto}
 .mdl .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;padding:18px;margin:20px 0}
 .mdl input,.mdl select{background:#0f1622;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 10px;font:inherit}.mdl input:focus,.mdl select:focus{outline:none;border-color:#ffb547}.mdl h3{margin:0 0 4px}.mdl label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink2);margin:8px 0}.mdl input{width:100%;box-sizing:border-box}
@@ -405,7 +410,7 @@ input,select,textarea{font-size:15px}
     <button class="btn" id="area" title="Cerca le piste di kart nella zona inquadrata dalla mappa">Cerca nella mappa</button>
   </div>
   <span id="tcver" class="sub" style="margin:0 0 0 auto;font-size:11px;white-space:nowrap"></span>
-  <div class="modesw" id="modesw" title="Cambia dashboard"><button data-m="am">🏁 Amatore</button><button data-m="pro">⭐ Team Pro</button></div><button class="btn" id="dashbtn" title="Scegli cosa vedere nella tua dashboard">⚙️</button><button class="btn" id="acctbtn">👤 Accedi</button>
+  <button class="btn eubtn" id="eubtn" title="Piste europee">🇪🇺 Europa</button><div class="modesw" id="modesw" title="Cambia dashboard"><button data-m="am">🏁 Amatore</button><button data-m="pro">⭐ Team Pro</button></div><button class="btn" id="dashbtn" title="Scegli cosa vedere nella tua dashboard">⚙️</button><button class="btn" id="acctbtn">👤 Accedi</button>
   <div class="status" id="status">Caricamento della banca dati delle piste…</div>
 </header>
 <div class="near" id="near"></div>
@@ -640,6 +645,10 @@ input,select,textarea{font-size:15px}
 <div class="mtxb-card" id="mtxb-info"><b>Tocca una cella</b><div class="sub" style="margin:4px 0 0">Ogni spicchio è un sensore: tocca o passa sopra per vedere direzione, distanza, intensità, se si rinforza e se sta arrivando in pista.</div></div>
 <div class="mtxb-card"><b>Riepilogo</b><div id="mtxb-sum" class="sub" style="margin:4px 0 0"></div></div>
 <div class="mtxb-card"><b>Celle più intense</b><div id="mtxb-top"></div></div></div></div></div></div>
+<div class="mdl" id="eupick"><div class="box" style="max-width:980px;width:100%"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h3 style="margin:0">🇪🇺 Piste europee</h3><span class="sub" style="margin:0" id="eu-n"></span><button class="chipb" id="eu-x" style="margin-left:auto">Chiudi</button></div>
+<div class="sub" style="margin:6px 0 10px">Meteo, asfalto, gomme, pressioni e carburazione funzionano come in Italia. Il radar fuori dall'Italia è quello di RainViewer (animazione delle ultime 2 ore); previsione radar a 60 minuti e matrice sensori per ora sono solo in Italia.</div>
+<input id="eu-q" placeholder="Cerca pista, città o nazione (es. Genk, Zuera, Le Mans)…" style="width:100%;background:#0f1622;border:1px solid var(--line2);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit">
+<div class="eu-cc" id="eu-cc"></div><div id="eu-list" class="eu-list"></div></div></div>
 <div class="mdl" id="modepick"><div class="box" style="max-width:760px"><h3 style="margin:0 0 4px">Come usi TrackCast?</h3><div class="sub" style="margin:0 0 14px">Scegli la dashboard adatta a te. Puoi cambiarla quando vuoi dal pulsante in alto.</div>
 <div class="mp-grid"><button class="mp-card" data-m="am"><span class="mp-ic">🏁</span><b>Amatore / domenicale</b><span>Vai in pista per divertirti o per le gare del club e il motore lo curi tu.</span><ul><li>Meteo, pioggia e slick o rain, matrice radar a 128 occhi</li><li>Pressioni e carburazione semplici</li><li>Cura del motore: ore, revisioni, consigli</li><li>Tempi dal tuo MyChron, Alfano o Unipro legati al meteo</li></ul></button>
 <button class="mp-card" data-m="pro"><span class="mp-ic">⭐</span><b>Team / pilota Pro</b><span>Corri nei campionati, hai un team e un meccanico.</span><ul><li>Radar avanzato, matrice a 2048 occhi, modelli a confronto</li><li>Strategia, dossier weekend, report</li><li>Schermo box con live timing, avvisi al team</li><li>Stazione meteo in pista</li></ul></button></div></div></div>
@@ -959,7 +968,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='26/11/2026 11:20';
+const TC_VER='26/11/2026 12:00';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -2376,6 +2385,37 @@ async function nomiSearch(text){ // "lonato kart" -> tries "karting lonato", "ka
 async function nomiNear(lat,lon,deg=0.6){const vb=`viewbox=${lon-deg},${lat+deg},${lon+deg},${lat-deg}&bounded=1`;let out=[];
   for(const q of['karting','kartodromo','kart']){try{out=dedupe(out.concat(await nomi(vb+'&q='+q)));}catch(e){}}return out;}
 function mergeTracks(list){TRACKS=dedupe(TRACKS.concat(list));store.set('tc_tracks_v2',{ts:Date.now(),list:TRACKS.map(t=>({...t,geo:null}))});}
+// ---------- Piste europee ----------
+const EU_CC={BE:['🇧🇪','Belgio'],NL:['🇳🇱','Paesi Bassi'],DE:['🇩🇪','Germania'],FR:['🇫🇷','Francia'],ES:['🇪🇸','Spagna'],PT:['🇵🇹','Portogallo'],GB:['🇬🇧','Regno Unito'],SE:['🇸🇪','Svezia'],DK:['🇩🇰','Danimarca'],AT:['🇦🇹','Austria'],CZ:['🇨🇿','Rep. Ceca'],PL:['🇵🇱','Polonia'],HU:['🇭🇺','Ungheria'],SK:['🇸🇰','Slovacchia'],HR:['🇭🇷','Croazia']};
+const EU_RAW=[['Karting Genk','Genk','BE','genk horensbergdam'],['Karting des Fagnes','Mariembourg','BE','mariembourg fagnes'],['Karting Eupen','Eupen','BE','eupen'],
+ ['Kartcircuit Berghem','Berghem','NL','berghem'],['Kartbaan Strijen','Strijen','NL','strijen'],['Kartcircuit Lelystad','Lelystad','NL','lelystad'],
+ ['Prokart Raceland','Wackersdorf','DE','wackersdorf raceland'],['Erftlandring','Kerpen','DE','erftlandring kerpen'],['Motodrom Ampfing','Ampfing','DE','ampfing'],['Kartbahn Oschersleben','Oschersleben','DE','oschersleben'],['Kartbahn Mülsen','Mülsen','DE','mulsen'],['Kartbahn Liedolsheim','Dettenheim','DE','liedolsheim'],
+ ['Circuit International de Salbris','Salbris','FR','salbris'],['Circuit Alain Prost','Le Mans','FR','alain prost le mans'],['Circuit de l\'Europe','Angerville','FR','angerville'],['Karting du Bourbonnais','Varennes-sur-Allier','FR','varennes bourbonnais'],['Karting de Laval','Laval','FR','laval beausoleil'],
+ ['Circuito Internacional de Zuera','Zuera','ES','zuera'],['Kartódromo Lucas Guerrero','Chiva','ES','lucas guerrero valencia'],['Circuito de Campillos','Campillos','ES','campillos'],['Karting Vendrell','El Vendrell','ES','vendrell'],
+ ['Kartódromo Internacional do Algarve','Portimão','PT','algarve portimao'],['Kartódromo de Baltar','Paredes','PT','baltar'],['Circuito Vasco Sameiro','Braga','PT','braga sameiro'],
+ ['PF International','Grantham','GB','pfi brandon'],['Whilton Mill','Whilton','GB','whilton'],['Rowrah','Rowrah','GB','rowrah'],['Larkhall','Larkhall','GB','larkhall'],['Glan y Gors','Cerrigydrudion','GB','glan y gors'],['Shenington','Shenington','GB','shenington'],['Buckmore Park','Chatham','GB','buckmore'],['Clay Pigeon','Maiden Newton','GB','clay pigeon'],
+ ['Kristianstad Karting','Kristianstad','SE','kristianstad'],['Rødby KartRing','Rødby','DK','rodby'],['PS Racing Center','Greinbach','AT','greinbach'],
+ ['Kartodrom Sosnová','Sosnová','CZ','sosnova'],['Kartodrom Vysoké Mýto','Vysoké Mýto','CZ','vysoke myto'],['Tor Słomczyn','Słomczyn','PL','slomczyn'],['Kakucsring','Kakucs','HU','kakucs'],['Slovakia Ring Karting','Orechová Potôň','SK','slovakia ring'],['Karting Rijeka','Čavle','HR','grobnik rijeka']];
+const EU=EU_RAW.map(([n,c,cc,a])=>({id:'eu-'+norm(n).replace(/[^a-z0-9]+/g,'-'),name:n,city:`${c} · ${EU_CC[cc][1]}`,loc:c,cc,alias:a,eu:true,lat:null,lon:null,approx:true}));
+const EUS={cc:''};
+async function euLocate(t){const cache=store.get('tc_eu_pos',{});const c=cache[t.id];if(c){t.lat=c.lat;t.lon=c.lon;t.approx=c.src!=='osm';if(c.src==='osm')return t;}
+  if(t.lat==null){const j=await fetchJSON(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(t.loc)}&count=5&language=it&countryCode=${t.cc}`,{},9000);const r=(j.results||[])[0];if(!r)throw new Error('località non trovata');t.lat=r.latitude;t.lon=r.longitude;cache[t.id]={lat:t.lat,lon:t.lon,src:'comune'};store.set('tc_eu_pos',cache);}
+  // aggancio al tracciato vero su OpenStreetMap (entro 8 km dal paese)
+  try{const j=await overpass(`[out:json][timeout:20];nwr(around:8000,${t.lat},${t.lon})["sport"="karting"];out center tags;`,22000);
+    const fs=(j.elements||[]).map(e=>({lat:e.center?e.center.lat:e.lat,lon:e.center?e.center.lon:e.lon,name:(e.tags||{}).name||'',kind:(e.tags||{}).leisure||(e.tags||{}).highway||''})).filter(f=>f.lat!=null);
+    const w=sigWords(t.name+' '+t.alias);let best=fs.find(f=>sigWords(f.name).some(x=>w.includes(x)));
+    if(!best){const tr=fs.filter(f=>/track|raceway/.test(f.kind)).sort((a,b)=>hav(t.lat,t.lon,a.lat,a.lon)-hav(t.lat,t.lon,b.lat,b.lon));best=tr[0]||fs.sort((a,b)=>hav(t.lat,t.lon,a.lat,a.lon)-hav(t.lat,t.lon,b.lat,b.lon))[0];}
+    if(best&&hav(t.lat,t.lon,best.lat,best.lon)<9){t.lat=best.lat;t.lon=best.lon;t.approx=false;cache[t.id]={lat:t.lat,lon:t.lon,src:'osm'};store.set('tc_eu_pos',cache);}}catch(e){}
+  return t;}
+function renderEU(){const q=norm($('eu-q').value||''),L=EU.filter(t=>(!EUS.cc||t.cc===EUS.cc)&&(!q||norm(t.name+' '+t.city+' '+t.alias+' '+EU_CC[t.cc][1]).includes(q)));
+  $('eu-n').textContent=`${EU.length} piste in ${Object.keys(EU_CC).length} nazioni`;
+  $('eu-cc').innerHTML=`<button data-cc="" class="${EUS.cc?'':'on'}">Tutte</button>`+Object.entries(EU_CC).map(([k,[f,n]])=>`<button data-cc="${k}" class="${EUS.cc===k?'on':''}">${f} ${n}</button>`).join('');
+  $('eu-list').innerHTML=L.map(t=>`<button class="eu-t" data-id="${t.id}"><span class="fl">${EU_CC[t.cc][0]}</span><div><b>${esc(t.name)}</b><span>${esc(t.city)}</span></div></button>`).join('')||'<div class="sub">Nessuna pista trovata. Puoi anche cercarla con la ricerca in alto.</div>';
+  $('eu-cc').querySelectorAll('[data-cc]').forEach(b=>b.onclick=()=>{EUS.cc=b.dataset.cc;renderEU();});
+  $('eu-list').querySelectorAll('[data-id]').forEach(b=>b.onclick=async()=>{const t=EU.find(x=>x.id===b.dataset.id);b.querySelector('span:last-child').textContent='Cerco il tracciato…';
+    try{await euLocate(t);$('eupick').style.display='none';if(!TRACKS.some(x=>x.id===t.id))TRACKS.push(t);selectTrack(t);}catch(e){b.querySelector('span:last-child').textContent='Non trovata: '+e.message;}});}
+$('eubtn').onclick=()=>{$('eupick').style.display='flex';renderEU();setTimeout(()=>$('eu-q').focus(),50);};$('eu-x').onclick=()=>$('eupick').style.display='none';$('eu-q').oninput=renderEU;
+$('eupick').addEventListener('click',e=>{if(e.target.id==='eupick')$('eupick').style.display='none';});
 async function loadTrackDB(){
   const c=store.get('tc_tracks_v2',null);TRACKS=dedupe(SEED.concat(c&&c.list||[]));
   applyTrackFix();mergeACI();geocodeACI().then(()=>setTimeout(refineAllTracks,30000)); // after the first track has loaded
