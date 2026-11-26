@@ -968,7 +968,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='26/11/2026 13:00';
+const TC_VER='26/11/2026 13:20';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -1234,7 +1234,7 @@ async function acctInit(){if(!acctOn()){ACCT.ready=true;renderAcctBtn();applyPro
 async function refreshPlan(){const was=proOK();ACCT.plan=null;if(ACCT.sb&&ACCT.session){try{const{data,error}=await ACCT.sb.rpc('my_plan');if(!error)ACCT.plan=data;}catch(e){}}
   renderAcctBtn();applyProGate();try{renderCloudStatus();cloudSoon();}catch(e){}try{if(ACCT.session)udSoon(300);}catch(e){}if(!was&&proOK()&&CUR){runNowcast();runCloudcast();}}
 function applyProGate(){$('nowc').classList.toggle('locked',ACCT.ready&&!proOK());if(typeof ptGate==='function')ptGate();}
-function renderAcctBtn(){const b=$('acctbtn');if(!acctOn()){b.style.display='none';return;}b.style.display='';
+function renderAcctBtn(){const b=$('acctbtn');try{store.set('tc_creator',!!(ACCT.session&&ACCT.plan&&ACCT.plan.admin));}catch(e){}if(!acctOn()){b.style.display='none';return;}b.style.display='';
   b.innerHTML=ACCT.session?(ACCT.plan&&ACCT.plan.admin?'👑 Creatore':proOK()?'<span class="badge pro">PRO</span> Account':'👤 Account'):'👤 Accedi';}
 const planLabel=s=>`${s.plan==='team'?'Pro team'+(s.team?' “'+esc(s.team)+'”':''):'Pro singolo'} · ${s.billing==='anno'?'annuale':'mensile'}${s.until?' · fino al '+new Date(s.until).toLocaleDateString('it-IT'):''}`;
 function renderAcct(){const B=$('acct-body');
