@@ -29,7 +29,7 @@ h2{font:800 20px/1.15 var(--cond);letter-spacing:.04em;text-transform:uppercase;
 .sub{color:var(--ink3);font-size:13.5px}
 #map{height:520px;border-radius:14px;overflow:hidden;background:#0b1220;margin-top:10px}
 @media(max-width:600px){#map{height:380px}}
-.leaflet-container{background:#0b1220;font:inherit}
+.leaflet-container{background:#0b1220;font:inherit}#map.osmdark .leaflet-tile-pane{filter:invert(1) hue-rotate(195deg) brightness(.85) contrast(.9) saturate(.5)}
 .mk{display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-100%)}
 .mk b{font:800 13px var(--mono);padding:3px 7px;border-radius:8px;color:#06101f;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.45)}
 .mk i{width:2px;height:8px;background:rgba(255,255,255,.6)}
@@ -240,7 +240,8 @@ function renderCal(){const box=$('cal');if(!box)return;const today=new Date().to
 // ---- mappa ----
 let map=null,lay=null;
 function initMap(){if(map)return;try{if(!window.L||!L.map)throw 0;map=L.map('map',{zoomControl:true,attributionControl:true,worldCopyJump:false}).setView([49.5,8],4);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:12,attribution:'© OpenStreetMap · © CARTO'}).addTo(map);lay=L.layerGroup().addTo(map);}catch(e){map=null;$('map').innerHTML='<div class="sub" style="padding:20px">🗺️ Mappa non disponibile in questa anteprima: usa la tabella qui sotto.</div>';$('map').style.height='auto';}}
+  const tl=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:12,attribution:'© OpenStreetMap · © CARTO'}).addTo(map);let bad=0,sw=false;
+  tl.on('tileerror',()=>{if(sw||++bad<3)return;sw=true;map.removeLayer(tl);$('map').classList.add('osmdark');L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:12,attribution:'© OpenStreetMap'}).addTo(map);});lay=L.layerGroup().addTo(map);}catch(e){map=null;$('map').innerHTML='<div class="sub" style="padding:20px">🗺️ Mappa non disponibile in questa anteprima: usa la tabella qui sotto.</div>';$('map').style.height='auto';}}
 function drawMap(){if(!map)return;try{lay.clearLayers();T.forEach(x=>{if(x.lat==null)return;const s=stat(x);const c=s?COL[s.k]:'#93a1b8';
   if(!OSM.indoor&&x.indoor)return;const ic=L.divIcon({className:'',html:x.osmT?`<div class="mk"><b style="background:${c};font-size:10px;padding:1px 4px;opacity:.9">${s?fmt(s.ta)+'°':'·'}</b><i></i></div>`:`<div class="mk"><b style="background:${c}">${s?fmt(s.ta)+'°':'·'}</b><i></i></div>`,iconSize:[0,0]});
   L.marker([x.lat,x.lon],{icon:ic,title:x.name}).addTo(lay).bindPopup(`<b>${esc(x.name)}</b><br>${esc(x.town)} · ${CC[x.cc][0]}<br>${s?`${t('air')} ${fmt(s.ta)}° · ${t('p3')} ${s.p3}% · ${t('wind')} ${fmt(s.ws)} km/h<br>`:''}<a href="#" data-open="${x.id}">${t('open')} →</a> · <a href="#" data-add="${x.id}">${t('add')}</a>`);});}catch(e){}}
