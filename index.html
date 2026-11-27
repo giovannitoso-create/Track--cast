@@ -451,6 +451,10 @@ body.light .pill-s.slick{background:#c05f00;color:#fff}body.light .pill-s.rain{b
 .tcbar .tb.on{background:rgba(74,143,240,.18);color:#9cc3ff;box-shadow:inset 0 0 0 1px rgba(74,143,240,.35)}
 .tcbar .sep{width:1px;height:26px;background:var(--line2);margin:0 6px;flex:none}
 @media(max-width:600px){.tcbar .tb .tl{display:none}.tcbar .tb.pg .tl{display:inline}}
+
+/* ===== modalità incorporata (scheda pista dentro la pagina Europa) ===== */
+body.embed .tcbar,body.embed header,body.embed .near,body.embed #near,body.embed #wkcard,body.embed #procard,body.embed #stcard,body.embed #kartcard,body.embed #tcupd,body.embed .foot,body.embed #gpsprob,body.embed #modepick{display:none!important}
+body.embed .wrap{padding-top:6px}
 </style>
 </head>
 <body>
@@ -885,7 +889,7 @@ setTimeout(()=>{const tv=$('tcver');if(tv)tv.textContent='versione '+TC_VER;
     const chk=auto=>fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const TC_VER='(\d[^']*)'/);if(!m||m[1]===TC_VER)return;
       const go=()=>location.replace(location.pathname+'?v='+Date.now()+location.hash);if(auto&&!busy())return go();
       if($('tcupd'))return;const b=document.createElement('div');b.id='tcupd';b.innerHTML=`🔄 C'è una versione più nuova del sito (${m[1]}). <button class="btn primary" id="tcupdb">Aggiorna</button>`;document.body.prepend(b);$('tcupdb').onclick=go;}).catch(()=>{});
-    chk(true);setInterval(()=>chk(document.hidden),5*60e3);document.addEventListener('visibilitychange',()=>{if(!document.hidden)chk(true);});}
+    if(!/embed=1/.test(location.search)){chk(true);setInterval(()=>chk(document.hidden),5*60e3);}document.addEventListener('visibilitychange',()=>{if(!document.hidden)chk(true);});}
   const v=$('mtx-ver');if(v)v.textContent='Versione del sito: '+TC_VER;if(!CUR&&typeof renderMatrix==='function')renderMatrix();},0);
 function renderSensorLayer(){sensLayer.clearLayers();const r=NC.res;if(!r||!r.sens||!CUR)return;
   for(const s of r.sens){if(s.off||s.v<0.2||(!s.hit&&(s.di%4||s.ri%2)))continue;const b=s.brg*Math.PI/180,lat=CUR.lat+Math.cos(b)*s.km/111.2,lon=CUR.lon+Math.sin(b)*s.km/(111.2*Math.cos(CUR.lat*Math.PI/180));const c=tcColor(s.v)||[120,200,255];
@@ -3526,6 +3530,7 @@ $('k-export').onclick=()=>{const rows=['tipo;giro;tempo_s;ora;lat;lon;velocita_k
   const last=store.get('tc_last',null);
   const euId=new URLSearchParams(location.search).get('eu'),euT=euId&&EU.find(x=>x.id===euId);
   const QP=new URLSearchParams(location.search),trk=(QP.get('trk')||'').split(',').map(Number);
+  if(QP.get('embed')==='1'){document.body.classList.add('embed');try{$('modepick').style.display='none';}catch(e){}}
   if(trk.length===2&&trk.every(isFinite)){const t={id:'osm-'+trk.map(v=>v.toFixed(4)).join('_'),name:QP.get('n')||'Pista',city:QP.get('cc')||'',lat:trk[0],lon:trk[1],eu:true};
     if(!TRACKS.some(x=>x.id===t.id))TRACKS.push(t);selectTrack(t);try{history.replaceState(null,'',location.pathname);}catch(e){}}
   else

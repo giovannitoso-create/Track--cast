@@ -79,6 +79,10 @@ body.light #map{background:#0b1220}
 .tcbar .tb.on{background:rgba(74,143,240,.18);color:#9cc3ff;box-shadow:inset 0 0 0 1px rgba(74,143,240,.35)}
 .tcbar .sep{width:1px;height:26px;background:var(--line2);margin:0 6px;flex:none}
 @media(max-width:600px){.tcbar .tb .tl{display:none}.tcbar .tb.pg .tl{display:inline}}
+.sheet{position:fixed;inset:0;z-index:3000;background:rgba(3,6,12,.65);display:none;align-items:flex-end;justify-content:center}.sheet.on{display:flex}
+.sh-box{width:min(1200px,100%);height:min(92vh,100%);background:var(--bg);border:1px solid var(--line2);border-radius:18px 18px 0 0;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -10px 40px rgba(0,0,0,.5)}
+.sh-h{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--s1)}.sh-h b{font:800 20px var(--cond);text-transform:uppercase;letter-spacing:.03em}
+#sh-if{flex:1;border:0;width:100%;background:#0a0d12}
 </style>
 </head>
 <body>
@@ -111,6 +115,7 @@ body.light #map{background:#0b1220}
   <div class="note" data-i="note">Previsioni Open-Meteo (modelli ad alta risoluzione). Fuori dall'Italia il calcolo dell'asfalto, delle gomme e delle pressioni si apre nella pagina della pista con «Apri». Il radar a 60 minuti e la matrice dei sensori per ora sono disponibili solo sulle piste italiane.</div>
 </div>
 <div class="toast" id="toast"></div>
+<div class="sheet" id="sheet"><div class="sh-box"><div class="sh-h"><b id="sh-t"></b><span class="sub" id="sh-s"></span><a class="open" id="sh-full" href="#" target="_top" style="margin-left:auto;text-decoration:none">⤢</a><button class="open" id="sh-x" style="background:#22355c">✕</button></div><iframe id="sh-if" title="Scheda pista"></iframe></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (()=>{
@@ -145,12 +150,12 @@ const OSM={done:new Set(store.get('tc_eu_osm_done',[])),busy:false,indoor:store.
 const I18={it:{tag:'METEO PER LE PISTE DI KART EUROPEE',back:'← Piste italiane',h1:"L'Europa del kart, adesso",h1s:'Tutte le piste europee sulla mappa con il meteo di questo momento. Tocca una pista per vederla nel dettaglio.',lgDry:'Asciutto',lgRisk:'Pioggia possibile (3 h)',lgWet:'Piove adesso',lgNum:"Il numero è la temperatura dell'aria",nowTitle:'In sintesi',cmpTitle:'Confronta le piste',cmpSub:'Aggiungi fino a 4 piste con ＋ dalla tabella: le vedi affiancate con le prossime 24 ore.',allTitle:'Tutte le piste',search:'Cerca pista, città o nazione…',
   note:"Previsioni Open-Meteo (modelli ad alta risoluzione). Il calcolo di asfalto, gomme e pressioni si apre nella pagina della pista con «Apri». Il radar a 60 minuti e la matrice dei sensori per ora sono disponibili solo sulle piste italiane.",
   all:'Tutte',track:'Pista',country:'Nazione',air:'Aria',now:'Adesso',p3:'Pioggia 3 h',wind:'Vento',d24:'Prossime 24 h',verdict:'Gomme',open:'Apri',add:'＋',dry:'SLICK',risk:'SLICK · RAIN PRONTE',wet:'RAIN',kWet:'Piove adesso',kRisk:'Pioggia possibile',kDry:'Asciutte',kWarm:'Più calda',rankWet:'Dove sta piovendo',rankWarm:'Le più calde',rankWind:'Le più ventose',none:'Nessuna',upd:'Aggiornato alle',tracks:'piste',loading:'Carico il meteo di tutte le piste…',minmax:'min/max',rainmm:'pioggia',empty:'Nessuna pista nel confronto: premi ＋ in tabella.',full:'Massimo 4 piste nel confronto.',
-  osmLoad:'Carica tutte le piste di',osmAll:'Carica tutta l\'Europa',osmBusy:'Cerco su OpenStreetMap…',osmDone:'piste da OpenStreetMap',osmHint:'Oltre alle piste principali puoi caricare tutte le piste di kart mappate su OpenStreetMap.',indoor:'Mostra anche le piste al coperto',osmErr:'OpenStreetMap non risponde, riprova tra poco.',main:'principale',
+  osmLoad:'Carica tutte le piste di',shSub:'asfalto, gomme, pressioni, carburazione e grafici',shFull:'Apri a pagina intera',osmAll:'Carica tutta l\'Europa',osmBusy:'Cerco su OpenStreetMap…',osmDone:'piste da OpenStreetMap',osmHint:'Oltre alle piste principali puoi caricare tutte le piste di kart mappate su OpenStreetMap.',indoor:'Mostra anche le piste al coperto',osmErr:'OpenStreetMap non risponde, riprova tra poco.',main:'principale',
   demo:"🧪 Prototipo in chat: qui il meteo vero non è raggiungibile, i valori sono d'esempio. Sul sito vero sono quelli reali."},
  en:{tag:'WEATHER FOR EUROPEAN KART TRACKS',back:'← Italian tracks',h1:'European karting, right now',h1s:'Every European track on the map with the weather right now. Tap a track to see it in detail.',lgDry:'Dry',lgRisk:'Rain possible (3 h)',lgWet:'Raining now',lgNum:'The number is the air temperature',nowTitle:'At a glance',cmpTitle:'Compare tracks',cmpSub:'Add up to 4 tracks with ＋ from the table to see them side by side with the next 24 hours.',allTitle:'All tracks',search:'Search track, town or country…',
   note:'Forecasts by Open-Meteo (high-resolution models). Track temperature, tyres and pressures open on the track page with “Open”. The 60-minute radar forecast and the sensor matrix are currently available on Italian tracks only.',
   all:'All',track:'Track',country:'Country',air:'Air',now:'Now',p3:'Rain 3 h',wind:'Wind',d24:'Next 24 h',verdict:'Tyres',open:'Open',add:'＋',dry:'SLICK',risk:'SLICK · RAINS READY',wet:'RAIN',kWet:'Raining now',kRisk:'Rain possible',kDry:'Dry',kWarm:'Warmest',rankWet:'Where it is raining',rankWarm:'Warmest tracks',rankWind:'Windiest tracks',none:'None',upd:'Updated at',tracks:'tracks',loading:'Loading the weather for every track…',minmax:'min/max',rainmm:'rain',empty:'No tracks to compare yet: press ＋ in the table.',full:'Up to 4 tracks in the comparison.',
-  osmLoad:'Load every track in',osmAll:'Load all of Europe',osmBusy:'Searching OpenStreetMap…',osmDone:'tracks from OpenStreetMap',osmHint:'Besides the main tracks you can load every kart track mapped on OpenStreetMap.',indoor:'Also show indoor tracks',osmErr:'OpenStreetMap is not responding, try again shortly.',main:'main',
+  osmLoad:'Load every track in',shSub:'track temperature, tyres, pressures, carburetion and charts',shFull:'Open full page',osmAll:'Load all of Europe',osmBusy:'Searching OpenStreetMap…',osmDone:'tracks from OpenStreetMap',osmHint:'Besides the main tracks you can load every kart track mapped on OpenStreetMap.',indoor:'Also show indoor tracks',osmErr:'OpenStreetMap is not responding, try again shortly.',main:'main',
   demo:'🧪 Chat prototype: live weather is not reachable here, values are sample data. On the real site they are live.'}};
 let LANG=store.get('tc_lang',(navigator.language||'it').startsWith('it')?'it':'en');const t=k=>(I18[LANG]||I18.it)[k]||k;
 function applyLang(){document.documentElement.lang=LANG;document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));document.querySelectorAll('[data-ip]').forEach(e=>e.placeholder=t(e.dataset.ip));
@@ -185,7 +190,10 @@ function drawMap(){if(!map)return;try{lay.clearLayers();T.forEach(x=>{if(x.lat==
   if(!OSM.indoor&&x.indoor)return;const ic=L.divIcon({className:'',html:x.osmT?`<div class="mk"><b style="background:${c};font-size:10px;padding:1px 4px;opacity:.9">${s?fmt(s.ta)+'°':'·'}</b><i></i></div>`:`<div class="mk"><b style="background:${c}">${s?fmt(s.ta)+'°':'·'}</b><i></i></div>`,iconSize:[0,0]});
   L.marker([x.lat,x.lon],{icon:ic,title:x.name}).addTo(lay).bindPopup(`<b>${esc(x.name)}</b><br>${esc(x.town)} · ${CC[x.cc][0]}<br>${s?`${t('air')} ${fmt(s.ta)}° · ${t('p3')} ${s.p3}% · ${t('wind')} ${fmt(s.ws)} km/h<br>`:''}<a href="#" data-open="${x.id}">${t('open')} →</a> · <a href="#" data-add="${x.id}">${t('add')}</a>`);});}catch(e){}}
 document.addEventListener('click',e=>{const o=e.target.closest('[data-open]'),a=e.target.closest('[data-add]');if(o){e.preventDefault();openTrack(o.dataset.open);}if(a){e.preventDefault();addCmp(a.dataset.add);}});
-function openTrack(id){const x=T.find(y=>y.id===id);if(x&&x.osmT){location.href=`index.html?trk=${x.lat.toFixed(5)},${x.lon.toFixed(5)}&n=${encodeURIComponent(x.name)}&cc=${x.cc}`;return;}location.href='index.html?eu='+encodeURIComponent(id);}
+function trackURL(x){return x.osmT?`index.html?trk=${x.lat.toFixed(5)},${x.lon.toFixed(5)}&n=${encodeURIComponent(x.name)}&cc=${x.cc}`:'index.html?eu='+encodeURIComponent(x.id);}
+function openTrack(id){const x=T.find(y=>y.id===id);if(!x)return;const u=trackURL(x);$('sh-t').textContent=`${CC[x.cc][0]} ${x.name}`;$('sh-s').textContent=t('shSub');$('sh-full').href=u;$('sh-full').title=t('shFull');
+  $('sh-if').src=u+(u.includes('?')?'&':'?')+'embed=1';$('sheet').classList.add('on');document.body.style.overflow='hidden';}
+$('sh-x').onclick=()=>{$('sheet').classList.remove('on');$('sh-if').src='about:blank';document.body.style.overflow='';};$('sheet').addEventListener('click',e=>{if(e.target.id==='sheet')$('sh-x').onclick();});
 // ---- sintesi, classifiche, tabella, confronto ----
 const ST={cc:'',sort:'name',dir:1,cmp:store.get('tc_eu_cmp',[])};
 function toast(m){const e=$('toast');e.textContent=m;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',2500);}
