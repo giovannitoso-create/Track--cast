@@ -56,10 +56,12 @@ input.q{flex:1;min-width:200px;background:#0b1323;border:1px solid var(--line2);
 .cc .rm{position:absolute;top:10px;right:10px;background:none;border:0;color:var(--ink3);cursor:pointer;font-size:16px}
 .cc .big{font:800 40px/1 var(--cond);margin:10px 0 2px}.cc .row{display:flex;justify-content:space-between;padding:5px 0;border-top:1px dashed var(--line);font-size:13.5px}.cc .row span{color:var(--ink3)}
 .spark{width:100%;height:70px;margin-top:8px}
+.osmbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 10px;padding:10px 12px;border-radius:12px;background:var(--s2);border:1px solid var(--line);font-size:13.5px}.osmbar .open{white-space:nowrap}.osmbar label{display:flex;gap:6px;align-items:center;color:var(--ink2)}
 .note{margin-top:22px;font-size:12.5px;color:var(--ink3);line-height:1.6}
 .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#14233f;border:1px solid #2d4a7a;border-radius:12px;padding:10px 14px;font-size:13.5px;display:none;z-index:9}
 .demo{background:#2a210b;border:1px solid #6b5313;color:#ffe08a;border-radius:12px;padding:10px 12px;margin-top:12px;font-size:13.5px;display:none}
 
+body.light .osmbar{background:#f6f8fb}
 body.light{--bg:#fff;--s1:#fff;--s2:#f6f8fb;--line:#e3e7ee;--line2:#d3d9e2;--ink:#111418;--ink2:#3d4552;--ink3:#6b7482;font-family:Arial,Inter,system-ui,sans-serif}
 body.light header{background:#fff;border-bottom:1px solid #e3e7ee}body.light .logo{color:#0b2a7a}body.light .logo small{color:#9a7400}
 body.light .card{background:#fff;border-color:#e6e9ef;box-shadow:0 1px 2px rgba(16,24,40,.04)}body.light h1,body.light h2{text-transform:none;font-family:Arial,Inter,sans-serif;font-weight:400;letter-spacing:0}
@@ -104,7 +106,7 @@ body.light #map{background:#0b1220}
 
   <div class="card" style="margin-top:16px"><h2 data-i="allTitle">Tutte le piste</h2>
     <div class="ctl"><input class="q" id="q" data-ip="search" placeholder="Cerca pista, città o nazione…"><div class="chips" id="cc"></div></div>
-    <div class="tw"><table class="tbl" id="tbl"></table></div></div>
+    <div class="osmbar" id="osmbar"></div><div class="tw"><table class="tbl" id="tbl"></table></div></div>
 
   <div class="note" data-i="note">Previsioni Open-Meteo (modelli ad alta risoluzione). Fuori dall'Italia il calcolo dell'asfalto, delle gomme e delle pressioni si apre nella pagina della pista con «Apri». Il radar a 60 minuti e la matrice dei sensori per ora sono disponibili solo sulle piste italiane.</div>
 </div>
@@ -117,7 +119,7 @@ const store={get:(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JS
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
 // ---- elenco piste (uguale alla pagina principale) ----
-const CC={BE:['🇧🇪','Belgio','Belgium'],NL:['🇳🇱','Paesi Bassi','Netherlands'],DE:['🇩🇪','Germania','Germany'],FR:['🇫🇷','Francia','France'],ES:['🇪🇸','Spagna','Spain'],PT:['🇵🇹','Portogallo','Portugal'],GB:['🇬🇧','Regno Unito','United Kingdom'],SE:['🇸🇪','Svezia','Sweden'],DK:['🇩🇰','Danimarca','Denmark'],AT:['🇦🇹','Austria','Austria'],CZ:['🇨🇿','Rep. Ceca','Czechia'],PL:['🇵🇱','Polonia','Poland'],HU:['🇭🇺','Ungheria','Hungary'],SK:['🇸🇰','Slovacchia','Slovakia'],HR:['🇭🇷','Croazia','Croatia']};
+const CC={BE:['🇧🇪','Belgio','Belgium'],NL:['🇳🇱','Paesi Bassi','Netherlands'],DE:['🇩🇪','Germania','Germany'],FR:['🇫🇷','Francia','France'],ES:['🇪🇸','Spagna','Spain'],PT:['🇵🇹','Portogallo','Portugal'],GB:['🇬🇧','Regno Unito','United Kingdom'],SE:['🇸🇪','Svezia','Sweden'],DK:['🇩🇰','Danimarca','Denmark'],AT:['🇦🇹','Austria','Austria'],CZ:['🇨🇿','Rep. Ceca','Czechia'],PL:['🇵🇱','Polonia','Poland'],HU:['🇭🇺','Ungheria','Hungary'],SK:['🇸🇰','Slovacchia','Slovakia'],HR:['🇭🇷','Croazia','Croatia'],CH:['🇨🇭','Svizzera','Switzerland'],IE:['🇮🇪','Irlanda','Ireland'],NO:['🇳🇴','Norvegia','Norway'],FI:['🇫🇮','Finlandia','Finland'],SI:['🇸🇮','Slovenia','Slovenia'],RO:['🇷🇴','Romania','Romania'],GR:['🇬🇷','Grecia','Greece'],LU:['🇱🇺','Lussemburgo','Luxembourg'],LT:['🇱🇹','Lituania','Lithuania'],LV:['🇱🇻','Lettonia','Latvia'],EE:['🇪🇪','Estonia','Estonia'],BG:['🇧🇬','Bulgaria','Bulgaria'],RS:['🇷🇸','Serbia','Serbia']};
 const RAW=[['Karting Genk','Genk','BE'],['Karting des Fagnes','Mariembourg','BE'],['Karting Eupen','Eupen','BE'],['Kartcircuit Berghem','Berghem','NL'],['Kartbaan Strijen','Strijen','NL'],['Kartcircuit Lelystad','Lelystad','NL'],
  ['Prokart Raceland','Wackersdorf','DE'],['Erftlandring','Kerpen','DE'],['Motodrom Ampfing','Ampfing','DE'],['Kartbahn Oschersleben','Oschersleben','DE'],['Kartbahn Mülsen','Mülsen','DE'],['Kartbahn Liedolsheim','Dettenheim','DE'],
  ['Circuit International de Salbris','Salbris','FR'],['Circuit Alain Prost','Le Mans','FR'],["Circuit de l'Europe",'Angerville','FR'],['Karting du Bourbonnais','Varennes-sur-Allier','FR'],['Karting de Laval','Laval','FR'],
@@ -125,15 +127,30 @@ const RAW=[['Karting Genk','Genk','BE'],['Karting des Fagnes','Mariembourg','BE'
  ['Kartódromo Internacional do Algarve','Portimão','PT'],['Kartódromo de Baltar','Paredes','PT'],['Circuito Vasco Sameiro','Braga','PT'],
  ['PF International','Grantham','GB'],['Whilton Mill','Whilton','GB'],['Rowrah','Rowrah','GB'],['Larkhall','Larkhall','GB'],['Glan y Gors','Cerrigydrudion','GB'],['Shenington','Shenington','GB'],['Buckmore Park','Chatham','GB'],['Clay Pigeon','Maiden Newton','GB'],
  ['Kristianstad Karting','Kristianstad','SE'],['Rødby KartRing','Rødby','DK'],['PS Racing Center','Greinbach','AT'],['Kartodrom Sosnová','Sosnová','CZ'],['Kartodrom Vysoké Mýto','Vysoké Mýto','CZ'],['Tor Słomczyn','Słomczyn','PL'],['Kakucsring','Kakucs','HU'],['Slovakia Ring Karting','Orechová Potôň','SK'],['Karting Rijeka','Čavle','HR']];
-const T=RAW.map(([n,c,cc])=>({id:'eu-'+norm(n).replace(/[^a-z0-9]+/g,'-'),name:n,town:c,cc,lat:null,lon:null,w:null}));
+const T=RAW.map(([n,c,cc])=>({id:'eu-'+norm(n).replace(/[^a-z0-9]+/g,'-'),name:n,town:c,cc,lat:null,lon:null,w:null,cur:true}));
+// ---- tutte le piste mappate su OpenStreetMap, nazione per nazione ----
+const OVP=['https://overpass-api.de/api/interpreter','https://overpass.private.coffee/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
+const hav=(a,b,c,d)=>{const R=6371,r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 2*R*Math.asin(Math.sqrt(x));};
+async function ovp(q){let err;for(const u of OVP){try{const c=new AbortController(),tm=setTimeout(()=>c.abort(),45000);const r=await fetch(u,{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'},signal:c.signal});clearTimeout(tm);if(!r.ok)throw new Error(r.status);const j=await r.json();if(j&&j.elements)return j;}catch(e){err=e;}}throw err||new Error('overpass');}
+function addOSM(cc,els){let n=0;for(const e of els){const tg=e.tags||{},la=e.center?e.center.lat:e.lat,lo=e.center?e.center.lon:e.lon;if(la==null)continue;
+    const indoor=tg.indoor==='yes'||tg.covered==='yes'||e.type==='way'&&tg.building;const name=tg.name||tg['name:en']||'';if(!name)continue;
+    const dup=T.find(x=>x.lat!=null&&hav(x.lat,x.lon,la,lo)<2.5);if(dup){if(dup.cur&&!dup.osm){dup.lat=la;dup.lon=lo;dup.osm=true;}continue;}
+    T.push({id:'osm-'+e.type[0]+e.id,name,town:tg['addr:city']||tg['addr:place']||'',cc,lat:la,lon:lo,w:null,osmT:true,indoor,len:tg.length||''});n++;}return n;}
+async function loadOSM(cc){const key='tc_eu_osm_'+cc,c=store.get(key,null);if(c&&Date.now()-c.at<7*864e5){addOSM(cc,c.els);return c.els.length;}
+  const q=`[out:json][timeout:60];area["ISO3166-1"="${cc}"][admin_level=2]->.a;(nwr(area.a)["sport"="karting"]["leisure"~"^(track|sports_centre|pitch)$"];nwr(area.a)["highway"="raceway"]["sport"="karting"];);out center tags;`;
+  const j=await ovp(q);const els=j.elements.map(e=>({type:e.type,id:e.id,lat:e.lat,lon:e.lon,center:e.center,tags:{name:(e.tags||{}).name,'name:en':(e.tags||{})['name:en'],'addr:city':(e.tags||{})['addr:city'],'addr:place':(e.tags||{})['addr:place'],indoor:(e.tags||{}).indoor,covered:(e.tags||{}).covered,building:(e.tags||{}).building,length:(e.tags||{}).length}}));
+  store.set(key,{at:Date.now(),els});addOSM(cc,els);return els.length;}
+const OSM={done:new Set(store.get('tc_eu_osm_done',[])),busy:false,indoor:store.get('tc_eu_indoor',false)};
 // ---- lingua ----
 const I18={it:{tag:'METEO PER LE PISTE DI KART EUROPEE',back:'← Piste italiane',h1:"L'Europa del kart, adesso",h1s:'Tutte le piste europee sulla mappa con il meteo di questo momento. Tocca una pista per vederla nel dettaglio.',lgDry:'Asciutto',lgRisk:'Pioggia possibile (3 h)',lgWet:'Piove adesso',lgNum:"Il numero è la temperatura dell'aria",nowTitle:'In sintesi',cmpTitle:'Confronta le piste',cmpSub:'Aggiungi fino a 4 piste con ＋ dalla tabella: le vedi affiancate con le prossime 24 ore.',allTitle:'Tutte le piste',search:'Cerca pista, città o nazione…',
   note:"Previsioni Open-Meteo (modelli ad alta risoluzione). Il calcolo di asfalto, gomme e pressioni si apre nella pagina della pista con «Apri». Il radar a 60 minuti e la matrice dei sensori per ora sono disponibili solo sulle piste italiane.",
   all:'Tutte',track:'Pista',country:'Nazione',air:'Aria',now:'Adesso',p3:'Pioggia 3 h',wind:'Vento',d24:'Prossime 24 h',verdict:'Gomme',open:'Apri',add:'＋',dry:'SLICK',risk:'SLICK · RAIN PRONTE',wet:'RAIN',kWet:'Piove adesso',kRisk:'Pioggia possibile',kDry:'Asciutte',kWarm:'Più calda',rankWet:'Dove sta piovendo',rankWarm:'Le più calde',rankWind:'Le più ventose',none:'Nessuna',upd:'Aggiornato alle',tracks:'piste',loading:'Carico il meteo di tutte le piste…',minmax:'min/max',rainmm:'pioggia',empty:'Nessuna pista nel confronto: premi ＋ in tabella.',full:'Massimo 4 piste nel confronto.',
+  osmLoad:'Carica tutte le piste di',osmAll:'Carica tutta l\'Europa',osmBusy:'Cerco su OpenStreetMap…',osmDone:'piste da OpenStreetMap',osmHint:'Oltre alle piste principali puoi caricare tutte le piste di kart mappate su OpenStreetMap.',indoor:'Mostra anche le piste al coperto',osmErr:'OpenStreetMap non risponde, riprova tra poco.',main:'principale',
   demo:"🧪 Prototipo in chat: qui il meteo vero non è raggiungibile, i valori sono d'esempio. Sul sito vero sono quelli reali."},
  en:{tag:'WEATHER FOR EUROPEAN KART TRACKS',back:'← Italian tracks',h1:'European karting, right now',h1s:'Every European track on the map with the weather right now. Tap a track to see it in detail.',lgDry:'Dry',lgRisk:'Rain possible (3 h)',lgWet:'Raining now',lgNum:'The number is the air temperature',nowTitle:'At a glance',cmpTitle:'Compare tracks',cmpSub:'Add up to 4 tracks with ＋ from the table to see them side by side with the next 24 hours.',allTitle:'All tracks',search:'Search track, town or country…',
   note:'Forecasts by Open-Meteo (high-resolution models). Track temperature, tyres and pressures open on the track page with “Open”. The 60-minute radar forecast and the sensor matrix are currently available on Italian tracks only.',
   all:'All',track:'Track',country:'Country',air:'Air',now:'Now',p3:'Rain 3 h',wind:'Wind',d24:'Next 24 h',verdict:'Tyres',open:'Open',add:'＋',dry:'SLICK',risk:'SLICK · RAINS READY',wet:'RAIN',kWet:'Raining now',kRisk:'Rain possible',kDry:'Dry',kWarm:'Warmest',rankWet:'Where it is raining',rankWarm:'Warmest tracks',rankWind:'Windiest tracks',none:'None',upd:'Updated at',tracks:'tracks',loading:'Loading the weather for every track…',minmax:'min/max',rainmm:'rain',empty:'No tracks to compare yet: press ＋ in the table.',full:'Up to 4 tracks in the comparison.',
+  osmLoad:'Load every track in',osmAll:'Load all of Europe',osmBusy:'Searching OpenStreetMap…',osmDone:'tracks from OpenStreetMap',osmHint:'Besides the main tracks you can load every kart track mapped on OpenStreetMap.',indoor:'Also show indoor tracks',osmErr:'OpenStreetMap is not responding, try again shortly.',main:'main',
   demo:'🧪 Chat prototype: live weather is not reachable here, values are sample data. On the real site they are live.'}};
 let LANG=store.get('tc_lang',(navigator.language||'it').startsWith('it')?'it':'en');const t=k=>(I18[LANG]||I18.it)[k]||k;
 function applyLang(){document.documentElement.lang=LANG;document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));document.querySelectorAll('[data-ip]').forEach(e=>e.placeholder=t(e.dataset.ip));
@@ -147,7 +164,9 @@ async function getJ(u,ms=12000){const c=new AbortController(),tm=setTimeout(()=>
 async function locate(){const cache=store.get('tc_eu_pos',{});const todo=[];T.forEach(x=>{const c=cache[x.id];if(c){x.lat=c.lat;x.lon=c.lon;x.osm=c.src==='osm';}else todo.push(x);});
   for(let i=0;i<todo.length;i+=6){await Promise.all(todo.slice(i,i+6).map(async x=>{try{const j=await getJ(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(x.town)}&count=3&language=it&countryCode=${x.cc}`,8000);const r=(j.results||[])[0];if(r){x.lat=r.latitude;x.lon=r.longitude;cache[x.id]={lat:x.lat,lon:x.lon,src:'comune'};}}catch(e){}}));}
   store.set('tc_eu_pos',cache);}
-async function weather(){const L=T.filter(x=>x.lat!=null);if(!L.length)throw new Error('no pos');
+async function weather(only){const L=(only||T).filter(x=>x.lat!=null&&(!only||!x.w));if(!L.length){if(!only)throw new Error('no pos');return;}
+  for(let i=0;i<L.length;i+=80){await weatherChunk(L.slice(i,i+80));}}
+async function weatherChunk(L){
   const u=`https://api.open-meteo.com/v1/forecast?latitude=${L.map(x=>x.lat.toFixed(4)).join(',')}&longitude=${L.map(x=>x.lon.toFixed(4)).join(',')}&current=temperature_2m,precipitation,wind_speed_10m,wind_gusts_10m,cloud_cover,is_day&hourly=temperature_2m,precipitation,precipitation_probability,wind_speed_10m&forecast_days=2&timezone=auto&wind_speed_unit=kmh`;
   let j=await getJ(u,20000);if(!Array.isArray(j))j=[j];L.forEach((x,i)=>{x.w=j[i];});}
 function demoData(){$('demo').style.display='block';$('demo').textContent=t('demo');T.forEach((x,i)=>{if(x.lat==null){const b={BE:[50.6,5],NL:[52,5],DE:[50.5,10],FR:[47,2.5],ES:[40.5,-3],PT:[39.6,-8],GB:[52.5,-1.5],SE:[56,14],DK:[54.7,11.4],AT:[47.2,15.8],CZ:[50,15],PL:[52.2,21],HU:[47.1,19.3],SK:[48,17.4],HR:[45.4,14.5]}[x.cc];x.lat=b[0]+((i*37)%10-5)/20;x.lon=b[1]+((i*53)%10-5)/15;}
@@ -163,16 +182,22 @@ let map=null,lay=null;
 function initMap(){if(map)return;try{if(!window.L||!L.map)throw 0;map=L.map('map',{zoomControl:true,attributionControl:true,worldCopyJump:false}).setView([49.5,8],4);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:12,attribution:'© OpenStreetMap · © CARTO'}).addTo(map);lay=L.layerGroup().addTo(map);}catch(e){map=null;$('map').innerHTML='<div class="sub" style="padding:20px">🗺️ Mappa non disponibile in questa anteprima: usa la tabella qui sotto.</div>';$('map').style.height='auto';}}
 function drawMap(){if(!map)return;try{lay.clearLayers();T.forEach(x=>{if(x.lat==null)return;const s=stat(x);const c=s?COL[s.k]:'#93a1b8';
-  const ic=L.divIcon({className:'',html:`<div class="mk"><b style="background:${c}">${s?fmt(s.ta)+'°':'·'}</b><i></i></div>`,iconSize:[0,0]});
+  if(!OSM.indoor&&x.indoor)return;const ic=L.divIcon({className:'',html:x.osmT?`<div class="mk"><b style="background:${c};font-size:10px;padding:1px 4px;opacity:.9">${s?fmt(s.ta)+'°':'·'}</b><i></i></div>`:`<div class="mk"><b style="background:${c}">${s?fmt(s.ta)+'°':'·'}</b><i></i></div>`,iconSize:[0,0]});
   L.marker([x.lat,x.lon],{icon:ic,title:x.name}).addTo(lay).bindPopup(`<b>${esc(x.name)}</b><br>${esc(x.town)} · ${CC[x.cc][0]}<br>${s?`${t('air')} ${fmt(s.ta)}° · ${t('p3')} ${s.p3}% · ${t('wind')} ${fmt(s.ws)} km/h<br>`:''}<a href="#" data-open="${x.id}">${t('open')} →</a> · <a href="#" data-add="${x.id}">${t('add')}</a>`);});}catch(e){}}
 document.addEventListener('click',e=>{const o=e.target.closest('[data-open]'),a=e.target.closest('[data-add]');if(o){e.preventDefault();openTrack(o.dataset.open);}if(a){e.preventDefault();addCmp(a.dataset.add);}});
-function openTrack(id){location.href='index.html?eu='+encodeURIComponent(id);}
+function openTrack(id){const x=T.find(y=>y.id===id);if(x&&x.osmT){location.href=`index.html?trk=${x.lat.toFixed(5)},${x.lon.toFixed(5)}&n=${encodeURIComponent(x.name)}&cc=${x.cc}`;return;}location.href='index.html?eu='+encodeURIComponent(id);}
 // ---- sintesi, classifiche, tabella, confronto ----
 const ST={cc:'',sort:'name',dir:1,cmp:store.get('tc_eu_cmp',[])};
 function toast(m){const e=$('toast');e.textContent=m;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',2500);}
 function addCmp(id){if(ST.cmp.includes(id)){ST.cmp=ST.cmp.filter(x=>x!==id);}else{if(ST.cmp.length>=4){toast(t('full'));return;}ST.cmp.push(id);}store.set('tc_eu_cmp',ST.cmp);render();}
 function spark(s){if(!s)return'';const W=240,H=70,T24=s.T24,R=s.R24,lo=Math.min(...T24),hi=Math.max(...T24),rg=Math.max(1,hi-lo),X=i=>i*(W-4)/(T24.length-1)+2,Y=v=>H-14-(H-22)*(v-lo)/rg,rm=Math.max(1,...R);
   return`<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${R.map((v,i)=>v>0?`<rect x="${X(i)-3}" y="${H-12-10*v/rm}" width="6" height="${10*v/rm}" fill="#3d8bff"/>`:'').join('')}<polyline fill="none" stroke="#ffcc33" stroke-width="2.4" points="${T24.map((v,i)=>`${X(i)},${Y(v)}`).join(' ')}"/><text x="2" y="10" fill="#93a1b8" font-size="10">${fmt(hi)}°</text><text x="2" y="${H-2}" fill="#93a1b8" font-size="10">${fmt(lo)}°</text></svg>`;}
+function renderOSM(nm){const b=$('osmbar');const n=T.filter(x=>x.osmT).length;
+  b.innerHTML=`<span>${OSM.busy?t('osmBusy'):n?`<b>${n}</b> ${t('osmDone')}`:t('osmHint')}</span>`+(ST.cc&&!OSM.done.has(ST.cc)?`<button class="open" id="osm1">${t('osmLoad')} ${CC[ST.cc][0]} ${nm(ST.cc)}</button>`:'')+(!ST.cc?`<button class="open" id="osmall" style="background:#22355c">${t('osmAll')}</button>`:'')+
+   `<label><input type="checkbox" id="osmin" ${OSM.indoor?'checked':''}> ${t('indoor')}</label>`;
+  const go=async ccs=>{if(OSM.busy)return;OSM.busy=true;render();let fail=false;for(const c of ccs){if(OSM.done.has(c))continue;try{await loadOSM(c);OSM.done.add(c);store.set('tc_eu_osm_done',[...OSM.done]);render();}catch(e){fail=true;}}
+    OSM.busy=false;try{await weather(T.filter(x=>x.osmT));}catch(e){}render();if(fail)toast(t('osmErr'));};
+  if($('osm1'))$('osm1').onclick=()=>go([ST.cc]);if($('osmall'))$('osmall').onclick=()=>go(Object.keys(CC));$('osmin').onchange=e=>{OSM.indoor=e.target.checked;store.set('tc_eu_indoor',OSM.indoor);render();};}
 function render(nm=c=>CC[c][LANG==='en'?2:1]){
   const S=T.map(x=>({x,s:stat(x)})).filter(o=>o.s);
   if(S.length){const cnt=k=>S.filter(o=>o.s.k===k).length,warm=S.slice().sort((a,b)=>b.s.ta-a.s.ta)[0];
@@ -187,12 +212,12 @@ function render(nm=c=>CC[c][LANG==='en'?2:1]){
   $('cc').innerHTML=`<button data-c="" class="${ST.cc?'':'on'}">${t('all')}</button>`+Object.keys(CC).map(k=>`<button data-c="${k}" class="${ST.cc===k?'on':''}">${CC[k][0]} ${nm(k)}</button>`).join('');
   $('cc').querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{ST.cc=b.dataset.c;render();});
   // tabella
-  const q=norm($('q').value);let R=T.filter(x=>(!ST.cc||x.cc===ST.cc)&&(!q||norm(x.name+' '+x.town+' '+CC[x.cc][1]+' '+CC[x.cc][2]).includes(q))).map(x=>({x,s:stat(x)}));
+  renderOSM(nm);const q=norm($('q').value);let R=T.filter(x=>(OSM.indoor||!x.indoor)&&(!ST.cc||x.cc===ST.cc)&&(!q||norm(x.name+' '+x.town+' '+CC[x.cc][1]+' '+CC[x.cc][2]).includes(q))).map(x=>({x,s:stat(x)}));
   const ord={wet:0,risk:1,dry:2},key={name:o=>norm(o.x.name),country:o=>nm(o.x.cc)+o.x.name,air:o=>o.s?o.s.ta:-99,p3:o=>o.s?o.s.p3:-1,wind:o=>o.s?o.s.ws:-1,state:o=>o.s?ord[o.s.k]:9}[ST.sort];
   R.sort((a,b)=>{const A=key(a),B=key(b);return(A>B?1:A<B?-1:0)*ST.dir;});
   const th=(k,l)=>`<th data-s="${k}" class="${ST.sort===k?'on':''}">${l}${ST.sort===k?(ST.dir>0?' ▲':' ▼'):''}</th>`;
   $('tbl').innerHTML=`<thead><tr>${th('name',t('track'))}${th('country',t('country'))}${th('air',t('air'))}${th('p3',t('p3'))}${th('wind',t('wind'))}<th>${t('d24')}</th>${th('state',t('verdict'))}<th></th></tr></thead><tbody>${R.map(({x,s})=>`<tr>
-    <td><b>${esc(x.name)}</b><div class="sub" style="font-size:12px">${esc(x.town)}</div></td><td>${CC[x.cc][0]} ${nm(x.cc)}</td><td class="num">${s?fmt(s.ta)+'°':'—'}</td><td class="num">${s?s.p3+'%':'—'}</td><td class="num">${s?fmt(s.ws)+' km/h':'—'}</td>
+    <td><b>${esc(x.name)}</b><div class="sub" style="font-size:12px">${esc(x.town||'')}${x.cur?` · ⭐ ${t('main')}`:''}${x.indoor?' · 🏠':''}</div></td><td>${CC[x.cc][0]} ${nm(x.cc)}</td><td class="num">${s?fmt(s.ta)+'°':'—'}</td><td class="num">${s?s.p3+'%':'—'}</td><td class="num">${s?fmt(s.ws)+' km/h':'—'}</td>
     <td class="num">${s?`${fmt(s.tmin)}°/${fmt(s.tmax)}° · ${fmt(s.r24,1)} mm`:'—'}</td><td>${s?`<span class="tag ${s.k}">${t(s.k)}</span>`:''}</td>
     <td style="text-align:right"><button class="open" data-add="${x.id}" title="Confronta" style="background:${ST.cmp.includes(x.id)?'#ffcc33;color:#1a1300':'#22355c'}">${ST.cmp.includes(x.id)?'✓':'＋'}</button> <button class="open" data-open="${x.id}">${t('open')}</button></td></tr>`).join('')}</tbody>`;
   $('tbl').querySelectorAll('th[data-s]').forEach(h=>h.onclick=()=>{if(ST.sort===h.dataset.s)ST.dir*=-1;else{ST.sort=h.dataset.s;ST.dir=1;}render();});
@@ -203,7 +228,7 @@ function render(nm=c=>CC[c][LANG==='en'?2:1]){
     <button class="open" data-open="${x.id}" style="width:100%;margin-top:8px">${t('open')} →</button></div>`;}).join(''):`<div class="sub">${t('empty')}</div>`;
   drawMap();}
 $('q').oninput=()=>render();
-async function load(){render();try{await locate();await weather();}catch(e){demoData();}render();}
+async function load(){render();try{await locate();for(const c of OSM.done){try{await loadOSM(c);}catch(e){}}await weather();}catch(e){demoData();}render();}
 (()=>{const ap=()=>{document.body.classList.remove('light');};ap();})();
 document.getElementById('tcbar').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(!b)return;const el=document.querySelector(b.dataset.go);if(el){const y=el.getBoundingClientRect().top+scrollY-70;scrollTo({top:y,behavior:'smooth'});}});
 applyLang();initMap();load();

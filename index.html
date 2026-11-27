@@ -1023,7 +1023,7 @@ function sensorMatrix(frames,mf){
         if(along>0&&cross<Math.max(3,along*0.36)){hit=true;eta=along/sp*10;}}
       out.push({ri,di,brg,km,v,p:d.p,tr,hit,eta});}}
   return out;}
-const TC_VER='26/11/2026 14:30';
+const TC_VER='27/11/2026 10:00';
 function mtxMsg(t,retry){const l=$('mtx-l');if(!l)return;l.innerHTML=t+(retry?'<br><button class="chipb" id="mtx-retry" style="margin-top:6px">Riprova</button>':'');const b=$('mtx-retry');if(b)b.onclick=()=>runNowcast();
   const c=$('mtx-c');if(c&&!NC.res)c.getContext('2d').clearRect(0,0,c.width,c.height);}
 const MTXA={raf:0,base:null,hits:[],C:0,k:1,R0:0,RS:0,vis:true,t0:performance.now()};
@@ -3525,6 +3525,10 @@ $('k-export').onclick=()=>{const rows=['tipo;giro;tempo_s;ora;lat;lon;velocita_k
   const want=decodeURIComponent((location.hash||'').slice(1)).replace(/[-_+]/g,' ').trim();
   const last=store.get('tc_last',null);
   const euId=new URLSearchParams(location.search).get('eu'),euT=euId&&EU.find(x=>x.id===euId);
+  const QP=new URLSearchParams(location.search),trk=(QP.get('trk')||'').split(',').map(Number);
+  if(trk.length===2&&trk.every(isFinite)){const t={id:'osm-'+trk.map(v=>v.toFixed(4)).join('_'),name:QP.get('n')||'Pista',city:QP.get('cc')||'',lat:trk[0],lon:trk[1],eu:true};
+    if(!TRACKS.some(x=>x.id===t.id))TRACKS.push(t);selectTrack(t);try{history.replaceState(null,'',location.pathname);}catch(e){}}
+  else
   if(euT){try{await euLocate(euT);if(!TRACKS.some(x=>x.id===euT.id))TRACKS.push(euT);selectTrack(euT);}catch(e){if(last)selectTrack(last);}try{history.replaceState(null,'',location.pathname);}catch(e){}}
   else if(want.length>=2){runSearch(want,true);}
   else if(last)selectTrack(last);
