@@ -123,7 +123,19 @@ body.light #map{background:#0b1220}
 </div>
 <div class="toast" id="toast"></div>
 <div class="sheet" id="sheet"><div class="sh-box"><div class="sh-h"><b id="sh-t"></b><span class="sub" id="sh-s"></span><a class="open" id="sh-full" href="#" target="_top" style="margin-left:auto;text-decoration:none">⤢</a><button class="open" id="sh-x" style="background:#22355c">✕</button></div><iframe id="sh-if" title="Scheda pista"></iframe></div></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// Leaflet: prova più CDN, così la mappa compare anche se uno è bloccato o lento
+(function(){var J=['https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js','https://unpkg.com/leaflet@1.9.4/dist/leaflet.js','https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js'],
+C=['https://unpkg.com/leaflet@1.9.4/dist/leaflet.css','https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css'];
+window.__leafCB=[];window.__leafFail=false;
+function css(){var ok=false;try{for(var i=0;i<document.styleSheets.length;i++){var h=document.styleSheets[i].href||'';if(/leaflet/.test(h)){try{ok=document.styleSheets[i].cssRules.length>0;}catch(e){ok=true;}}}}catch(e){}
+  if(!ok)C.forEach(function(u){var l=document.createElement('link');l.rel='stylesheet';l.href=u;document.head.appendChild(l);});}
+function go(i){if(window.L&&window.L.map){done();return;}if(i>=J.length){window.__leafFail=true;window.__leafCB.forEach(function(f){f(false);});return;}
+  var s=document.createElement('script');s.src=J[i];var t=setTimeout(function(){s.onload=s.onerror=null;go(i+1);},7000);
+  s.onload=function(){clearTimeout(t);if(window.L&&window.L.map)done();else go(i+1);};s.onerror=function(){clearTimeout(t);go(i+1);};document.head.appendChild(s);}
+function done(){window.__leafOK=true;window.__leafCB.forEach(function(f){f(true);});}
+window.addEventListener('load',css);go(0);})();
+</script>
 <script>
 (()=>{
 const $=id=>document.getElementById(id);
@@ -239,9 +251,9 @@ function renderCal(){const box=$('cal');if(!box)return;const today=new Date().to
   box.innerHTML=h;{const f=box.querySelector('.cale:not(.past)');if(f){const m=f.previousElementSibling&&f.previousElementSibling.classList.contains('calm')?f.previousElementSibling:f;box.scrollTop=m.offsetTop-box.offsetTop;}}box.querySelectorAll('[data-it]').forEach(b=>b.onclick=()=>{location.href='index.html#'+encodeURIComponent(b.dataset.it);});}
 // ---- mappa ----
 let map=null,lay=null;
-function initMap(){if(map)return;try{if(!window.L||!L.map)throw 0;map=L.map('map',{zoomControl:true,attributionControl:true,worldCopyJump:false}).setView([49.5,8],4);
+function initMap(){if(map)return;if(!(window.L&&L.map)&&!window.__leafFail){if(!initMap._w){initMap._w=1;$('map').innerHTML='<div class="sub" style="padding:20px">🗺️ '+(LANG==='en'?'Loading map…':'Carico la mappa…')+'</div>';(window.__leafCB||[]).push(()=>{$('map').innerHTML='';initMap();drawMap();});}return;}try{if(!window.L||!L.map)throw 0;map=L.map('map',{zoomControl:true,attributionControl:true,worldCopyJump:false}).setView([49.5,8],4);
   const tl=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:12,attribution:'© OpenStreetMap · © CARTO'}).addTo(map);let bad=0,sw=false;
-  tl.on('tileerror',()=>{if(sw||++bad<3)return;sw=true;map.removeLayer(tl);$('map').classList.add('osmdark');L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:12,attribution:'© OpenStreetMap'}).addTo(map);});lay=L.layerGroup().addTo(map);}catch(e){map=null;$('map').innerHTML='<div class="sub" style="padding:20px">🗺️ Mappa non disponibile in questa anteprima: usa la tabella qui sotto.</div>';$('map').style.height='auto';}}
+  tl.on('tileerror',()=>{if(sw||++bad<3)return;sw=true;map.removeLayer(tl);$('map').classList.add('osmdark');L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:12,attribution:'© OpenStreetMap'}).addTo(map);});lay=L.layerGroup().addTo(map);const fix=()=>{try{map.invalidateSize();}catch(e){}};[100,400,1200,3000].forEach(ms=>setTimeout(fix,ms));addEventListener('resize',fix);addEventListener('load',fix);if(window.ResizeObserver)new ResizeObserver(fix).observe($('map'));}catch(e){map=null;$('map').innerHTML='<div class="sub" style="padding:20px">🗺️ '+(LANG==='en'?'Map not available right now (map library did not load): use the table below and reload the page.':'Mappa non disponibile ora (la libreria della mappa non si è caricata): usa la tabella qui sotto e ricarica la pagina.')+'</div>';$('map').style.height='auto';}}
 function drawMap(){if(!map)return;try{lay.clearLayers();T.forEach(x=>{if(x.lat==null)return;const s=stat(x);const c=s?COL[s.k]:'#93a1b8';
   if(!OSM.indoor&&x.indoor)return;const ic=L.divIcon({className:'',html:x.osmT?`<div class="mk"><b style="background:${c};font-size:10px;padding:1px 4px;opacity:.9">${s?fmt(s.ta)+'°':'·'}</b><i></i></div>`:`<div class="mk"><b style="background:${c}">${s?fmt(s.ta)+'°':'·'}</b><i></i></div>`,iconSize:[0,0]});
   L.marker([x.lat,x.lon],{icon:ic,title:x.name}).addTo(lay).bindPopup(`<b>${esc(x.name)}</b><br>${esc(x.town)} · ${CC[x.cc][0]}<br>${s?`${t('air')} ${fmt(s.ta)}° · ${t('p3')} ${s.p3}% · ${t('wind')} ${fmt(s.ws)} km/h<br>`:''}<a href="#" data-open="${x.id}">${t('open')} →</a> · <a href="#" data-add="${x.id}">${t('add')}</a>`);});}catch(e){}}
@@ -296,6 +308,10 @@ async function load(){render();renderCal();try{await locate();for(const c of OSM
 (()=>{const ap=()=>{document.body.classList.remove('light');};ap();})();
 document.getElementById('tcbar').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(!b)return;const el=document.querySelector(b.dataset.go);if(el){const y=el.getBoundingClientRect().top+scrollY-70;scrollTo({top:y,behavior:'smooth'});}});
 applyLang();initMap();load();
+const EU_VER='27/11/2026 12:00';
+(()=>{const f=document.createElement('div');f.id='euver';f.className='sub';f.style.cssText='text-align:center;font-size:12px;opacity:.7;padding:14px 0 24px';f.textContent=(LANG==='en'?'version ':'versione ')+EU_VER;document.body.appendChild(f);
+  const chk=()=>fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const EU_VER='([^']*)'/);if(m&&m[1]!==EU_VER&&!window.__TC_DEMO){const k='tc_eu_rl_'+m[1];if(!sessionStorage.getItem(k)){sessionStorage.setItem(k,1);location.reload();}}}).catch(()=>{});
+  if(!window.__TC_DEMO){setTimeout(chk,1500);setInterval(chk,10*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)chk();});}})();
 // account: stesso account della pagina principale (stesso sito)
 (()=>{const a=$('acct');if(store.get('tc_creator',false)||window.__TC_DEMO){a.style.display='';a.textContent='👑 '+(LANG==='en'?'Creator':'Creatore');a.title=LANG==='en'?'Creator account: everything included':'Account del creatore: tutto incluso';}})();setInterval(()=>{weather().then(render).catch(()=>{});},15*60e3);
 })();
